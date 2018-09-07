@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ *
+ * This program and the accompanying materials are made available under the
+ * terms of the Eclipse Distribution License v. 1.0, which is available at
+ * http://www.eclipse.org/org/documents/edl-v10.php.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+package org.glassfish.pfl.basic.contain;
+
+import java.util.List ;
+import java.util.LinkedList ;
+import java.util.ArrayList ;
+import java.util.EmptyStackException ;
+
+/** A stack with additional operations that support recording
+ * the current top of stack as a mark, and then later popping
+ * all items pushed since the last mark call.
+ */
+public final class MarkStack<E> {
+    private List<E> items ;
+    // The int on the marks list points to the first element on items that is part of the mark.
+    private List<Integer> marks ; 
+
+    public MarkStack() {
+	items = new ArrayList<E>() ;
+	marks = new ArrayList<Integer>() ;
+    }
+
+    public E push( E elem ) {
+	items.add( elem ) ;
+	return elem ;
+    }
+
+    /** Return the top element of the stack and remove it from the stack.
+     * @exception EmptyStackException is thrown if the stack is empty.
+     * @exception IllegalStateException if an attempt is made to pop
+     * past the top mark.
+     */
+    public E pop() {
+	if (isEmpty()) {
+            throw new EmptyStackException();
+        }
+
+	if (marks.size() > 0) {
+	    int topMark = marks.get( marks.size() - 1 ) ;
+	    if (topMark == items.size()) {
+                throw new IllegalStateException("Cannot pop item past top mark");
+            }
+	}
+
+	E result = items.remove( items.size() - 1 ) ;
+	return result ;
+    }
+
+    /** Return true iff the stack is empty.
+     */
+    public boolean isEmpty() {
+        if (marks.size() > 0) {
+	    int topMark = marks.get( marks.size() - 1 ) ;
+            return topMark == items.size() ;
+        }
+
+	return items.isEmpty() ;
+    }
+
+    /** Return the top element of the stack.  Does not change the stack.
+     * @exception EmptyStackException is thrown if the stack is empty.
+     */
+    public E peek() {
+	if (isEmpty()) {
+            throw new EmptyStackException();
+        }
+
+	return items.get( items.size() - 1 ) ;	
+    }
+
+    /** Record the current position in the stack for a 
+     * subsequent popMark call.  This allow marking the 
+     * start of a related group of items on the stack
+     * that can be popped together later by popMark.
+     * Multiple mark calls are supported.
+     */
+    public void mark() {
+	marks.add( items.size() ) ;
+    }
+
+    /** Return an ordered list of stack elements starting with
+     * the element that was on top of the stack when mark was
+     * called.  
+     */
+    public List<E> popMark() {
+	// Use a LinkedList here because addFirst runs in
+	// constant time.  The equivalent operation on an
+	// ArrayList is linear in the list size.  Removing
+	// items from the middle of an ArrayList is also
+	// inefficient, because the tail must be copied.
+	LinkedList<E> result = new LinkedList<E>() ;	
+	int topMark = marks.remove( marks.size() - 1 ) ;
+	while (items.size() > topMark) {
+	    result.addFirst( items.remove( items.size() - 1 ) ) ;
+	}
+	return result ;
+    }
+}

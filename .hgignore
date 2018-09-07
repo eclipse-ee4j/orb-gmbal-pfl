@@ -1,0 +1,8 @@
+syntax:glob
+
+.DS_Store
+pfl-test/gen/work.*/**
+*.class
+**/target/**
+.idea/**
+*.iml

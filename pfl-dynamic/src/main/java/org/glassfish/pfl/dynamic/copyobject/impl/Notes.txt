@@ -1,0 +1,74 @@
+#
+# Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Distribution License v. 1.0, which is available at
+# http://www.eclipse.org/org/documents/edl-v10.php.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+Note on improving the reflective copy object architecture.
+
+Basic abstractions:
+
+/** Creates an instance of an ObjectCopier to be used for a single session.
+ */
+ObjectCopierFactory {
+    ObjectCopier make() ;
+}
+
+/** Used to copy objects in a single session: multiple calls to the
+ * same ObjectCopier instance will share all aliases.
+ObjectCopier {
+    Object copy( Object obj ) throws ReflectiveCopyException ;
+}
+
+------------------------
+Reflective case:
+
+/** Used to copy an Object of a particular type.  Preserves aliasing through
+ * oldToNew.
+ */
+interface ClassCopier {
+    Object copy( IdentityHashMap oldToNew, Object source ) throws ReflectiveCopyException ;
+}
+
+/** Create a ClassCopier for a particular type.
+ */
+ClassCopierFactory {
+    ClassCopier get( Class cls ) throws ReflectiveCopyException ;
+}
+
+Use filter pattern: use a chain of ClassCopierFactory instances, take first non-null result.
+
+Special ClassCopier instances:
+    DefaultClassCopiers
+	ClassCopier makeMapCopier( ClassCopierFactory ccf ) 
+	ClassCopier getIdentityCopier() 
+	ClassCopier getErrorCopier()
+
+ClassCopierFactory instances:
+
+    - A client may create a special ClassCopierFactory with arbitrary behavior.
+    - An ArrayClassCopierFactory that returns a ClassCopier for an array, and 
+      null for non-array
+    - A OrdinaryClassCopierFactory that returns a ClassCopier for any Class,
+      and throws ReflectiveCopyException if it cannot create a ClassCopier.
+    - An ImmutableClassCopierFactory that returns an IdentityClassCopier if
+      the class is immutable (also has registration API).
+    - A CachingClassCopierFactory that maintains a cache of know ClassCopier
+      instances for particular classes (also has a registration API).
+    - PipelineCopierFactory:
+	- Does Caching -> Special (may be no-op) -> Array -> Ordinary
+	- Updates cache if needed
+	- Provides API for:
+	    - registration of know ClassCopier instances
+	    - registration of immutable classes (go straight to cache)
+	    - registration of optional special ClassCopierFactory
+	- passes itself to Array and Ordinary ClassCopierFactory instances
+
+    DefaultClassCopierFactories:
+	ClassCopierFactory makeCachingClassCopierFactory()
+	ClassCopierFactory makeArrayClassCopierFactory( ClassCopierFactory ) 
+	ClassCopierFactory makeOrdinaryClassCopierFactory( ClassCopierFactory ) 

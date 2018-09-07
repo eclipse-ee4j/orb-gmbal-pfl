@@ -1,0 +1,51 @@
+#
+# Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Distribution License v. 1.0, which is available at
+# http://www.eclipse.org/org/documents/edl-v10.php.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+Codegen provides reflective information about classes,
+much as the ordinary Class and Method classes in Java.
+We need (at least) the following cases:
+    1. ClassGenerator and MethodGenerator provide info about
+       classes and methods that are being generated in the 
+       framework.  These must also be AST nodes.
+    2. ClassInfoReflectiveImpl and MethodInfoReflectiveImpl provides
+       info about Java Class and Method instances that are already 
+       loaded in the VM.  They should not be AST nodes.
+    3. We will also need ClassInfo and MethodInfo implementations 
+       that handle the Doclet classes.  This is needed for supporting
+       dynamic RMI-IIOP.  They should not be AST nodes.
+    4. ClassInfo and MethodInfo may need some way to access the underlying
+       Java Class and Method instances, when they exist.  This may also 
+       be needed for dynamic RMI-IIOP
+
+Here is the inheritance structure of the implementation:
+
+ClassInfo (interface)
+    ClassInfoBase (abstract class)
+	ClassInfoReflectiveImpl
+	    - Just uses Java reflection on a Class instance.
+	ClassInfoDocletImpl
+	    - Just uses the Doclet API to implement ClassInfo
+	ClassGenerator
+	    - also implements Node
+	    - uses delegation to an instance of NodeBase to implement
+	      the Node API.
+
+MethodInfo (interface)
+    MethodInfoBase (abstract class)
+	MethodInfoReflectiveImpl
+	    - Just uses Java reflection on a Method instance.
+	    - really just initialization: the API is implemented in the
+	      super class.
+	MethodInfoDocletImpl
+	    - Just uses the Doclet API to implement MethodInfo
+	MethodGenerator
+	    - also implements Node
+	    - uses delegation to an instance of NodeBase to implement
+	      the Node API.

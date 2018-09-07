@@ -1,0 +1,100 @@
+#
+# Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Distribution License v. 1.0, which is available at
+# http://www.eclipse.org/org/documents/edl-v10.php.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+GlassFish dependencies on copyobject:
+    spi.copyobject.CopyobjectDefaults
+    spi.copyobject.CopierManager
+    spi.copyobject.ObjectCopierFactory
+    spi.copyobject.OptimizedCopyObjectDefaults (from optional)
+Do not move these, or change their packaging.
+
+Classes used only in ReflectObjectCopierImpl:
+    import com.sun.corba.se.impl.util.Utility ;
+    import com.sun.corba.se.spi.logging.LogWrapperBase ;
+    import com.sun.corba.se.spi.orb.ORB ;
+    import org.omg.CORBA.portable.Delegate ;
+    import org.omg.CORBA.portable.ObjectImpl ;
+
+Needed in ClassCopierOrdinaryImpl for USE_BCEL_REFLECTIVE_COPYOBJECT.
+    import com.sun.corba.se.impl.orbutil.ORBConstants ;
+
+Needed only in BCELCopierGenerator:
+    import org.apache.bcel.*;
+    import org.apache.bcel.classfile.*;
+    import org.apache.bcel.generic.*;
+
+Moving copyobject into ORB library:
+    spi/copyobject
+	CopierManager			orb
+	CopyobjectDefaults		orb (depends on ORBStream)
+	ObjectCopierFactory		orb
+
+	(move following to spi.orbutil.copyobject:) 
+	ObjectCopier			lib
+	ReflectiveCopyException		lib
+    impl/copyobject
+	CopierManagerImpl		orb
+	JavaStreamObjectCopierImpl	orb: change to
+	    JavaStreamObjectORBCopierImpl orb (subclass overrides
+		copy, does autoconnect if obj instanceof Remote,
+		otherwise calls super.copy)
+	ORBStreamObjectCopierImpl	orb
+	ReferenceObjectCopierImpl	orb (don't need this for lib)
+
+	(move to impl/orbutil/copyobject)
+	JavaStreamObjectCopierImpl	lib (no autoconnect)
+	FallbackObjectCopierImpl	lib 
+
+    optional spi/copyobject
+	OptimizedCopyObjectDefaults	orb
+
+    optional impl/copyobject
+	OldReflectObjectCopierImpl	orb (actually only need this for testing)
+    optional impl/copyobject/newreflect
+	Move the following to impl/orbutil/copyobject
+	replace:
+	    BCELCopierBase.java
+	    BCELCopierGenerator.java
+	with corresponding codegen classes.	lib
+
+	CachingClassCopierFactory.java		lib
+	ClassCopier.java			lib
+	ClassCopierBase.java			lib
+	ClassCopierFactory.java			lib
+	ClassCopierFactoryArrayImpl.java	lib
+	ClassCopierFactoryPipelineImpl.java	lib
+	ClassCopierOrdinaryImpl.java		lib
+	DefaultClassCopierFactories.java	lib
+	DefaultClassCopiers.java		lib
+	FastCache.java				lib
+	FastCacheTest.java			lib (test only)
+	PipelineClassCopierFactory.java		lib
+
+	Move to optional impl/copyobject:
+	ReflectObjectCopierImpl.java		orb
+
+	
+New order:
+    spi/orbutil/copyobject		    lib
+    spi/copyobject			    orb
+    impl/orbutil/copyobject		    lib
+    impl/copyobject			    orb
+    optional spi/copyobject		    orb
+    optional spi/orbutil/copyobject	    lib
+	contains new class:
+	public class ObjectCopierFactory {
+	    public static ObjectCopier make() {
+		... // like new ReflectObjectCopierImpl, without CORBA bits
+	    }
+	}
+	
+    optional impl/copyobject		    orb
+    optional impl/orbutil/copyobject	    lib
+

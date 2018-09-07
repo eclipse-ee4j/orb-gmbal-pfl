@@ -1,0 +1,63 @@
+#
+# Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+#
+# This program and the accompanying materials are made available under the
+# terms of the Eclipse Distribution License v. 1.0, which is available at
+# http://www.eclipse.org/org/documents/edl-v10.php.
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+
+For now, we are leaving codegen in optional, so we can leave copyobject there
+as well.
+
+Split impl.copyobject.JavaStreamObjectCopierImpl into two parts:
+    impl.copyobject.JavaStreamObjectCopierImpl, which does NOT do the autoconnect
+    impl.copyobject.JavaStreamORBObjectCopierImpl, which subclasses 
+    JavaStreamObjectCopierImpl and DOES the autoconnect.
+
+New packaging:
+    spi/copyobject		ORB
+	spi.copyobject.CopierManager
+	spi.copyobject.CopyobjectDefaults
+    spi/orbutil/copyobject	LIB
+	spi.copyobject.ObjectCopier
+	spi.copyobject.ObjectCopierFactory
+	spi.copyobject.ReflectiveCopyException
+
+    impl/copyobject		ORB
+	impl.copyobject.CopierManagerImpl
+	impl.copyobject.JavaStreamORBObjectCopierImpl
+	impl.copyobject.ORBStreamObjectCopierImpl
+	impl.copyobject.ReferenceObjectCopierImpl
+
+    impl/orbutil/copyobject	LIB
+	impl.copyobject.JavaStreamObjectCopierImpl
+	impl.copyobject.FallbackObjectCopierImpl
+
+
+    optional spi/copyobject		ORB
+	optional spi.copyobject.OptimizedCopyObjectDefaults
+    optional spi/orbutil/copyobject	LIB
+	new: ObjectCopierFactoryImpl (like ReflectiveObjectCopierImpl, but does not
+	    do ORB-specific copying)
+	
+    optional impl/copyobject		ORB
+	optional impl.copyobject.newreflect.ReflectObjectCopierImpl
+	optional impl.copyobject.OldReflectObjectCopierImpl
+    optional impl/orbutil/copyobject	LIB
+	optional impl.copyobject.newreflect.BCELCopierBase		=> move to codegen
+	optional impl.copyobject.newreflect.BCELCopierGenerator		=> move to codegen
+	optional impl.copyobject.newreflect.CachingClassCopierFactory
+	optional impl.copyobject.newreflect.ClassCopier
+	optional impl.copyobject.newreflect.ClassCopierBase
+	optional impl.copyobject.newreflect.ClassCopierFactory
+	optional impl.copyobject.newreflect.ClassCopierFactoryArrayImpl
+	optional impl.copyobject.newreflect.ClassCopierFactoryPipelineImpl
+	optional impl.copyobject.newreflect.ClassCopierOrdinaryImpl
+	optional impl.copyobject.newreflect.DefaultClassCopierFactories
+	optional impl.copyobject.newreflect.DefaultClassCopiers
+	optional impl.copyobject.newreflect.FastCache
+	optional impl.copyobject.newreflect.FastCacheTest
+	optional impl.copyobject.newreflect.PipelineClassCopierFactory
+

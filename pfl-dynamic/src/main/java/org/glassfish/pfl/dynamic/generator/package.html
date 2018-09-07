@@ -1,0 +1,100 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+<!--
+
+    Copyright (c) 2018 Oracle and/or its affiliates. All rights reserved.
+
+    This program and the accompanying materials are made available under the
+    terms of the Eclipse Distribution License v. 1.0, which is available at
+    http://www.eclipse.org/org/documents/edl-v10.php.
+
+    SPDX-License-Identifier: BSD-3-Clause
+
+-->
+
+    <title>org.glassfish.dynamic.generator package</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  </head>
+  <body>
+      This package defines a facility that can be used to enhance Java interfaces
+      and abstract classes with properties and delegation.  Delegation only
+      applies to abstract classes, since a class must contain non-static
+      data members to support delegation.
+
+      An interface or abstract class that contains at least one abstract method
+      annotated &#64;Value or at least one field annotated &#64;Delegate is a client
+      class.  The resulting implementation produced automatically as described
+      below is the enhanced class.
+
+      All properties are read-only and all delegates are set in the constructor.
+      Writable properties are generally a bad idea, and indicate a poor design.
+      Dynamic delegation is potentially very useful, but not really in keeping
+      with the static nature of Java interfaces.  It also raises complex
+      synchronization questions which probably cannot be handled by a general
+      framework.
+
+      Annotations used:
+        &#64;Value: defines a property accessor method (optional value representing
+            ID, default is derived from method name)
+        &#64;Delegate: defines a data member used to handle all methods on an
+            implemented interface (optional value representing ID,
+            default is field name)
+        &#64;Factory: used on a class that contains abstract methods that
+            are annotated as &#64;Builder with return type matching the
+            value of the &#64;Factory annotation (required Class value that
+            gives the client class for which &#64;Builder methods are supplied.
+        &#64;Builder: used on a method of a &#64;Factory class
+            that acts as a builder for an enhanced
+            class.  Builders may also be enhanced. (optional String[]
+            value mapping builder value ids to enhanced class value
+            or delegate ids).
+        &#64;Id: used on a parameter in a builder method to indicate what
+            id in the result the parameter value initializes.
+            (required String value parameter).
+
+      The key point in all of this is how to create instances of classes that
+      use delegation and properties.  Initializing a delegate or initializing
+      a property value takes place when the enhanced class is constructed.
+      We can have generic methods to do this, or explicit constructors.
+      A builder (a factory class, or a limited meta-class) may itself
+      use property and delegation facilities in order to construct its target.
+
+      Interface case:
+      - All we really need in the generated class is a constructor that takes
+        a Map&lt;String,Object&gt; as an argument.
+
+      Abstract class case:
+      - This is more complex.  It would seem to make sense to require that for
+        each constructor in the client class, there is a corresponding constructor
+        in the enhanced class, which takes a Map&lt;String,Object&gt; as an extra argument
+        (probably at the end of the arg list). The implementation just calls
+        super on the correspding parent class constructor, and then uses the
+        Map&lt;String,Object&gt; to initialize the delegates and values.
+
+      So we need a way to indicate that a particular method in a builder class
+      can be used to initialize a particular delegate or property value in
+      the builder's target class.  We can do this by property ID.  For example,
+      the &#64;Builder annotation can have a String[] value, in which each element
+      takes the form
+
+      "(bid)-&gt;(ecid)"
+
+      where bid is an id for a value in the builder, and ecid is an id
+      for a value or delegate in the enhanced class.
+
+      Basic dynamic initialization:
+      Object create( Pair&lt;String,Object&gt;... )
+      Object create( Map&lt;String,Object&gt; )
+      Here the map key/first element is either a String (for a Value) or
+      a Class (for a Delegate).
+
+      How does a builder method work?
+      A builder method is any abstract method in a &#64;Builder class that returns
+      the type of the &#64;Builder annotation value.  The interesting problem here
+      is how to pick an appropriate constructor to use.  Basic idea:
+      - all parameters NOT annotated with &#64;Id must match a particular constructor.
+      - all ID parameters are used to create a Map&lt;String,Object&gt; that is
+        passed to the corresponding derived constructor in the enhanced class.
+  </body>
+</html>
