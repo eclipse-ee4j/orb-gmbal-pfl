@@ -34,9 +34,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.ejb</groupId>
-            <artifactId>javax.ejb-api</artifactId>
-            <version>3.2</version>
+            <groupId>jakarta.ejb</groupId>
+            <artifactId>jakarta.ejb-api</artifactId>
+            <version>3.2.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
