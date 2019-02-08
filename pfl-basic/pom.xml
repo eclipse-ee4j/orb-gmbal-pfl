@@ -32,8 +32,6 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
-                <version>2.3.7</version>
-                <extensions>true</extensions>
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
@@ -91,104 +89,7 @@
 
         </plugins>
     </build>
-
-    <profiles>
-        <profile>
-            <id>multi-release</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <properties>
-                <additionalparam />  <!-- using toolchain, so turn off doclint disablement -->
-            </properties>
-            <build>
-                <plugins>
-                    <!-- compile main portion of jar with configured JDK -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-toolchains-plugin</artifactId>
-                    </plugin>
-
-                    <!-- use ant to compile the Java 9 classes before packaging-->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-antrun-plugin</artifactId>
-                        <executions>
-                            <!-- make sure the java9 versions are not present when the bundle:manifest goal runs -->
-                            <execution>
-                                <id>clear-java9</id>
-                                <phase>compile</phase>
-                                <configuration>
-                                    <tasks>
-                                        <delete dir="${java9.build.outputDirectory}" />
-                                    </tasks>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-
-                            <!-- build the java9 versions into the META-INF directory -->
-                            <execution>
-                                <id>compile-java9</id>
-                                <phase>prepare-package</phase>
-                                <configuration>
-                                    <tasks>
-                                        <mkdir dir="${java9.build.outputDirectory}" />
-                                        <javac srcdir="${java9.sourceDirectory}" destdir="${java9.build.outputDirectory}" debug="true" debuglevel="lines,vars,source" classpath="${project.build.outputDirectory}" includeantruntime="false" />
-                                    </tasks>
-                                </configuration>
-                                <goals>
-                                    <goal>run</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-
-                    <!-- add the multi-release:true manifest entry -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-jar-plugin</artifactId>
-                        <configuration>
-                            <archive>
-                                <manifestEntries>
-                                    <Multi-Release>true</Multi-Release>
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.8</version>
-                        <executions>
-                            <execution>
-                                <id>attach-javadocs</id>
-                                <goals>
-                                    <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin> 
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin> 
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
+    
     <reporting>
         <plugins>
             <plugin>
