@@ -75,7 +75,12 @@
     </mailingLists>
 
     <properties>
-        <jdkVersion>1.7</jdkVersion>
+        <!-- The oldest Java version supported by this tool.               -->
+        <!-- Will control compilation of the main code and the unit tests. -->
+        <base.java.version>1.7</base.java.version>
+
+        <!-- trigger release-only profiles -->
+        <release.arguments>-Drelease=true</release.arguments>
     </properties>
     
     <modules>
@@ -93,26 +98,6 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-toolchains-plugin</artifactId>
-                    <version>1.1</version>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>toolchain</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                    <configuration>
-                        <toolchains>
-                            <jdk>
-                                <version>${jdkVersion}</version>
-                                <vendor>oracle</vendor>
-                            </jdk>
-                        </toolchains>
-                    </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
                     <version>2.9</version>
                 </plugin>
@@ -125,18 +110,83 @@
                     <artifactId>maven-gpg-plugin</artifactId>
                     <version>1.6</version>
                 </plugin>
+                <plugin>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>maven-bundle-plugin</artifactId>
+                    <version>3.4.0</version>
+                    <extensions>true</extensions>
+                </plugin>
             </plugins>
         </pluginManagement>
         
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.6.1</version>
+                <artifactId>maven-toolchains-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>toolchain</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
-                    <source>${jdkVersion}</source>
-                    <target>${jdkVersion}</target>
+                    <toolchains>
+                        <jdk>
+                            <version>${base.java.version}</version>
+                            <vendor>oracle</vendor>
+                        </jdk>
+                    </toolchains>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>${base.java.version}</source>
+                    <target>${base.java.version}</target>
+                </configuration>
+                <!-- define the possible compilations -->
+                <executions>
+                    <!-- for Java 9 -->
+                    <execution>
+                        <id>java9</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>9</release>
+                            <jdkToolchain>
+                                <version>9</version>
+                            </jdkToolchain>
+                            <compileSourceRoots>
+                                <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
+                            </compileSourceRoots>
+                            <multiReleaseOutput>true</multiReleaseOutput>
+                        </configuration>
+                    </execution>
+                    <!-- for Java 11 -->
+                    <execution>
+                        <id>java11</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>11</release>
+                            <jdkToolchain>
+                                <version>11</version>
+                            </jdkToolchain>
+                            <compileSourceRoots>
+                                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+                            </compileSourceRoots>
+                            <multiReleaseOutput>true</multiReleaseOutput>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>
@@ -157,6 +207,18 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-jar</id>
+                        <configuration>
+                            <archive>
+                                <manifestEntries>
+                                    <Multi-Release>true</Multi-Release>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- prevent the site plugin from deploying to the scm url -->
@@ -219,7 +281,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-project-info-reports-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.0.0</version>
                 <reportSets>
                     <reportSet>
                         <id>aggregate-project-info</id>
@@ -280,6 +342,104 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-toolchains-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+
+        <!-- enable java9 compilation -->
+        <profile>
+            <id>compile-java9</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>java9</id>
+                                <phase>compile</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <!-- enable java11 compilation -->
+        <profile>
+            <id>compile-java11</id>
+            <activation>
+                <jdk>[11,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>java11</id>
+                                <phase>compile</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>test-toolchains-bypass</id>
+            <activation>
+                <property>
+                    <name>!release</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+                    <!-- Run the unit tests with the JVM used to run maven -->
+                    <plugin>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.21.0</version>
+                        <configuration>
+                            <jvm>${env.JAVA_HOME}/bin/java</jvm>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>multi-jar</id>
+            <activation>
+                <property>
+                    <name>release</name>
+                </property>
+            </activation>
+
+            <build>
+                <plugins>
+
+                    <!-- enable java9/11 compilations -->
+
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>java9</id>
+                                <phase>compile</phase>
+                            </execution>
+                            <execution>
+                                <id>java11</id>
+                                <phase>compile</phase>
+                            </execution>
+                        </executions>
                     </plugin>
                 </plugins>
             </build>
