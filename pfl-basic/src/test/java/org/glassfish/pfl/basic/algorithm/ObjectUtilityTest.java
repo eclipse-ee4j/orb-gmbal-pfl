@@ -10,14 +10,16 @@
 
 package org.glassfish.pfl.basic.algorithm;
 
-import org.glassfish.pfl.basic.testobjects.SerializableClass2;
-import org.glassfish.pfl.basic.testobjects.TestObjects;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 
 import java.util.Arrays;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.stringContainsInOrder;
+import org.glassfish.pfl.basic.testobjects.SerializableClass2;
+import org.glassfish.pfl.basic.testobjects.TestObjects;
+import org.junit.Assume;
+import org.junit.Test;
 
 public class ObjectUtilityTest {
     @Test
@@ -36,6 +38,7 @@ public class ObjectUtilityTest {
 
     @Test
     public void whenObjectInJdk_displayFields() throws Exception {
+        Assume.assumeThat(System.getProperty("os.name"), not(equalTo("Linux")));
         String string = ObjectUtility.defaultObjectToString(System.out);
 
         assertThat(string, stringContainsInOrder(values("autoFlush=", "true")));
