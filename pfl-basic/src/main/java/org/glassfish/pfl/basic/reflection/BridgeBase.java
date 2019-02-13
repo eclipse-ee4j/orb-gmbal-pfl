@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -232,9 +232,27 @@ public abstract class BridgeBase {
      * @param classBytes the byte code for the class
      * @param classLoader the classloader in which it is to be defined
      * @param protectionDomain the domain in which the class should be defined
+     *
+     * @deprecated will not work in Java 11 or later. Use {@link #defineClass(Class, String, byte[])} instead
      */
-    public final Class<?> defineClass(String className, byte[] classBytes, ClassLoader classLoader, ProtectionDomain protectionDomain) {
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated
+    public Class<?> defineClass(String className, byte[] classBytes, ClassLoader classLoader, ProtectionDomain protectionDomain) {
         return unsafe.defineClass(className, classBytes, 0, classBytes.length, classLoader, null);
+    }
+
+    /**
+     * Defines a new class from bytecode. The class will be defined in the classloader and package associated with a
+     * specified 'anchor class'.
+     *
+     * @param anchorClass the class from which the package and classloader of the new class are to be taken.
+     * @param className the name of the class to define
+     * @param classBytes the bytes used to define the class
+     * @return a new instantiable class, in the package and classloader of the anchor class.
+     */
+    @SuppressWarnings("deprecation")
+    public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) throws Throwable {
+        return defineClass(className, classBytes, anchorClass.getClassLoader(), null);
     }
 
     /**

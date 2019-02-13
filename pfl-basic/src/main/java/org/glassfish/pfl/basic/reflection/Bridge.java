@@ -125,7 +125,6 @@ public final class Bridge extends BridgeBase {
     }
 
 
-    @SuppressWarnings("unchecked")
     private Bridge() {
         latestUserDefinedLoaderMethod = getLatestUserDefinedLoaderMethod();
         reflectionFactory = ReflectionFactory.getReflectionFactory();
@@ -168,12 +167,11 @@ public final class Bridge extends BridgeBase {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final <T> Constructor<T> newConstructorForExternalization(Class<T> cl) {
         try {
-            Constructor<?> cons = cl.getDeclaredConstructor();
+            Constructor<T> cons = cl.getDeclaredConstructor();
             cons.setAccessible(true);
-            return isPublic(cons) ? (Constructor<T>) cons : null;
+            return isPublic(cons) ? cons : null;
         } catch (NoSuchMethodException ex) {
             return null;
         }
@@ -267,6 +265,7 @@ public final class Bridge extends BridgeBase {
             return null;
         }
     }
+
     private static Method getPrivateMethod(Class<?> cl, String name, Class<?> returnType, Class<?>... argTypes ) {
         try {
             Method method = cl.getDeclaredMethod(name, argTypes);
