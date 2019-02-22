@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2011, 2018 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2011, 2019 Oracle and/or its affiliates. All rights reserved.
 
     This program and the accompanying materials are made available under the
     terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -347,7 +347,6 @@
             </build>
         </profile>
 
-
         <!-- enable java9 compilation -->
         <profile>
             <id>compile-java9</id>
@@ -441,6 +440,46 @@
                             </execution>
                         </executions>
                     </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <!-- include required legal artifacts in module jars -->
+            <id>install-legal-files</id>
+            <activation>
+                <file>
+                    <exists>src/main/java</exists>
+                </file>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.coderplus.maven.plugins</groupId>
+                        <artifactId>copy-rename-maven-plugin</artifactId>
+                        <version>1.0.1</version>
+                        <executions>
+                          <execution>
+                            <id>copy-legal-files</id>
+                            <phase>generate-resources</phase>
+                            <goals>
+                              <goal>copy</goal>
+                            </goals>
+                            <configuration>
+                                <fileSets>
+                                    <fileSet>
+                                        <sourceFile>${project.basedir}/../LICENSE.md</sourceFile>
+                                        <destinationFile>${project.build.outputDirectory}/META-INF/LICENSE</destinationFile>
+                                    </fileSet>
+                                    <fileSet>
+                                        <sourceFile>${project.basedir}/../NOTICE.md</sourceFile>
+                                        <destinationFile>${project.build.outputDirectory}/META-INF/NOTICE</destinationFile>
+                                    </fileSet>
+                                </fileSets>
+                            </configuration>
+                          </execution>
+                        </executions>
+                      </plugin>
                 </plugins>
             </build>
         </profile>
