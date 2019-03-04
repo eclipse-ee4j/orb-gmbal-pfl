@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF8"?>
+<toolchains>
+    <!-- JDK toolchains -->
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>1.7</version>
+            <vendor>oracle</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>/opt/tools/java/oracle/jdk-7/latest</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>1.8</version>
+            <vendor>oracle</vendor>
+        </provides>
+        <configuration>
+            <jdkHome>/opt/tools/java/oracle/jdk-8/latest</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>9</version>
+        </provides>
+        <configuration>
+            <jdkHome>/opt/tools/java/openjdk/jdk-9/latest</jdkHome>
+        </configuration>
+    </toolchain>
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>11</version>
+        </provides>
+        <configuration>
+            <jdkHome>/opt/tools/java/openjdk/jdk-11/latest</jdkHome>
+        </configuration>
+    </toolchain>
+</toolchains>
