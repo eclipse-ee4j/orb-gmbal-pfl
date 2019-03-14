@@ -14,8 +14,6 @@ import static java.util.Arrays.asList;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.List;
 import java.util.Properties;
@@ -1040,41 +1038,6 @@ public final class Wrapper {
     byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
           cl, imports, props, System.out);
     return CodeGeneratorUtil.makeClass(cg.name(), data, pd, cl);
-  }
-
-  private static <T> ProtectionDomain getCurrentProtectionDomain(final Class<T> cls) {
-    if (System.getSecurityManager() == null) {
-      return cls.getProtectionDomain();
-    } else {
-      return AccessController.doPrivileged((PrivilegedAction<ProtectionDomain>) cls::getProtectionDomain);
-    }
-  }
-
-  /**
-   * Return a GenericClass instance so that we can easily create an instance
-   * of the generated class.  This form should be used as an abbreviation,
-   * where the context ClassLoader and associated ProtectionDomain are all that
-   * is needed.
-   */
-  public static <T> GenericClass<T> _generate(Class<T> cls, Properties props) {
-
-    ClassGenerator cg = env().classGenerator();
-    return _generate(cg, cls, props);
-  }
-
-  /**
-   * Return a GenericClass instance so that we can easily create an instance
-   * of the generated class.  This form should be used as an abbreviation,
-   * where the context ClassLoader and associated ProtectionDomain are all that
-   * is needed.
-   */
-  public static <T> GenericClass<T> _generate(ClassGenerator cg, Class<T> cls, Properties props) {
-
-    ClassLoader cl = CurrentClassLoader.get();
-    ProtectionDomain pd = getCurrentProtectionDomain(cls);
-
-    Class<?> implClass = _generate(cg, cl, pd, props);
-    return new GenericClass<>(cls, implClass);
   }
 
   /**
