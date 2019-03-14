@@ -251,7 +251,7 @@ public abstract class BridgeBase {
      * @return a new instantiable class, in the package and classloader of the anchor class.
      */
     @SuppressWarnings("deprecation")
-    public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) throws Throwable {
+    public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) {
         return defineClass(className, classBytes, anchorClass.getClassLoader(), null);
     }
 

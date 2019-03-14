@@ -986,38 +986,8 @@ public final class Wrapper {
    * the current ClassGenerator.  options may be used
    * to control some aspects of the code generation, such as
    * debugging options.
-   */
-  public static Class<?> _generate(ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream debugOutput) {
-    ClassGenerator cg = env().classGenerator();
-
-    return _generate(cg, cl, pd, props, debugOutput);
-  }
-
-  /**
-   * Generate a class for the ClassGenerator.
-   * Basically equivalent to _byteCode followed by _makeClass.
-   * cl is used to resolve any references
-   * to other classes and to load the class given by
-   * the current ClassGenerator.  options may be used
-   * to control some aspects of the code generation, such as
-   * debugging options.
-   */
-  public static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream debugOutput) {
-
-    ImportList imports = env().imports();
-    byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
-          cl, imports, props, debugOutput);
-    return CodeGeneratorUtil.makeClass(cg.name(), data, pd, cl);
-  }
-
-  /**
-   * Generate a class for the current ClassGenerator.
-   * Basically equivalent to _byteCode followed by _makeClass.
-   * cl is used to resolve any references
-   * to other classes and to load the class given by
-   * the current ClassGenerator.  options may be used
-   * to control some aspects of the code generation, such as
-   * debugging options.
+   *
+   * @deprecated as of Java 11, use {@link #_generate(Class, Properties)}
    */
   public static Class<?> _generate(ClassLoader cl, ProtectionDomain pd, Properties props) {
     ClassGenerator cg = env().classGenerator();
@@ -1033,11 +1003,40 @@ public final class Wrapper {
    * to control some aspects of the code generation, such as
    * debugging options.
    */
-  public static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props) {
+  private static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props) {
     ImportList imports = env().imports();
     byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
           cl, imports, props, System.out);
     return CodeGeneratorUtil.makeClass(cg.name(), data, pd, cl);
+  }
+
+  /**
+   * Generate a class for the current ClassGenerator, in the same classloader and package
+   * as a specified "anchor" class to which the caller has access.
+   *
+   * @param anchorClass an existing class used as a reference for the new one.
+   * @param props options to control some aspects of the code generation, such as debugging.
+   *
+   * @since since 4.1.0
+   */
+  public static Class<?> _generate(Class<?> anchorClass, Properties props) {
+    return _generate(env().classGenerator(), anchorClass, props);
+  }
+
+  /**
+   * Generate a class for the current ClassGenerator.
+   * Basically equivalent to _byteCode followed by _makeClass.
+   * cl is used to resolve any references
+   * to other classes and to load the class given by
+   * the current ClassGenerator.  options may be used
+   * to control some aspects of the code generation, such as
+   * debugging options.
+   */
+  private static Class<?> _generate(ClassGenerator cg, Class<?> anchorClass, Properties props) {
+    ImportList imports = env().imports();
+    byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
+          anchorClass.getClassLoader(), imports, props, System.out);
+    return CodeGeneratorUtil.makeClass(cg.name(), data, anchorClass);
   }
 
   /**
