@@ -10,25 +10,9 @@
 
 package org.glassfish.pfl.dynamic.codegen;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import org.glassfish.pfl.basic.func.NullaryFunction;
-import org.glassfish.pfl.dynamic.codegen.lib.Constants;
-import org.glassfish.pfl.dynamic.codegen.lib.EchoInt;
-import org.glassfish.pfl.dynamic.codegen.test.Constants_gen;
-import org.glassfish.pfl.dynamic.codegen.impl.ASMSetupVisitor;
-import org.glassfish.pfl.dynamic.codegen.impl.Attribute;
-import org.glassfish.pfl.dynamic.codegen.impl.ClassGeneratorImpl;
-import org.glassfish.pfl.dynamic.codegen.impl.CurrentClassLoader;
-import org.glassfish.pfl.dynamic.codegen.impl.Node;
-import org.glassfish.pfl.dynamic.codegen.impl.NodeBase;
-import org.glassfish.pfl.dynamic.codegen.impl.TreeWalkerContext;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
-import org.glassfish.pfl.dynamic.codegen.spi.GenericClass;
-import org.glassfish.pfl.dynamic.codegen.spi.Type;
-import org.glassfish.pfl.dynamic.copyobject.spi.DefaultCopier;
-import org.glassfish.pfl.dynamic.TestCaseTools;
-import org.junit.Ignore;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._classGenerator;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._clear;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._generate;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -36,8 +20,25 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import org.glassfish.pfl.basic.func.NullaryFunction;
+import org.glassfish.pfl.dynamic.TestCaseTools;
+import org.glassfish.pfl.dynamic.codegen.impl.ASMSetupVisitor;
+import org.glassfish.pfl.dynamic.codegen.impl.Attribute;
+import org.glassfish.pfl.dynamic.codegen.impl.ClassGeneratorImpl;
+import org.glassfish.pfl.dynamic.codegen.impl.CurrentClassLoader;
+import org.glassfish.pfl.dynamic.codegen.impl.Node;
+import org.glassfish.pfl.dynamic.codegen.impl.NodeBase;
+import org.glassfish.pfl.dynamic.codegen.impl.TreeWalkerContext;
+import org.glassfish.pfl.dynamic.codegen.lib.Constants;
+import org.glassfish.pfl.dynamic.codegen.lib.EchoInt;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.GenericClass;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.test.Constants_gen;
+import org.glassfish.pfl.dynamic.copyobject.spi.DefaultCopier;
+import org.junit.Ignore;
 
 /**
  * Test for the ASM-based codegen library.
@@ -68,22 +69,11 @@ import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.*;
 public class ClientTest extends TestCase {
     private static final boolean DEBUG = false;
 
-    // Make sure that ControlBase is loaded in the ClassLoader
-    // that loaded Client, otherwise it could first be
-    // loaded in a TestClassLoader (see GenerationTestSuiteBase)
-    // rather than in the parent to which TestClassLoader delegates.
-    private static final Object cb = new ControlBase();
-
     public ClientTest() {
     }
 
-    public ClientTest(String name) {
-        super(name);
-    }
-
     private ClassLoader makeClassLoader() {
-        ClassLoader cl = new GenerationTestSuiteBase.TestClassLoader(this.getClass().getClassLoader());
-        return cl;
+        return new GenerationTestSuiteBase.TestClassLoader(this.getClass().getClassLoader());
     }
 
     private ClassInfo getClassInfo(SimpleCodeGenerator cg) {
@@ -123,14 +113,9 @@ public class ClientTest extends TestCase {
 
         constantsFactory.evaluate();
 
-        GenericClass<Constants> genClass = null;
+        GenericClass<Constants> genClass;
 
-        try {
-            genClass = _generate(Constants.class,
-                    GenerationTestSuiteBase.getByteCodeGenerationProperties(DEBUG));
-        } catch (Exception exc) {
-            fail("Unexpected exception " + exc + " in _generate for Constants");
-        }
+        genClass = _generate(Constants.class, GenerationTestSuiteBase.getByteCodeGenerationProperties(DEBUG));
 
         Constants constants = genClass.create();
 
@@ -152,45 +137,25 @@ public class ClientTest extends TestCase {
             super();
         }
 
-        public DynamicAttributeTestSuite(String name) {
-            super(name);
-        }
-
         // Declare some attributes of different types
-        private static final Attribute<String> foo =
-                new Attribute<String>(String.class, "foo", "");
+        private static final Attribute<String> foo = new Attribute<>(String.class, "foo", "");
 
-        private static final Attribute<Integer> bar =
-                new Attribute<Integer>(Integer.class, "bar", 1);
+        private static final Attribute<Integer> bar = new Attribute<>(Integer.class, "bar", 1);
 
         private interface StringList extends List<String> {
         }
 
-        private static class StringArrayList extends ArrayList<String>
-                implements StringList {
+        private static class StringArrayList extends ArrayList<String> implements StringList {
 
-            public StringArrayList() {
-                super();
-            }
-
-            public StringArrayList(List<String> list) {
+            StringArrayList(List<String> list) {
                 super(list);
             }
         }
 
         private static final NullaryFunction<StringList> rgbl =
-                new NullaryFunction<StringList>() {
-                    public StringList evaluate() {
-                        return new StringArrayList(Arrays.asList(
-                                "red", "blue", "green"));
-                    }
-                };
+              () -> new StringArrayList(Arrays.asList("red", "blue", "green"));
 
-        private static final Attribute<Integer> notUsed =
-                new Attribute<Integer>(Integer.class, "notUsed", 0);
-
-        private static final Attribute<StringList> baz =
-                new Attribute<StringList>(StringList.class, "baz", rgbl);
+        private static final Attribute<StringList> baz = new Attribute<>(StringList.class, "baz", rgbl);
 
         // Create a single node, set/get the attributes
         public void testSimpleNode() {
@@ -205,13 +170,11 @@ public class ClientTest extends TestCase {
             bar.set(node, 42);
             assertEquals(bar.get(node), new Integer(42));
 
-            StringList tval = new StringArrayList(Arrays.asList(
-                    "yellow", "orange"));
+            StringList tval = new StringArrayList(Arrays.asList("yellow", "orange"));
             baz.set(node, tval);
             assertEquals(baz.get(node), tval);
 
-            Set<Attribute<?>> expectedAttrs =
-                    new HashSet<Attribute<?>>();
+            Set<Attribute<?>> expectedAttrs = new HashSet<>();
             expectedAttrs.add(foo);
             expectedAttrs.add(bar);
             expectedAttrs.add(baz);
@@ -334,20 +297,14 @@ public class ClientTest extends TestCase {
         private void init() {
             testClass = getClass("DefaultPackageTest");
             try {
-                Object obj = testClass.newInstance();
-                echo = EchoInt.class.cast(obj);
+                echo = (EchoInt) testClass.newInstance();
             } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
 
-        public DefaultPackageTestSuiteBase(boolean gbc, boolean debug) {
+        DefaultPackageTestSuiteBase(boolean gbc, boolean debug) {
             super(gbc, debug);
-            init();
-        }
-
-        public DefaultPackageTestSuiteBase(String name, boolean gbc, boolean debug) {
-            super(name, gbc, debug);
             init();
         }
 
@@ -360,9 +317,6 @@ public class ClientTest extends TestCase {
     // This is mainly to validate the test itself, but also provides additional
     // testing of the source code generation process.
     public static class DefaultPackageTestSuite extends DefaultPackageTestSuiteBase {
-        public DefaultPackageTestSuite(String name) {
-            super(name, false, DEBUG);
-        }
 
         public DefaultPackageTestSuite() {
             super(false, DEBUG);
@@ -372,9 +326,6 @@ public class ClientTest extends TestCase {
     // The main test suite for code generation.  This tests all of the different
     // patterns of code generation.
     public static class BytecodeGenerationDefaultPackageTestSuite extends DefaultPackageTestSuiteBase {
-        public BytecodeGenerationDefaultPackageTestSuite(String name) {
-            super(name, true, DEBUG);
-        }
 
         public BytecodeGenerationDefaultPackageTestSuite() {
             super(true, DEBUG);
@@ -505,9 +456,6 @@ public class ClientTest extends TestCase {
 
     // Test code generation by generating byte code directly.
     public static class EJBAdapterBytecodeTestSuite extends EJBAdapterTestSuiteBase {
-        public EJBAdapterBytecodeTestSuite(String name) {
-            super("MyRemote__Adapter", name, true, DEBUG);
-        }
 
         public EJBAdapterBytecodeTestSuite() {
             super("MyRemote__Adapter", true, DEBUG);
@@ -532,9 +480,6 @@ public class ClientTest extends TestCase {
 
     // Test code generation by generating byte code directly.  
     public static class EJBAdapterSimplifiedBytecodeTestSuite extends EJBAdapterTestSuiteBase {
-        public EJBAdapterSimplifiedBytecodeTestSuite(String name) {
-            super("MyRemote__Adapter_Simplified", name, true, DEBUG);
-        }
 
         public EJBAdapterSimplifiedBytecodeTestSuite() {
             super("MyRemote__Adapter_Simplified", true, DEBUG);
