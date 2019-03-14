@@ -10,15 +10,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.spi;
 
-import org.glassfish.pfl.basic.contain.Pair;
-import org.glassfish.pfl.basic.fsm.FSM;
-import org.glassfish.pfl.basic.fsm.FSMImpl;
-import org.glassfish.pfl.basic.fsm.Input;
-import org.glassfish.pfl.basic.fsm.Runner;
-import org.glassfish.pfl.basic.fsm.State;
-import org.glassfish.pfl.basic.fsm.StateEngine;
-import org.glassfish.pfl.dynamic.codegen.impl.*;
-import org.glassfish.pfl.dynamic.copyobject.impl.ClassCopierOrdinaryImpl;
+import static java.util.Arrays.asList;
 
 import java.io.IOException;
 import java.io.PrintStream;
@@ -28,8 +20,29 @@ import java.security.ProtectionDomain;
 import java.util.List;
 import java.util.Properties;
 import java.util.Stack;
-
-import static java.util.Arrays.asList;
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.basic.fsm.FSM;
+import org.glassfish.pfl.basic.fsm.FSMImpl;
+import org.glassfish.pfl.basic.fsm.Input;
+import org.glassfish.pfl.basic.fsm.Runner;
+import org.glassfish.pfl.basic.fsm.State;
+import org.glassfish.pfl.basic.fsm.StateEngine;
+import org.glassfish.pfl.dynamic.codegen.impl.BlockStatement;
+import org.glassfish.pfl.dynamic.codegen.impl.ClassGeneratorImpl;
+import org.glassfish.pfl.dynamic.codegen.impl.CodeGenerator;
+import org.glassfish.pfl.dynamic.codegen.impl.CodeGeneratorUtil;
+import org.glassfish.pfl.dynamic.codegen.impl.CurrentClassLoader;
+import org.glassfish.pfl.dynamic.codegen.impl.ExpressionFactory;
+import org.glassfish.pfl.dynamic.codegen.impl.FieldGenerator;
+import org.glassfish.pfl.dynamic.codegen.impl.Identifier;
+import org.glassfish.pfl.dynamic.codegen.impl.IfStatement;
+import org.glassfish.pfl.dynamic.codegen.impl.ImportListImpl;
+import org.glassfish.pfl.dynamic.codegen.impl.MethodGenerator;
+import org.glassfish.pfl.dynamic.codegen.impl.SwitchStatement;
+import org.glassfish.pfl.dynamic.codegen.impl.TryStatement;
+import org.glassfish.pfl.dynamic.codegen.impl.Util;
+import org.glassfish.pfl.dynamic.codegen.impl.WhileStatement;
+import org.glassfish.pfl.dynamic.copyobject.impl.ClassCopierOrdinaryImpl;
 
 /** Main API for runtime code generation.
  * This API generates bytecode dynamically at runtime, allowing direct construction
@@ -219,8 +232,10 @@ import static java.util.Arrays.asList;
  *  generate source code (@see _sourceCode), and generate byteCode 
  *  (@see _byteCode).
  */ 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public final class Wrapper {
-    private Wrapper() {} 
+  private Wrapper() {
+  }
 
     // Checking the sequence of operations in the class
     // is equivalent to parsing a sentence in the grammar defined
@@ -238,1909 +253,1738 @@ public final class Wrapper {
     // J2SE 5.0 provides some useful facilities (notably enums)
     // that can be used in conjunction with the ORB FSM framework.
 
-    // This defines enums that implement the FSM state interface that
-    // can be used in the FSM
-    private enum Operation implements Input{ 
-	PACKAGE,	    // _package method
-	IMPORT,		    // _import method
-	CLASS,		    // _class method
-	DATA,		    // _data method
-	INITIALIZER,	    // _initializer method
-	METHOD,		    // _method method
-	ARG,		    // _arg method 
-	BODY,		    // _body method
-	IF,		    // _if method
-	ELSE,		    // _else method
-	TRY,		    // _try method 
-	CATCH,		    // _catch method
-	FINALLY,	    // _finally method
-	SWITCH,		    // _switch method
-	CASE,		    // _case method 
-	DEFAULT,	    // _default method 
-	WHILE,		    // _while method
-	SIMPLE,		    // _return, _throw, _assign, _define, 
-			    // and _expr methods
-	END } ;		    // _end method
+  // This defines enums that implement the FSM state interface that
+  // can be used in the FSM
+  private enum Operation implements Input {
+    PACKAGE,      // _package method
+    IMPORT,        // _import method
+    CLASS,        // _class method
+    DATA,        // _data method
+    INITIALIZER,      // _initializer method
+    METHOD,        // _method method
+    ARG,        // _arg method
+    BODY,        // _body method
+    IF,        // _if method
+    ELSE,        // _else method
+    TRY,        // _try method
+    CATCH,        // _catch method
+    FINALLY,      // _finally method
+    SWITCH,        // _switch method
+    CASE,        // _case method
+    DEFAULT,      // _default method
+    WHILE,        // _while method
+    SIMPLE,        // _return, _throw, _assign, _define,
+    // and _expr methods
+    END
+  }
 
     // SIMPLE represents simple statements: return, throw, expr, assign
     // and define.
 
-    // Note that the state objects must extend State, so we cannot
-    // use enum here.
-    private static final State S_INIT = new State( "S_INIT", State.Kind.INITIAL ) ;
-    private static final State S_DONE = new State( "S_DONE", State.Kind.FINAL ) ;
-    private static final State S_PACKAGE = new State( "S_PACKAGE" ) ;
-    private static final State S_CLASS = new State( "S_CLASS", State.Kind.INITIAL ) ;
-    private static final State S_INITIALIZER = new State( "S_INITIALIZER" ) ;
-    private static final State S_METHOD = new State( "S_METHOD", State.Kind.INITIAL ) ;
-    private static final State S_BODY = new State( "S_BODY", State.Kind.INITIAL ) ;
-    private static final State S_IF = new State( "S_IF", State.Kind.INITIAL ) ;
-    private static final State S_ELSE = new State( "S_ELSE" ) ;
-    private static final State S_TRY = new State( "S_TRY", State.Kind.INITIAL ) ;
-    private static final State S_FINAL = new State( "S_FINAL" ) ;
-    private static final State S_SWITCH = new State( "S_SWITCH", State.Kind.INITIAL ) ;
-    private static final State S_DEFAULT = new State( "S_DEFAULT" ) ;
+  // Note that the state objects must extend State, so we cannot
+  // use enum here.
+  private static final State S_INIT = new State("S_INIT", State.Kind.INITIAL);
+  private static final State S_DONE = new State("S_DONE", State.Kind.FINAL);
+  private static final State S_PACKAGE = new State("S_PACKAGE");
+  private static final State S_CLASS = new State("S_CLASS", State.Kind.INITIAL);
+  private static final State S_METHOD = new State("S_METHOD", State.Kind.INITIAL);
+  private static final State S_BODY = new State("S_BODY", State.Kind.INITIAL);
+  private static final State S_IF = new State("S_IF", State.Kind.INITIAL);
+  private static final State S_ELSE = new State("S_ELSE");
+  private static final State S_TRY = new State("S_TRY", State.Kind.INITIAL);
+  private static final State S_FINAL = new State("S_FINAL");
+  private static final State S_SWITCH = new State("S_SWITCH", State.Kind.INITIAL);
+  private static final State S_DEFAULT = new State("S_DEFAULT");
 
-    private static final StateEngine engine = StateEngine.create() ;
+  private static final StateEngine engine = StateEngine.create();
 
-    // This set of transitions is used in several states,
-    // so we use this method to avoid repetition.
-    private static void addCommonTransitions( State state ) {
-	engine.add( state, Operation.SIMPLE, null, state ) ;
-	engine.add( state, Operation.IF, null, state ) ;
-	engine.add( state, Operation.TRY, null, state ) ;
-	engine.add( state, Operation.SWITCH, null, state ) ;
-	engine.add( state, Operation.WHILE, null, state ) ;
-	engine.add( state, Operation.END, null, S_DONE ) ;
-    }
+  // This set of transitions is used in several states,
+  // so we use this method to avoid repetition.
+  private static void addCommonTransitions(State state) {
+    engine.add(state, Operation.SIMPLE, null, state);
+    engine.add(state, Operation.IF, null, state);
+    engine.add(state, Operation.TRY, null, state);
+    engine.add(state, Operation.SWITCH, null, state);
+    engine.add(state, Operation.WHILE, null, state);
+    engine.add(state, Operation.END, null, S_DONE);
+  }
 
-    static {
-	// Table of legal state transitions in each state:
-	// Any input not in the table is illegal.
-	// No transitions are legal in S_DONE.
-	//
-	// XXX We should provide a default action that prints out an appropriate
-	// error message (rather than the default FSM-specific one).
-	// 
-	//	    State	Input		        Action	New State 
-	engine.add( S_INIT,	Operation.PACKAGE,	null,	S_PACKAGE ) ;
-
-	engine.add( S_PACKAGE,	Operation.IMPORT,	null,	S_PACKAGE ) ;
-	engine.add( S_PACKAGE,	Operation.CLASS,	null,	S_CLASS ) ;
-	
-	engine.add( S_CLASS,	Operation.DATA,		null,	S_CLASS ) ;
-	engine.add( S_CLASS,	Operation.INITIALIZER,  null,	S_CLASS ) ;
-	engine.add( S_CLASS,	Operation.METHOD,	null,	S_CLASS ) ;
-	engine.add( S_CLASS,	Operation.END,		null,	S_DONE ) ;
-
-	engine.add( S_METHOD,	Operation.BODY,		null,	S_BODY ) ;
-	engine.add( S_METHOD,	Operation.ARG,		null,	S_METHOD ) ;
-	engine.add( S_METHOD,	Operation.END,		null,	S_DONE ) ;
-
-	addCommonTransitions( S_BODY ) ;
-
-	addCommonTransitions( S_IF ) ;
-	engine.add( S_IF,	Operation.ELSE,		null,	S_ELSE ) ;
-
-	addCommonTransitions( S_ELSE ) ;
-
-	addCommonTransitions( S_TRY ) ;
-	engine.add( S_TRY,	Operation.CATCH,	null,	S_TRY ) ;
-	engine.add( S_TRY,	Operation.FINALLY,	null,	S_FINAL ) ;
-
-	addCommonTransitions( S_FINAL ) ;
-
-	addCommonTransitions( S_SWITCH ) ;
-	engine.add( S_SWITCH,	Operation.CASE,		null,	S_SWITCH ) ;
-	engine.add( S_SWITCH,	Operation.DEFAULT,	null,	S_DEFAULT ) ;
-
-	addCommonTransitions( S_DEFAULT ) ;
-     }
-	
-    // We need to represent the current state as a stack of contexts.
-    // The contexts are stacked as follows: class, method or body
-    // (for static initializers), statement* 
-    // (any number of statement contexts can be nested).
-    // The context stack is used to manage ExpressionFactories and
-    // to support lookup of variable identifiers.
+  static {
+    // Table of legal state transitions in each state:
+    // Any input not in the table is illegal.
+    // No transitions are legal in S_DONE.
     //
-    // We will not handle the push/pop interaction in the FSM.
-    // Instead, each Environment method that needs to push or
-    // pop will first update the current state machine, then (assuming
-    // there is no error) construct the type-specific context node.
-    // The constructor of the abstract base class Context actually
-    // pushes the Context onto the stack.
+    // XXX We should provide a default action that prints out an appropriate
+    // error message (rather than the default FSM-specific one).
     //
-    // Note that the sole purpose of the state machine is to make
-    // sure that operations are called in the correct order.
-    //
-    // Context Design 
-    //
-    // All contexts are constructed with a reference to the Environment
-    // They are stacked in the following order:
-    // 1. ClassContext
-    // 2. MethodContext (or just a BodyContext for a static initializer)
-    // 3. If/Try/Switch/While StatementContext as needed.
-    //
+    //	    State	Input		        Action	New State
+    engine.add(S_INIT, Operation.PACKAGE, null, S_PACKAGE);
 
-    private static abstract class Context {
-	private final Runner runner ;
-	private final Context parent ;
-	protected final Stack<Context> contexts ;
+    engine.add(S_PACKAGE, Operation.IMPORT, null, S_PACKAGE);
+    engine.add(S_PACKAGE, Operation.CLASS, null, S_CLASS);
 
-	private ExpressionFactory expressionFactory ;
-	private BlockStatement blockStatement ;
+    engine.add(S_CLASS, Operation.DATA, null, S_CLASS);
+    engine.add(S_CLASS, Operation.INITIALIZER, null, S_CLASS);
+    engine.add(S_CLASS, Operation.METHOD, null, S_CLASS);
+    engine.add(S_CLASS, Operation.END, null, S_DONE);
 
-	public final ExpressionFactory ef() {
-	    if (expressionFactory == null)
-		throw new IllegalStateException( 
-		    "No ExpressionFactory is currently available" ) ;
+    engine.add(S_METHOD, Operation.BODY, null, S_BODY);
+    engine.add(S_METHOD, Operation.ARG, null, S_METHOD);
+    engine.add(S_METHOD, Operation.END, null, S_DONE);
 
-	    return expressionFactory ;
-	}
+    addCommonTransitions(S_BODY);
 
-	public final BlockStatement bs() {
-	    if (blockStatement == null)
-		throw new IllegalStateException( 
-		    "No BlockStatement is currently available" ) ;
+    addCommonTransitions(S_IF);
+    engine.add(S_IF, Operation.ELSE, null, S_ELSE);
 
-	    return blockStatement ;
-	}
+    addCommonTransitions(S_ELSE);
 
-	protected final void setBlockStatement( BlockStatement bs ) {
-	    blockStatement = bs ;
-	    if (bs == null)
-		expressionFactory = null ;
-	    else
-		expressionFactory = bs.exprFactory() ;
-	}
+    addCommonTransitions(S_TRY);
+    engine.add(S_TRY, Operation.CATCH, null, S_TRY);
+    engine.add(S_TRY, Operation.FINALLY, null, S_FINAL);
 
-	public Context( Stack<Context> contexts, State start ) {
-	    FSM fsm = new FSMImpl( engine, start ) ;
-	    this.runner = new Runner( fsm ) ;
+    addCommonTransitions(S_FINAL);
 
-	    this.contexts = contexts ;
-	    if (contexts.empty())
-		this.parent = null ;
-	    else 
-		this.parent = contexts.peek() ;
+    addCommonTransitions(S_SWITCH);
+    engine.add(S_SWITCH, Operation.CASE, null, S_SWITCH);
+    engine.add(S_SWITCH, Operation.DEFAULT, null, S_DEFAULT);
 
-	    contexts.push( this ) ;
+    addCommonTransitions(S_DEFAULT);
+  }
 
-	    expressionFactory = null ;
-	    blockStatement = null ;
-	}
+  // We need to represent the current state as a stack of contexts.
+  // The contexts are stacked as follows: class, method or body
+  // (for static initializers), statement*
+  // (any number of statement contexts can be nested).
+  // The context stack is used to manage ExpressionFactories and
+  // to support lookup of variable identifiers.
+  //
+  // We will not handle the push/pop interaction in the FSM.
+  // Instead, each Environment method that needs to push or
+  // pop will first update the current state machine, then (assuming
+  // there is no error) construct the type-specific context node.
+  // The constructor of the abstract base class Context actually
+  // pushes the Context onto the stack.
+  //
+  // Note that the sole purpose of the state machine is to make
+  // sure that operations are called in the correct order.
+  //
+  // Context Design
+  //
+  // All contexts are constructed with a reference to the Environment
+  // They are stacked in the following order:
+  // 1. ClassContext
+  // 2. MethodContext (or just a BodyContext for a static initializer)
+  // 3. If/Try/Switch/While StatementContext as needed.
+  //
 
-	public final void stateTransition( Operation op ) {
-	    runner.doIt( op ) ;
-	}
+  private static abstract class Context {
+    private final Runner runner;
+    private final Context parent;
+    final Stack<Context> contexts;
 
-	public final Context parent() {
-	    return parent ;
-	}
+    private ExpressionFactory expressionFactory;
+    private BlockStatement blockStatement;
 
-	// Overridden in subclasses that have other places to
-	// find variables besides the BlockStatement
-	protected Expression alternateLookup( String ident ) {
-	    return null ;
-	}
+    final ExpressionFactory ef() {
+      if (expressionFactory == null)
+        throw new IllegalStateException(
+              "No ExpressionFactory is currently available");
 
-	// The main method used to search for variables.
-	// This works for all types of contexts.  First,
-	// we look in the BlockStatement, if present.
-	// Some subclasses of Context override alternate
-	// lookup, which is called next.  If the local
-	// call fails, we delegate to the parent (if any).
-	// Once all options fail, an exception is thrown.
-	public Expression getVariable( String ident ) {
-	    Expression result = null ;
-
-	    if (blockStatement != null) 
-		result = blockStatement.getVar( ident ) ;
-
-	    if (result == null)
-		result = alternateLookup( ident ) ;
-
-	    if ((result == null) && (parent != null))
-		result = parent.getVariable( ident ) ;
-
-	    if (result == null)
-		throw new IllegalArgumentException(
-		    "Identifier " + ident + " not found." ) ;
-
-	    return result ;
-	}
-
-	public void _end() {
-	    contexts.pop() ;
-	}
+      return expressionFactory;
     }
 
-    // Context used for _package and _import.
-    private static final class PackageContext extends Context {
-	public PackageContext( Stack<Context> contexts ) {
-	    // start of no-codegen copier
-	    super( contexts, S_INIT ) ;
-	    ClassCopierOrdinaryImpl.setCodegenCopierAllowed( false ) ;
-	}
+    final BlockStatement bs() {
+      if (blockStatement == null)
+        throw new IllegalStateException(
+              "No BlockStatement is currently available");
+
+      return blockStatement;
     }
 
-    // Context used for _class until
-    // we start defining methods or static initializers.
-    private static class ClassContext extends Context {
-	private final ClassGeneratorImpl cg ;
-
-	public ClassGeneratorImpl classGenerator() {
-	    return cg ;
-	}
-
-	public ClassContext( Stack<Context> contexts, ClassGeneratorImpl cg ) {
-	    super( contexts, S_CLASS ) ;
-	    this.cg = cg ;
-	}
-
-	public FieldGenerator _data( int modifiers, Type type, String name ) {
-	    return cg.addField( modifiers, type, name ) ;
-	}
-
-	public void _initializer() {
-	    new BodyContext( contexts, cg.initializer() ) ;
-	}
-
-	public void _method( int modifiers, Type type, String name,
-	    List<Type> exceptions ) {
-	    MethodGenerator mg = cg.startMethod( modifiers, type, name,
-		exceptions) ;
-	    new MethodContext( contexts, mg ) ;
-	}
-
-	public void _constructor( int modifiers, List<Type> exceptions ) {
-	    MethodGenerator mg = cg.startConstructor( modifiers, exceptions ) ;
-	    new MethodContext( contexts, mg ) ;
-	    // XXX somewhere we need to force the first statement in 
-	    // a constructor to be an expression that is either this or super.
-	}
-
-	// This method returns a field access expression.  This is the
-	// case of a variable lookup that resolves to a static or
-	// non-static field access expression.  This just finds the field;
-	// access checks are handled elsewhere.
-        @Override
-	protected Expression alternateLookup( String ident ) {
-	    FieldInfo fld = cg.findFieldInfo(ident) ;
-
-	    if (fld == null)
-		throw new IllegalArgumentException( ident 
-		    + " not found in " + cg.name() ) ;
-
-	    return FieldGenerator.class.cast(fld).getExpression() ;
-	}
-
-        @Override
-	public void _end() {
-	    super._end() ;
-	    // end of no-codegen copier
-	    ClassCopierOrdinaryImpl.setCodegenCopierAllowed( true ) ;
-	}
+    final void setBlockStatement(BlockStatement bs) {
+      blockStatement = bs;
+      if (bs == null)
+        expressionFactory = null;
+      else
+        expressionFactory = bs.exprFactory();
     }
 
-    // Context used for all methods and constructors.
-    private static class MethodContext extends Context {
-	private MethodGenerator mg ;
+    Context(Stack<Context> contexts, State start) {
+      FSM fsm = new FSMImpl(engine, start);
+      this.runner = new Runner(fsm);
 
-	public MethodGenerator methodGenerator() {
-	    return mg ;
-	}
+      this.contexts = contexts;
+      if (contexts.empty())
+        this.parent = null;
+      else
+        this.parent = contexts.peek();
 
-	public MethodContext( Stack<Context> contexts, MethodGenerator mg ) { 
-	    super( contexts, S_METHOD ) ;
-	    this.mg = mg ;
-	    setBlockStatement( null ) ;
-	}
+      contexts.push(this);
 
-	public Expression _arg( Type type, String ident ) {
-	    return mg.addArgument( type, ident ) ;
-	}
-
-	public void _body() {
-	    setBlockStatement( mg.body() ) ;
-	}
-
-        @Override
-	protected Expression alternateLookup( String ident ) {
-	    for (Variable var : mg.arguments())
-		if (ident.equals( ((VariableInternal)var).ident()))
-		    return var ;
-
-	    return null ;
-	}
-
-        @Override
-	public void _end() {
-	    super._end() ;
-	    ClassGeneratorImpl cg = ClassGeneratorImpl.class.cast( mg.parent() ) ;
-	    cg.methodComplete( mg ) ;
-	}
+      expressionFactory = null;
+      blockStatement = null;
     }
 
-    // Context used for static initializers.
-    private static class BodyContext extends Context {
-	public BodyContext( Stack<Context> contexts, BlockStatement bs ) {
-	    super( contexts, S_BODY ) ;
-	    setBlockStatement( bs ) ;
-	}
+    final void stateTransition(Operation op) {
+      runner.doIt(op);
     }
 
-    // Context used for if statements.
-    private static class IfStatementContext extends Context {
-	private final IfStatement ifstmt ;
-
-	public IfStatementContext( Stack<Context> contexts,
-	    Expression expr ) {
-	    super( contexts, S_IF ) ;
-	    this.ifstmt = parent().bs().addIf( expr ) ;
-	    setBlockStatement( ifstmt.truePart() ) ;
-	}
-
-	public void _else() {
-	    setBlockStatement( ifstmt.falsePart() ) ;
-	}
+    public final Context parent() {
+      return parent;
     }
 
-    // Context used for switch statements.
-    private static class SwitchStatementContext extends Context {
-	private final SwitchStatement swstmt ;
-
-	public SwitchStatementContext( Stack<Context> contexts,
-	    Expression expr ) {
-	    super( contexts, S_SWITCH ) ;
-	    this.swstmt = parent().bs().addSwitch( expr ) ;
-	    setBlockStatement( null ) ;
-	}
-
-	public void _case( int value ) {
-	    setBlockStatement( swstmt.addCase( value ) ) ;
-	}
-
-	public void _default() {
-	    setBlockStatement( swstmt.defaultCase() ) ;
-	}
+    // Overridden in subclasses that have other places to
+    // find variables besides the BlockStatement
+    protected Expression alternateLookup(String ident) {
+      return null;
     }
 
-    // Context used for try statements.
-    private static class TryStatementContext extends Context {
-	private final TryStatement trystmt ;
-	private Variable currentCaseVariable ;
+    // The main method used to search for variables.
+    // This works for all types of contexts.  First,
+    // we look in the BlockStatement, if present.
+    // Some subclasses of Context override alternate
+    // lookup, which is called next.  If the local
+    // call fails, we delegate to the parent (if any).
+    // Once all options fail, an exception is thrown.
+    Expression getVariable(String ident) {
+      Expression result = null;
 
-	public TryStatementContext( Stack<Context> contexts ) {
-	    super( contexts, S_TRY ) ;
-	    this.trystmt = parent().bs().addTry() ;
-	    currentCaseVariable = null ;
-	    setBlockStatement( trystmt.bodyPart() ) ;
-	}
+      if (blockStatement != null)
+        result = blockStatement.getVar(ident);
 
-	public Expression _catch( Type type, String name ) {
-	    Pair<Variable,BlockStatement> pair = 
-		trystmt.addCatch( type, name ) ;
-	    setBlockStatement( pair.second() ) ;
-	    currentCaseVariable = pair.first() ;
-	    return currentCaseVariable ;
-	}
+      if (result == null)
+        result = alternateLookup(ident);
 
-	public void _finally() {
-	    setBlockStatement( trystmt.finalPart() ) ;
-	    currentCaseVariable = null ;
-	}
+      if ((result == null) && (parent != null))
+        result = parent.getVariable(ident);
 
-        @Override
-	protected Expression alternateLookup( String ident ) {
-	    if (currentCaseVariable != null)
-		if (ident.equals( 
-                    ((VariableInternal)currentCaseVariable).ident()))
-		    return currentCaseVariable ;
+      if (result == null)
+        throw new IllegalArgumentException(
+              "Identifier " + ident + " not found.");
 
-	    return null ;
-	}
-
-        @Override
-	public void _end() {
-	    super._end() ;
-	    if (trystmt.catches().entrySet().isEmpty() &&
-		trystmt.finalPart().isEmpty())
-		throw new IllegalStateException(
-		    "A try statement must have at least one catch clause or a final part" ) ;
-	}
+      return result;
     }
 
-    // Context used for while statements.
-    private static class WhileStatementContext extends Context {
-	private final WhileStatement whilestmt ;
+    public void _end() {
+      contexts.pop();
+    }
+  }
 
-	public WhileStatementContext( Stack<Context> contexts,
-	    Expression expr ) {
-	    super( contexts, S_BODY ) ;
-	    this.whilestmt = parent().bs().addWhile( expr ) ;
-	    setBlockStatement(whilestmt.body()) ;
-	}
+  // Context used for _package and _import.
+  private static final class PackageContext extends Context {
+    PackageContext(Stack<Context> contexts) {
+      // start of no-codegen copier
+      super(contexts, S_INIT);
+      ClassCopierOrdinaryImpl.setCodegenCopierAllowed(false);
+    }
+  }
+
+  // Context used for _class until
+  // we start defining methods or static initializers.
+  private static class ClassContext extends Context {
+    private final ClassGeneratorImpl cg;
+
+    ClassContext(Stack<Context> contexts, ClassGeneratorImpl cg) {
+      super(contexts, S_CLASS);
+      this.cg = cg;
     }
 
-    // The Environment is stored in a ThreadLocal and used for
-    // all of the Wrapper public methods.
-    private static class Environment {
-	private Stack<Context> contexts ;
-	private ImportList imports ;
-	private String _package ;
-	private ClassGeneratorImpl root ;
-
-	public ImportList imports() {
-	    return imports ;
-	}
-
-	private <T extends Context> T top( Class<T> cls ) {
-	    return cls.cast( contexts.peek() ) ;
-	}
-
-	public Environment() {
-	    _clear() ;
-	}
-
-	void _clear() {
-	    contexts = new Stack<Context>() ;
-	    contexts.push( new PackageContext( contexts ) ) ;
-	    imports = new ImportListImpl() ;
-	    _package = "" ;
-	    root = null ;
-	}
-
-	public Type _t( String name ) {
-	    // look up the type in the table of imports.
-	    // If not found, treat as a fully qualified name.
-	    Type type = imports.lookup( name ) ;
-	    if (type == null)
-		return Type._class( name ) ;
-	    else
-		return type ;
-	}
-
-	public Expression _v( String name ) {
-	    return contexts.peek().getVariable( name ) ;
-	}
-	
-	public ClassGeneratorImpl classGenerator() {
-	    return root ;
-	}
-
-	public Type _thisClass() {
-	    return root.thisType() ;
-	}
-
-	public ExpressionFactory ef() {
-	    return contexts.peek().ef() ;
-	}
-
-	public BlockStatement bs() {
-	    return contexts.peek().bs() ;
-	}
-
-	private void checkState( Operation op ) {
-	    contexts.peek().stateTransition( op ) ;
-	}
-
-	public final void _package( String name ) {
-	    checkState( Operation.PACKAGE ) ;
-
-	    if (!"".equals( name ))
-		Identifier.isValidFullIdentifier( name ) ;
-
-	    _package = name ;
-	}
-
-	public final Type _import( final String name ) {
-	    checkState( Operation.IMPORT ) ;
-	    
-	    final Type type = Type._class( name ) ;
-	    final Type itype = imports.lookup( type.className() ) ;
-
-	    if (itype == null) {
-		imports.addImport( type ) ;
-	    } else {
-		if (!type.equals( itype ))
-		    throw new IllegalArgumentException( type.name() 
-			+ " conflicts with " + itype.name() ) ;
-	    }
-
-	    return type ;
-	}
-
-	public final void _import( ImportList importList ) {
-	    checkState( Operation.IMPORT ) ;
-
-	    imports = importList.copy() ;
-	}
-
-	public final ImportList _import() {
-	    checkState( Operation.IMPORT ) ;
-
-	    return imports.copy() ;
-	}
-
-	public final void _class( int modifiers, String name,
-	    Type superClass, List<Type> impls ) {
-	    checkState( Operation.CLASS ) ;
-	    String cname = name ;
-	    if (!_package.equals(""))
-		cname = _package + "." + name ;
-	    root = CodeGenerator.defineClass( modifiers,
-		cname, superClass, impls ) ;
-	    new ClassContext( contexts, root ) ;
-	}
-
-	public final void _interface( int modifiers, String name,
-	    List<Type> impls ) {
-	    checkState( Operation.CLASS ) ;
-	    String cname = name ;
-	    if (!_package.equals(""))
-		cname = _package + "." + name ;
-	    root = CodeGenerator.defineInterface( modifiers,
-		cname, impls ) ;
-	    new ClassContext( contexts, root ) ;
-	}
-
-	public final FieldGenerator _data( int modifiers, Type type,
-	    String name ) {
-	    checkState( Operation.DATA ) ;
-	    ClassContext cc = top( ClassContext.class ) ;
-	    return cc._data( modifiers, type, name ) ;
-	}
-
-	public final void _initializer() {
-	    checkState( Operation.INITIALIZER ) ;
-	    ClassContext cc = top( ClassContext.class ) ;
-	    cc._initializer() ;
-	}
-
-	public final void _method( int modifiers, Type type, 
-	    String name, List<Type> exceptions ) {
-	    checkState( Operation.METHOD ) ;
-	    ClassContext cc = top( ClassContext.class ) ;
-	    cc._method( modifiers, type, name, exceptions ) ;
-	}
-
-	public final void _constructor( int modifiers, List<Type> exceptions ) {
-	    checkState( Operation.METHOD ) ;
-	    ClassContext cc = top( ClassContext.class ) ;
-	    cc._constructor( modifiers, exceptions ) ;
-	}
-
-	public final Expression _arg( Type type, String name ) {
-	    checkState( Operation.ARG ) ;
-	    MethodContext mc = top( MethodContext.class ) ;
-	    return mc._arg( type, name ) ;
-	}
-
-	public final void _body() {
-	    checkState( Operation.BODY ) ;
-	    MethodContext mc = top( MethodContext.class ) ;
-	    mc._body() ;
-	}
-
-	public void _if( Expression expr )  {
-	    checkState( Operation.IF ) ;
-	    new IfStatementContext( contexts, expr ) ;
-	}
-
-	public void _else()  {
-	    checkState( Operation.ELSE ) ;
-	    IfStatementContext isc = top( IfStatementContext.class ) ;
-	    isc._else() ;
-	}
-
-	public void _try() {
-	    checkState( Operation.TRY ) ;
-	    new TryStatementContext( contexts ) ;
-	}
-
-	public Expression _catch( Type type, String name )  {
-	    checkState( Operation.CATCH ) ;
-	    TryStatementContext tsc = top( TryStatementContext.class ) ;
-	    return tsc._catch( type, name ) ;
-	}
-
-	public void _finally() {
-	    checkState( Operation.FINALLY ) ;
-	    TryStatementContext tsc = top( TryStatementContext.class ) ;
-	    tsc._finally() ;
-	}
-
-	public void _switch( Expression expr ) {
-	    checkState( Operation.SWITCH ) ;
-	    new SwitchStatementContext( contexts, expr ) ;
-	}
-
-	public void _case( int value ) {
-	    checkState( Operation.CASE ) ;
-	    SwitchStatementContext ssc = top( SwitchStatementContext.class ) ;
-	    ssc._case( value ) ;
-	}
-
-	public void _default() {
-	    checkState( Operation.DEFAULT ) ;
-	    SwitchStatementContext ssc =  top( SwitchStatementContext.class ) ;
-	    ssc._default() ;
-	}
-
-	public void _while( Expression expr ) {
-	    checkState( Operation.WHILE ) ;
-	    new WhileStatementContext( contexts, expr ) ;
-	}
-
-	public void _end() {
-	    checkState( Operation.END ) ;
-	    contexts.peek()._end() ;
-	}
+    FieldGenerator _data(int modifiers, Type type, String name) {
+      return cg.addField(modifiers, type, name);
     }
-    
-    // This ThreadLocal maintains the environment for using the
-    // Wrapper methods in a thread.
-    private static ThreadLocal<Environment> tl = new ThreadLocal<Environment>() {
-        @Override
-        protected Environment initialValue() {
-            return new Environment() ;
-        }
-    } ;
-    
-    private static Environment env() {
-        return tl.get() ;
+
+    void _method(int modifiers, Type type, String name,
+                        List<Type> exceptions) {
+      MethodGenerator mg = cg.startMethod(modifiers, type, name,
+            exceptions);
+      new MethodContext(contexts, mg);
     }
-    
+
+    void _constructor(int modifiers, List<Type> exceptions) {
+      MethodGenerator mg = cg.startConstructor(modifiers, exceptions);
+      new MethodContext(contexts, mg);
+      // XXX somewhere we need to force the first statement in
+      // a constructor to be an expression that is either this or super.
+    }
+
+    // This method returns a field access expression.  This is the
+    // case of a variable lookup that resolves to a static or
+    // non-static field access expression.  This just finds the field;
+    // access checks are handled elsewhere.
+    @Override
+    protected Expression alternateLookup(String ident) {
+      FieldInfo fld = cg.findFieldInfo(ident);
+
+      if (fld == null)
+        throw new IllegalArgumentException(ident
+              + " not found in " + cg.name());
+
+      return ((FieldGenerator) fld).getExpression();
+    }
+
+    @Override
+    public void _end() {
+      super._end();
+      // end of no-codegen copier
+      ClassCopierOrdinaryImpl.setCodegenCopierAllowed(true);
+    }
+  }
+
+  // Context used for all methods and constructors.
+  private static class MethodContext extends Context {
+    private MethodGenerator mg;
+
+    public MethodGenerator methodGenerator() {
+      return mg;
+    }
+
+    MethodContext(Stack<Context> contexts, MethodGenerator mg) {
+      super(contexts, S_METHOD);
+      this.mg = mg;
+      setBlockStatement(null);
+    }
+
+    Expression _arg(Type type, String ident) {
+      return mg.addArgument(type, ident);
+    }
+
+    void _body() {
+      setBlockStatement(mg.body());
+    }
+
+    @Override
+    protected Expression alternateLookup(String ident) {
+      for (Variable var : mg.arguments())
+        if (ident.equals(var.ident()))
+          return var;
+
+      return null;
+    }
+
+    @Override
+    public void _end() {
+      super._end();
+      ClassGeneratorImpl cg = (ClassGeneratorImpl) mg.parent();
+      cg.methodComplete(mg);
+    }
+  }
+
+  // Context used for static initializers.
+  private static class BodyContext extends Context {
+    BodyContext(Stack<Context> contexts, BlockStatement bs) {
+      super(contexts, S_BODY);
+      setBlockStatement(bs);
+    }
+  }
+
+  // Context used for if statements.
+  private static class IfStatementContext extends Context {
+    private final IfStatement ifstmt;
+
+    IfStatementContext(Stack<Context> contexts,
+                              Expression expr) {
+      super(contexts, S_IF);
+      this.ifstmt = parent().bs().addIf(expr);
+      setBlockStatement(ifstmt.truePart());
+    }
+
+    void _else() {
+      setBlockStatement(ifstmt.falsePart());
+    }
+  }
+
+  // Context used for switch statements.
+  private static class SwitchStatementContext extends Context {
+    private final SwitchStatement swstmt;
+
+    SwitchStatementContext(Stack<Context> contexts,
+                                  Expression expr) {
+      super(contexts, S_SWITCH);
+      this.swstmt = parent().bs().addSwitch(expr);
+      setBlockStatement(null);
+    }
+
+    void _case(int value) {
+      setBlockStatement(swstmt.addCase(value));
+    }
+
+    void _default() {
+      setBlockStatement(swstmt.defaultCase());
+    }
+  }
+
+  // Context used for try statements.
+  private static class TryStatementContext extends Context {
+    private final TryStatement trystmt;
+    private Variable currentCaseVariable;
+
+    TryStatementContext(Stack<Context> contexts) {
+      super(contexts, S_TRY);
+      this.trystmt = parent().bs().addTry();
+      currentCaseVariable = null;
+      setBlockStatement(trystmt.bodyPart());
+    }
+
+    Expression _catch(Type type, String name) {
+      Pair<Variable, BlockStatement> pair =
+            trystmt.addCatch(type, name);
+      setBlockStatement(pair.second());
+      currentCaseVariable = pair.first();
+      return currentCaseVariable;
+    }
+
+    void _finally() {
+      setBlockStatement(trystmt.finalPart());
+      currentCaseVariable = null;
+    }
+
+    @Override
+    protected Expression alternateLookup(String ident) {
+      if (currentCaseVariable != null)
+        if (ident.equals(currentCaseVariable.ident()))
+          return currentCaseVariable;
+
+      return null;
+    }
+
+    @Override
+    public void _end() {
+      super._end();
+      if (trystmt.catches().entrySet().isEmpty() &&
+            trystmt.finalPart().isEmpty())
+        throw new IllegalStateException(
+              "A try statement must have at least one catch clause or a final part");
+    }
+  }
+
+  // Context used for while statements.
+  private static class WhileStatementContext extends Context {
+    private final WhileStatement whilestmt;
+
+    WhileStatementContext(Stack<Context> contexts,
+                                 Expression expr) {
+      super(contexts, S_BODY);
+      this.whilestmt = parent().bs().addWhile(expr);
+      setBlockStatement(whilestmt.body());
+    }
+  }
+
+  // The Environment is stored in a ThreadLocal and used for
+  // all of the Wrapper public methods.
+  private static class Environment {
+    private Stack<Context> contexts;
+    private ImportList imports;
+    private String _package;
+    private ClassGeneratorImpl root;
+
+    ImportList imports() {
+      return imports;
+    }
+
+    private <T extends Context> T top(Class<T> cls) {
+      return cls.cast(contexts.peek());
+    }
+
+    Environment() {
+      _clear();
+    }
+
+    void _clear() {
+      contexts = new Stack<>();
+      contexts.push(new PackageContext(contexts));
+      imports = new ImportListImpl();
+      _package = "";
+      root = null;
+    }
+
+    Type _t(String name) {
+      // look up the type in the table of imports.
+      // If not found, treat as a fully qualified name.
+      Type type = imports.lookup(name);
+      if (type == null)
+        return Type._class(name);
+      else
+        return type;
+    }
+
+    Expression _v(String name) {
+      return contexts.peek().getVariable(name);
+    }
+
+    ClassGeneratorImpl classGenerator() {
+      return root;
+    }
+
+    Type _thisClass() {
+      return root.thisType();
+    }
+
+    ExpressionFactory ef() {
+      return contexts.peek().ef();
+    }
+
+    BlockStatement bs() {
+      return contexts.peek().bs();
+    }
+
+    private void checkState(Operation op) {
+      contexts.peek().stateTransition(op);
+    }
+
+    final void _package(String name) {
+      checkState(Operation.PACKAGE);
+
+      if (!"".equals(name))
+        Identifier.isValidFullIdentifier(name);
+
+      _package = name;
+    }
+
+    final Type _import(final String name) {
+      checkState(Operation.IMPORT);
+
+      final Type type = Type._class(name);
+      final Type itype = imports.lookup(type.className());
+
+      if (itype == null) {
+        imports.addImport(type);
+      } else {
+        if (!type.equals(itype))
+          throw new IllegalArgumentException(type.name()
+                + " conflicts with " + itype.name());
+      }
+
+      return type;
+    }
+
+    final void _import(ImportList importList) {
+      checkState(Operation.IMPORT);
+
+      imports = importList.copy();
+    }
+
+    final ImportList _import() {
+      checkState(Operation.IMPORT);
+
+      return imports.copy();
+    }
+
+    public final void _class(int modifiers, String name,
+                             Type superClass, List<Type> impls) {
+      checkState(Operation.CLASS);
+      String cname = name;
+      if (!_package.equals(""))
+        cname = _package + "." + name;
+      root = CodeGenerator.defineClass(modifiers,
+            cname, superClass, impls);
+      new ClassContext(contexts, root);
+    }
+
+    final void _interface(int modifiers, String name,
+                                 List<Type> impls) {
+      checkState(Operation.CLASS);
+      String cname = name;
+      if (!_package.equals(""))
+        cname = _package + "." + name;
+      root = CodeGenerator.defineInterface(modifiers,
+            cname, impls);
+      new ClassContext(contexts, root);
+    }
+
+    final FieldGenerator _data(int modifiers, Type type,
+                                      String name) {
+      checkState(Operation.DATA);
+      ClassContext cc = top(ClassContext.class);
+      return cc._data(modifiers, type, name);
+    }
+
+    final void _method(int modifiers, Type type,
+                              String name, List<Type> exceptions) {
+      checkState(Operation.METHOD);
+      ClassContext cc = top(ClassContext.class);
+      cc._method(modifiers, type, name, exceptions);
+    }
+
+    final void _constructor(int modifiers, List<Type> exceptions) {
+      checkState(Operation.METHOD);
+      ClassContext cc = top(ClassContext.class);
+      cc._constructor(modifiers, exceptions);
+    }
+
+    final Expression _arg(Type type, String name) {
+      checkState(Operation.ARG);
+      MethodContext mc = top(MethodContext.class);
+      return mc._arg(type, name);
+    }
+
+    final void _body() {
+      checkState(Operation.BODY);
+      MethodContext mc = top(MethodContext.class);
+      mc._body();
+    }
+
+    void _if(Expression expr) {
+      checkState(Operation.IF);
+      new IfStatementContext(contexts, expr);
+    }
+
+    void _else() {
+      checkState(Operation.ELSE);
+      IfStatementContext isc = top(IfStatementContext.class);
+      isc._else();
+    }
+
+    void _try() {
+      checkState(Operation.TRY);
+      new TryStatementContext(contexts);
+    }
+
+    Expression _catch(Type type, String name) {
+      checkState(Operation.CATCH);
+      TryStatementContext tsc = top(TryStatementContext.class);
+      return tsc._catch(type, name);
+    }
+
+    void _finally() {
+      checkState(Operation.FINALLY);
+      TryStatementContext tsc = top(TryStatementContext.class);
+      tsc._finally();
+    }
+
+    public void _switch(Expression expr) {
+      checkState(Operation.SWITCH);
+      new SwitchStatementContext(contexts, expr);
+    }
+
+    public void _case(int value) {
+      checkState(Operation.CASE);
+      SwitchStatementContext ssc = top(SwitchStatementContext.class);
+      ssc._case(value);
+    }
+
+    public void _default() {
+      checkState(Operation.DEFAULT);
+      SwitchStatementContext ssc = top(SwitchStatementContext.class);
+      ssc._default();
+    }
+
+    public void _while(Expression expr) {
+      checkState(Operation.WHILE);
+      new WhileStatementContext(contexts, expr);
+    }
+
+    public void _end() {
+      checkState(Operation.END);
+      contexts.peek()._end();
+    }
+  }
+
+  // This ThreadLocal maintains the environment for using the
+  // Wrapper methods in a thread.
+  private static ThreadLocal<Environment> tl = ThreadLocal.withInitial(Environment::new);
+
+  private static Environment env() {
+    return tl.get();
+  }
+
 //-------------------- Public API starts here -------------------------------
 
-    /** Obtain the ClassGeneratorImpl that is constructed by the Wrapper
-     * methods.  This is only needed for using Wrapper with custom
-     * vistors.
-     */
-    public static ClassGenerator _classGenerator() {
-	return env().classGenerator() ;
-    }
-
-    private static final String CODEGEN_PREFIX = "org.glassfish.dynamic.codegen" ;
-
-    private static final String DEBUG_PREFIX = CODEGEN_PREFIX + 
-	".debug" ;
-
-    /** Set this to enable dumping the generated byte codes to a 
-     * class file in the given directory.
-     */
-    public static final String CLASS_GENERATION_DIRECTORY = CODEGEN_PREFIX +
-	".classGenerationDirectory" ;
-
-    /** Option used to enable generation of source files while
-     * generating bytecode.  Set to name of directory that should
-     * contain the generated source file.
-     */
-    public static final String SOURCE_GENERATION_DIRECTORY = CODEGEN_PREFIX +
-	".sourceGenerationDirectory" ;
-    
-    /** Debugging option used to dump the contents of the AST after
-     * the setup visitor runs.
-     */
-    public static final String DUMP_AFTER_SETUP_VISITOR = DEBUG_PREFIX + 
-	".dumpAfterSetupVisitor" ;
-
-    /** Debugging option used to trace the byte code generation.
-     */
-    public static final String TRACE_BYTE_CODE_GENERATION = DEBUG_PREFIX +
-	".traceByteCodeGeneration" ;
-
-    /** Causes contents of constant pool to be dumped.
-     */
-    public static final String DUMP_CONSTANT_POOL = DEBUG_PREFIX + 
-	".dumpConstantPool" ;
-
-    /** Debugging option used to enable the ASM verifier, which can be
-     * helpful for debugging errors in the code generation.
-     */
-    public static final String USE_ASM_VERIFIER = DEBUG_PREFIX +
-	".useAsmVerifier" ;
-
-    /** Set the ClassLoader for this thread that will be used for validating
-     * references to pre-existing classes from generated code.  Applications
-     * that use special ClassLoaders (such as the app server) should call this
-     * method before starting to generate a new Class.  A good place to do this
-     * is just before the _package call.
-     */
-    public static void _setClassLoader( ClassLoader cl ) {
-	CurrentClassLoader.set( cl ) ;
-    }
-
-    /** Generate byte codes for the current ClassGenerator.
-     * cl is used to resolve any references
-     * to other classes.  options may be used
-     * to control some aspects of the code generation, such as
-     * debugging options.  Supported options include
-     * DUMP_AFTER_SETUP_VISITOR, TRACE_BYTE_CODE_GENERATION,
-     * USE_ASM_VERIFIER.
-     */
-    public static byte[] _byteCode( ClassLoader cl, Properties options ) {
-        return _byteCode( env().classGenerator(), cl, options ) ;
-    }
-
-    /** Generate byte codes for the ClassGenerator.
-     * cl is used to resolve any references
-     * to other classes.  options may be used
-     * to control some aspects of the code generation, such as
-     * debugging options.  Supported options include
-     * DUMP_AFTER_SETUP_VISITOR, TRACE_BYTE_CODE_GENERATION, 
-     * USE_ASM_VERIFIER.
-     */
-    public static byte[] _byteCode( ClassGenerator cgen, ClassLoader cl,
-        Properties options ) {
-
-	ClassGeneratorImpl cg = env().classGenerator() ;
-	ImportList imports = env().imports() ;
-	return CodeGenerator.generateBytecode( cg, cl, imports, options,
-	    System.out ) ;
-    }
-
-    /** Convert an array of bytes into a Class using the given 
-     * ClassLoader and ProtectionDomain.  Use of this method requires
-     * the suppressAccessChecks ReflectionPermission.
-     */
-    public static Class<?> _makeClass( byte[] data, String name, 
-	ClassLoader cl, ProtectionDomain pd ) {
-	return CodeGeneratorUtil.makeClass( name, data, pd, cl ) ;
-    }
-
-    /** Generate a class for the current ClassGenerator.
-     * Basically equivalent to _byteCode followed by _makeClass.
-     * cl is used to resolve any references
-     * to other classes and to load the class given by
-     * the current ClassGenerator.  options may be used
-     * to control some aspects of the code generation, such as
-     * debugging options.
-     */
-    public static Class<?> _generate( ClassLoader cl, ProtectionDomain pd,
-	Properties props, PrintStream debugOutput ) {
-	ClassGenerator cg = env().classGenerator() ;
-
-        return _generate( cg, cl, pd, props, debugOutput ) ;
-    }
-
-    /** Generate a class for the ClassGenerator.
-     * Basically equivalent to _byteCode followed by _makeClass.
-     * cl is used to resolve any references
-     * to other classes and to load the class given by 
-     * the current ClassGenerator.  options may be used
-     * to control some aspects of the code generation, such as
-     * debugging options.  
-     */
-    public static Class<?> _generate( ClassGenerator cg, ClassLoader cl,
-        ProtectionDomain pd, Properties props, PrintStream debugOutput ) {
-
-	ImportList imports = env().imports() ;
-	byte[] data = CodeGenerator.generateBytecode( (ClassGeneratorImpl)cg,
-            cl, imports, props, debugOutput ) ;
-	return CodeGeneratorUtil.makeClass( cg.name(), data, pd, cl ) ;
-    }
-
-    /** Generate a class for the current ClassGenerator.
-     * Basically equivalent to _byteCode followed by _makeClass.
-     * cl is used to resolve any references
-     * to other classes and to load the class given by
-     * the current ClassGenerator.  options may be used
-     * to control some aspects of the code generation, such as
-     * debugging options.
-     */
-    public static Class<?> _generate( ClassLoader cl, ProtectionDomain pd,
-	Properties props ) {
-	ClassGenerator cg = env().classGenerator() ;
-        return _generate( cg, cl, pd, props ) ;
-    }
-
-    /** Generate a class for the current ClassGenerator.
-     * Basically equivalent to _byteCode followed by _makeClass.
-     * cl is used to resolve any references
-     * to other classes and to load the class given by 
-     * the current ClassGenerator.  options may be used
-     * to control some aspects of the code generation, such as
-     * debugging options.  
-     */
-    public static Class<?> _generate( ClassGenerator cg, ClassLoader cl,
-        ProtectionDomain pd, Properties props ) {
-	ImportList imports = env().imports() ;
-	byte[] data = CodeGenerator.generateBytecode( (ClassGeneratorImpl)cg,
-            cl, imports, props, System.out ) ;
-	return CodeGeneratorUtil.makeClass( cg.name(), data, pd, cl ) ;
-    }
-
-    private static <T> ProtectionDomain getCurrentProtectionDomain( final Class<T> cls ) {
-	if (System.getSecurityManager() == null) {
-	    return cls.getProtectionDomain() ;
-	} else {
-	    return AccessController.doPrivileged( 
-		new PrivilegedAction<ProtectionDomain>() {
-		    public ProtectionDomain run() {
-			return cls.getProtectionDomain() ;
-		    }
-		}
-	    ) ;
-	}
-    }
-
-    /** Return a GenericClass instance so that we can easily create an instance
-     * of the generated class.  This form should be used as an abbreviation,
-     * where the context ClassLoader and associated ProtectionDomain are all that
-     * is needed.
-     */
-    public static <T> GenericClass<T> _generate( Class<T> cls,
-	Properties props ) throws ClassNotFoundException {
-
-	ClassGenerator cg = env().classGenerator() ;
-        return _generate( cg, cls, props ) ;
-    }
-
-    /** Return a GenericClass instance so that we can easily create an instance
-     * of the generated class.  This form should be used as an abbreviation,
-     * where the context ClassLoader and associated ProtectionDomain are all that
-     * is needed.
-     */
-    public static <T> GenericClass<T> _generate( ClassGenerator cg,
-        Class<T> cls, Properties props ) throws ClassNotFoundException {
-
-	ClassLoader cl = CurrentClassLoader.get() ;
-	ProtectionDomain pd = getCurrentProtectionDomain( cls ) ;
-
-	Class<?> implClass = _generate( cg, cl, pd, props ) ;
-	GenericClass<T> gc = new GenericClass<T>( cls, implClass ) ;
-	return gc ;
-    }
-
-    /** Generate the Java source code for the current Class defined by
-     * Wrapper calls.  options may be used to control some aspects
-     * of the formatting of the source code, but no options are currently
-     * defined.  The generate source code is written to the PrintStream.
-     */
-    public static void _sourceCode( PrintStream ps,
-	Properties options ) throws IOException {
-
-	ClassGenerator cg = env().classGenerator() ;
-        _sourceCode( cg, ps, options ) ;
-    }
-
-    /** Generate the Java source code for the ClassGenerator.
-     * options may be used to control some aspects
-     * of the formatting of the source code, but no options are currently
-     * defined.  The generate source code is written to the PrintStream.
-     */
-    public static void _sourceCode( ClassGenerator cg, PrintStream ps,
-	Properties options ) throws IOException {
-	ImportList imports = env().imports() ;
-	CodeGenerator.generateSourceCode( ps,
-            (ClassGeneratorImpl)cg, imports, options ) ;
-    }
-
-    /** Generate source code into a specified output directory.
-     * options must set SOURCE_GENERATION_DIRECTORY to the name
-     * of the output directory.
-     */
-    public static void _sourceCode( Properties options ) throws IOException {
-	ClassGenerator cg = env().classGenerator() ;
-        _sourceCode( cg, options ) ;
-    }
-
-    /** Generate source code into a specified output directory.
-     * options must set SOURCE_GENERATION_DIRECTORY to the name
-     * of the output directory.
-     */
-    public static void _sourceCode( ClassGenerator cg,
-        Properties options ) throws IOException {
-
-	ImportList imports = env().imports() ;
-	String sourceGenDir = options.getProperty( 
-	    Wrapper.SOURCE_GENERATION_DIRECTORY ) ;
-	if (sourceGenDir == null) {
-	    throw new IllegalArgumentException( 
-		"options must specify SOURCE_GENERATION_DIRECTORY" ) ;
-	} else {
-	    CodeGenerator.generateSourceCode( sourceGenDir,
-                (ClassGeneratorImpl)cg, imports,
-		options ) ;
-	}
-    }
-
-    /** Dump the contents of the AST for the current Class defined
-     * by Wrapper calls.  The AST is dumped to the PrintStream.
-     */
-    public static void _displayAST( PrintStream ps ) {
-	ClassGenerator cg = env().classGenerator() ;
-        _displayAST( cg, ps ) ;
-    }
-
-    /** Dump the contents of the AST for the current Class defined
-     * by Wrapper calls.  The AST is dumped to the PrintStream.
-     */
-    public static void _displayAST( ClassGenerator cg, PrintStream ps ) {
-	Util.display( (ClassGeneratorImpl)cg, ps ) ;
-    }
-
-    /** Discard the current Class generated by Wrapper calls, so that
-     * another Class may be generated.
-     */
-    public static void _clear() {
-	env()._clear() ;
-    }
-
-    /** Create a signature that may be used for calling a method or
-     * constructor.  rtype is the return type, and types gives all
-     * of the argument types.  types is empty if there are no
-     * arguments.
-     */
-    public static Signature _s( Type rtype, Type... types) {
-	return Signature.make( rtype, asList( types ) ) ;
-    }
-
-    /** Create a signature that may be used for calling a method or
-     * constructor.  rtype is the return type, and types gives all
-     * of the argument types.  types is empty if there are no
-     * arguments.
-     */
-    public static Signature _s( Type rtype, List<Type> types) {
-	return Signature.make( rtype, types ) ;
-    }
-    // Types
-
-    /** Return the reference type for the given class name.
-     * name may be either the Class name, if the full name has
-     * been imported using an _import statement, or a
-     * fully qualified Class name.
-     */
-    public static final Type _t( String name ) {
-	return env()._t( name ) ;
-    }
-
-    /** Return a representation of the void type.  This is
-     * used whenever a method has a void return type.
-     */
-    public static final Type _void()  {
-	return Type._void() ;
-    }
-
-    /** Return a representation of the null type.  This is
-     * the type of the null value.  The null type is
-     * assignment compatible with any reference type.
-     * This is not normally needed in dynamically generated code.
-     */
-    public static final Type _nullType()  {
-	return Type._null() ;
-    }
-
-    /** Return a representation of the boolean type.
-     */
-    public static final Type _boolean()  {
-	return Type._boolean() ;
-    }
-
-    /** Return a representation of the byte type.
-     */
-    public static final Type _byte() {
-	return Type._byte() ;
-    }
-
-    /** Return a representation of the short type.
-     */
-    public static final Type _short()  {
-	return Type._short() ;
-    }
-
-    /** Return a representation of the char type.
-     */
-    public static final Type _char()  {
-	return Type._char() ;
-    }
-
-    /** Return a representation of the int type.
-     */
-    public static final Type _int() {
-	return Type._int() ;
-    }
-
-    /** Return a representation of the long type.
-     */
-    public static final Type _long() {
-	return Type._long() ;
-    }
-
-    /** Return a representation of the float type.
-     */
-    public static final Type _float() {
-	return Type._float() ;
-    }
-
-    /** Return a representation of the double type.
-     */
-    public static final Type _double()  {
-	return Type._double() ;
-    }
-
-    /** Return a representation of the java.lang.Object type.
-     */
-    public static final Type _Object() {
-        return Type._Object() ;
-    }
-     
-    /** Return a representation of the java.lang.String type.
-     */
-    public static final Type _String() {
-	return Type._String() ;
-    }
-
-    /** Return a representation of the java.lang.Class type.
-     */
-    public static final Type _Class()  {
-	return Type._Class() ;
-    }
-
-    /** Return a representation of the array type with the 
-     * given component type.
-     */
-    public static final Type _array( Type type )  {
-	return Type._array( type ) ;
-    }
-
-    /** Split the class name into a pair of the package name and the unqualified class
-     * name.  If name is the name of a class in the anonymous global package,
-     * the package name is "".
-     */
-    public static final Pair<String,String> splitClassName( String name ) {
-    	int lastDot = name.lastIndexOf( '.' ) ;
-	String pname = (lastDot == -1) ? "" : name.substring( 0, lastDot ) ;
-	String cname = name.substring( lastDot + 1 ) ;
-	return new Pair<String,String>( pname, cname ) ;
-    }
-
-    // Declarations
-    /** _package must be called first to set the package name for this
-     * class.  After _package, all required _import calls must be made,
-     * followed by one _class call.  name may be "", in which case
-     * the generated class is in the default package.
-     */
-    public static final void _package( String name ) {
-	env()._package( name ) ;
-    }
-
-    /** Same as _package( "" ).  Note that this method MUST be called
-     * before _class or _interface.  This is a bit surprising,
-     * since Java allows omission of the package statement, but codegen
-     * requires an explicit package call.
-     */
-    public static final void _package() {
-	env()._package( "" ) ;
-    }
-
-    /** Used to create short names for types.  Name must be a fully
-     * qualified class name.  The last name becomes the short
-     * name used in _t to look up the full type.  The result Type can
-     * also be used directly.
-     */
-    public static final Type _import( String name ) {
-	return env()._import( name ) ;
-    }
-
-    /** Return an ImportList that can be shared across multiple
-     * class generations.
-     */
-    public static final ImportList _import() {
-	return env()._import() ;
-    }
-
-    /** Set the ImportList for the current class generation.
-     * Mainly useful for generating source code.
-     */
-    public static final void _import( ImportList ilist ) {
-	env()._import( ilist ) ;
-    }
-
-    /** Define a class.  This must be followed by calls to 
-     * _data, _initializer, or _method in any order.
-     */
-    public static final void _class( int modifiers, String name,
-	Type superClass, Type... impls ) {
-	env()._class( modifiers, name, superClass, asList(impls)) ;
-    }
-
-    /** Define a class.  This must be followed by calls to 
-     * _data, _initializer, or _method in any order.
-     */
-    public static final void _class( int modifiers, String name,
-	Type superClass, List<Type> impls ) {
-	env()._class( modifiers, name, superClass, impls ) ;
-    }
-
-    /** Define an interface.  This must be followed by calls to
-     * _method only.  All _method calls must define abstract methods.
-     * Note that static data in interfaces is not currently supported.
-     */
-    public static final void _interface( int modifiers, String name,
-	Type... impls ) {
-	env()._interface( modifiers, name, asList(impls) ) ;
-    }
-
-    /** Define an interface.  This must be followed by calls to
-     * _method only.  All _method calls must define abstract methods.
-     * Note that static data in interfaces is not currently supported.
-     */
-    public static final void _interface( int modifiers, String name,
-	List<Type> impls ) {
-	env()._interface( modifiers, name, impls ) ;
-    }
-
-    /** Define a data member in a class.  If static, it must be
-     * initialized in the class initializer, otherwise it must be 
-     * initialized in a constructor.
-     */
-    public static final Expression _data( int modifiers, Type type,
-	String name ) {
-	FieldGenerator fld = env()._data( modifiers, type, name ) ;
-	return fld.getExpression() ;
-    }
-
-    /* Begin or continue defining the static initializer for the class.
-     * Must be followed by any statement, or _end.  May be re-opened 
-     * later for additional statements.
-     */
-    public static final void _initializer() {
-	env()._initializer() ;
-    }
-
-    /** Begin defining a method in the current class.  Must be followed
-     * first be all _arg calls for the method, then by _body(), then
-     * by any statements, and finally by _end().  _body() may be followed
-     * immediately by _end(), in which case the method has an empty body.
-     * Abstract methods must have an empty body.
-     */ 
-    public static final void _method( int modifiers, Type type, 
-	String name, Type... exceptions ) {
-	env()._method( modifiers, type, name, asList(exceptions)) ;
-    }
-
-    /** Begin defining a method in the current class.  Must be followed
-     * first by all _arg calls for the method, then by _body(), then
-     * by any statements, and finally by _end().  _body() may be followed
-     * immediately by _end(), in which case the method has an empty body.
-     * Abstract methods must have an empty body.
-     */ 
-    public static final void _method( int modifiers, Type type, 
-	String name, List<Type> exceptions ) {
-	env()._method( modifiers, type, name, exceptions ) ;
-    }
-
-    /** Begin defining a constructor in the current class.  
-     * Must be followed
-     * first by all _arg calls for the constructor, then by _body(), then
-     * by optional statements, and finally by _end().  
-     * Note that the first statement in any constructor must be
-     * a this() or super() call.  Constructors may not have
-     * empty bodies.
-     */ 
-    public static final void _constructor( int modifiers, 
-	Type... exceptions ) {
-	env()._constructor( modifiers, asList(exceptions) ) ;
-    }
-
-    /** Begin defining a constructor in the current class.  
-     * Must be followed
-     * first by all _arg calls for the constructor, then by _body(), then
-     * by any statements, and finally by _end().
-     * Note that the first statement in any constructor must be
-     * a _this() or _super() call.  Constructors may not have
-     * empty bodies.
-     * Note that no default constructor is automatically generated
-     * using this API.
-     */ 
-    public static final void _constructor( int modifiers, 
-	List<Type> exceptions ) {
-	env()._constructor( modifiers, exceptions ) ;
-    }
-
-    /** Add an argument to the current method.
-     */
-    public static final Expression _arg( Type type, String name ) {
-	return env()._arg( type, name ) ;
-    }
-
-    /** Indicates the start of the definition of the body of a method.
-     * Must be followed by  0 or more statements, and be terminated by _end().
-     */
-    public static final void _body() {
-	env()._body() ;
-    }
-
-    /** Terminates the definition of the current statement, method,
-     * constructor, initializer, class, or package.
-     * Restores the context for the previous definition.
-     */
-    public static final void _end() {
-	env()._end() ;
-    }
-    
-    // Statements
-
-    /** Indicate that expr should be executed as a statement for its
-     * side effects.
-     */
-    public static final void _expr( Expression expr ) {
-	env().bs().addExpression( expr ) ;
-    }	
-
-    /** Indicates an assignment statement of the form var = expr.
-     * Var must be an assignable expression, such as a local variable,
-     * a non-final field reference, ior an array index expression.
-     */
-    public static final void _assign( Expression var, Expression expr ) {
-	env().bs().addAssign( var, expr ) ;
-    }
-
-    /** Indicates the introduction of a new local variable initialized to
-     * the given expression.
-     */
-    public static final Expression _define( Type type, String name,
-        Expression expr ) {
-
-	return env().bs().addDefinition( type, name, expr ) ;
-    }
-    
-    /** Indicates a break statement, that should transfer control out of the
-     * nearest enclosing _switch or _while statement.
-     */
-    public static final void _break() {
-	env().bs().addBreak() ;
-    }
-
-    /** Indicates the end of execution in a method.  Can only occur inside
-     * a definition of a method with a void return type.
-     */
-    public static final void _return() {
-	env().bs().addReturn() ;
-    }
-
-    /** Indicates the end of execution in a method with a return of the 
-     * value of the expression.  The type of the expression must be
-     * assignment compatible with the return type of the enclosing method.
-     */
-    public static final void _return( Expression expr )  {
-	env().bs().addReturn( expr ) ;
-    }
-
-    /** Indicates a throw statement that throws the given expression.
-     * The type of expr must support Throwable.
-     */
-    public static final void _throw( Expression expr )  {
-	env().bs().addThrow( expr ) ;
-    }
-
-    /** Indicate the start of an if statement with the given expression
-     * as the condition.  All subsequent statements until the next
-     * matching _else are part of the true branch of this if statement.
-     */
-    public static final void _if( Expression expr )  {
-	env()._if( expr ) ;
-    }
-
-    /** Indicate the start of the false branch of an if statement.
-     * All subsequent statements until the next matching _end are
-     * part of the false branch of the corresponding if statement.
-     */
-    public static final void _else()  {
-	env()._else() ;
-    }
-
-    /** Indicate the start of a try statement.
-     * All subsequent statements until the next matching _catch
-     * or _finally are part of this try statement.
-     */
-    public static final void _try() {
-	env()._try() ;
-    }
-
-    /** Indicate the start of a catch clause in a try statement.
-     * All subsequent statements until the next matching _catch
-     * or _finally are part of this catch clause.
-     */
-    public static final Expression _catch( Type type, String name )  {
-	return env()._catch( type, name ) ;
-    }
-
-    /** Indicate the start of a finally clause in a try statement.
-     * All subsequent statements until the next matching _end
-     * are part of this finally clause.
-     */
-    public static final void _finally() {
-	env()._finally() ;
-    }
-
-    /** Indicate the start of a switch statement with the given
-     * expression at the switch expression.  expr must have 
-     * type int.
-     * Must be followed by a _case or _default call.
-     */
-    public static final void _switch( Expression expr ) {
-	env()._switch( expr ) ;
-    }
-
-    /** Indicate the start of a particular case in a switch
-     * statement.  All statements until the next corresponding
-     * _case or _default are part of this case.
-     */
-    public static final void _case( int value ) {
-	env()._case( value ) ;
-    }
-
-    /** Indicate the start of the default case in a switch
-     * statement.  All statements until the next corresponding
-     * _end are part of the default case.
-     */
-    public static final void _default() {
-	env()._default() ;
-    }
-
-    /** Indicate the start of a while loop with the given 
-     * expression as its condition.  All statements until 
-     * the next corresponding _end are part of the while loop.
-     */
-    public static final void _while( Expression expr ) {
-	env()._while( expr ) ;
-    }
-
-    // Expressions
-
-    /** Construct the expression that refers to 
-     * the variable named name.  This is looked up 
-     * following the Java name scope rules.
-     */
-    public static final Expression _v(String name) {
-	return env()._v(name) ;
-    }
-
-    /** Return the null expression.
-     */
-    public static final Expression _null() {
-	return env().ef()._null() ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( boolean c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( char c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( byte c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( short c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( int c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( long c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( float c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( double c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.
-     */
-    public static final Expression _const( String c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Return a constant expression representing the
-     * value c.  Here c is a type, and this corresponds
-     * to the Java ".class" reference.
-     */
-    public static final Expression _const( Type c ) {
-	return env().ef()._const(c) ;
-    }
-
-    /** Generate a call to an instance method.  The full signature
-     * must be specified.
-     */
-    public static final Expression _call( Expression target, String ident,
-	Signature signature, Expression... args )  {
-	return env().ef().call( target, ident, signature, asList(args) ) ;
-    }
-
-    /** Generate a call to an instance method.  The full signature
-     * must be specified.
-     */
-    public static final Expression _call( Expression target, String ident,
-	Signature signature, List<Expression> args )  {
-	return env().ef().call( target, ident, signature, args ) ;
-    }
-
-    /** Generate a call to an instance method, using the Java method 
-     * overload resolution algorithm to determine the signature.
-     */
-    public static final Expression _call( Expression target, String ident,
-	Expression... args )  {
-	return env().ef().call( target, ident, asList(args) ) ;
-    }
-
-    /** Generate a call to an instance method, using the Java method 
-     * overload resolution algorithm to determine the signature.
-     */
-    public static final Expression _call( Expression target, String ident,
-	List<Expression> args )  {
-	return env().ef().call( target, ident, args ) ;
-    }
-
-    /** Generate a call to a static method.  The full signature
-     * must be specified.
-     */
-    public static final Expression _call( Type target, String ident,
-	Signature signature, Expression... args )  {
-	return env().ef().staticCall( target, ident, signature, asList(args) ) ;
-    }
-
-    /** Generate a call to a static method.  The full signature
-     * must be specified.
-     */
-    public static final Expression _call( Type target, String ident,
-	Signature signature, List<Expression> args )  {
-	return env().ef().staticCall( target, ident, signature, args ) ;
-    }
-
-    /** Generate a call to a static method, using the Java method 
-     * overload resolution algorithm to determine the signature.
-     */
-    public static final Expression _call( Type target, String ident,
-	Expression... args )  {
-	return env().ef().staticCall( target, ident, asList(args) ) ;
-    }
-
-    /** Generate a call to a static method, using the Java method 
-     * overload resolution algorithm to determine the signature.
-     */
-    public static final Expression _call( Type target, String ident,
-	List<Expression> args )  {
-	return env().ef().staticCall( target, ident, args ) ;
-    }
-
-    /** Generate a call to an instance method in the current super
-     * class.  The full signature must be specified.
-     */
-    public static final Expression _super( String ident,
-	Signature signature, Expression... exprs ) {
-	return env().ef().superCall( ident, signature, asList(exprs) ) ;
-    }
-
-    /** Generate a call to an instance method in the current super
-     * class.  The full signature must be specified.
-     */
-    public static final Expression _super( String ident,
-	Signature signature, List<Expression> exprs ) {
-	return env().ef().superCall( ident, signature, exprs ) ;
-    }
-
-    /** Generate a call to an instance method in the current super
-     * class using the Java method overload resolution algorithm to
-     * determine the signature.  
-     */
-    public static final Expression _super( String ident,
-	Expression... exprs )  {
-	return env().ef().superCall( ident, asList(exprs) ) ;
-    }
-
-    /** Generate a call to an instance method in the current super
-     * class using the Java method overload resolution algorithm to
-     * determine the signature.  
-     */
-    public static final Expression _super( String ident,
-	List<Expression> exprs )  {
-	return env().ef().superCall( ident, exprs ) ;
-    }
-
-    /** Invoke a superclass constructor as the first statement
-     * in a constructor for a class.  The full signature must
-     * be specified.  
-     * This may only be used as the first expression
-     * in a constructor.  Every constructor must begin with
-     * either a super(...) call or a this(...) call.
-     */
-    public static final Expression _super( Signature signature,
-	Expression... exprs )  {
-	return env().ef().superObj( signature, asList(exprs) ) ;
-    }
-
-    /** Invoke a superclass constructor as the first statement
-     * in a constructor for a class.  The full signature must
-     * be specified.  
-     * This may only be used as the first expression
-     * in a constructor.  Every constructor must begin with
-     * either a super(...) call or a this(...) call.
-     */
-    public static final Expression _super( Signature signature,
-	List<Expression> exprs )  {
-	return env().ef().superObj( signature, exprs ) ;
-    }
-
-    /** Invoke a superclass constructor as the first statement
-     * in a constructor for a class using the Java method overload
-     * resolution algorithm to determine the signature.
-     * This may only be used as the first expression
-     * in a constructor.  Every constructor must begin with
-     * either a super(...) call or a this(...) call.
-     */
-    public static final Expression _super( List<Expression> exprs )  {
-	return env().ef().superObj( exprs ) ;
-    }
-
-    /** Invoke a superclass constructor as the first statement
-     * in a constructor for a class using the Java method overload
-     * resolution algorithm to determine the signature.
-     * This may only be used as the first expression
-     * in a constructor.  Every constructor must begin with
-     * either a super(...) call or a this(...) call.
-     */
-    public static final Expression _super( Expression... exprs )  {
-	return env().ef().superObj( asList(exprs) ) ;
-    }
-
-    /** Invoke another constructor as the first statement
-     * in a constructor for a class.  The full signature must
-     * be specified.  
-     * This may only be used as the first expression
-     * in a constructor.  Every constructor must begin with
-     * either a super(...) call or a this(...) call.
-     */
-    public static final Expression _this( Signature signature,
-	Expression... exprs )  {
-	return env().ef().thisObj( signature, asList(exprs) ) ;
-    }
-
-    /** Invoke another constructor as the first statement
-     * in a constructor for a class.  The full signature must
-     * be specified.  
-     * This may only be used as the first expression
-     * in a constructor.  Every constructor must begin with
-     * either a super(...) call or a this(...) call.
-     */
-    public static final Expression _this( Signature signature,
-	List<Expression> exprs )  {
-	return env().ef().thisObj( signature, exprs ) ;
-    }
+  /**
+   * Obtain the ClassGeneratorImpl that is constructed by the Wrapper
+   * methods.  This is only needed for using Wrapper with custom
+   * vistors.
+   */
+  public static ClassGenerator _classGenerator() {
+    return env().classGenerator();
+  }
+
+  private static final String CODEGEN_PREFIX = "org.glassfish.dynamic.codegen";
+
+  private static final String DEBUG_PREFIX = CODEGEN_PREFIX + ".debug";
+
+  /**
+   * Set this to enable dumping the generated byte codes to a
+   * class file in the given directory.
+   */
+  public static final String CLASS_GENERATION_DIRECTORY = CODEGEN_PREFIX + ".classGenerationDirectory";
+
+  /**
+   * Option used to enable generation of source files while
+   * generating bytecode.  Set to name of directory that should
+   * contain the generated source file.
+   */
+  public static final String SOURCE_GENERATION_DIRECTORY = CODEGEN_PREFIX + ".sourceGenerationDirectory";
+
+  /**
+   * Debugging option used to dump the contents of the AST after
+   * the setup visitor runs.
+   */
+  public static final String DUMP_AFTER_SETUP_VISITOR = DEBUG_PREFIX + ".dumpAfterSetupVisitor";
+
+  /**
+   * Debugging option used to trace the byte code generation.
+   */
+  public static final String TRACE_BYTE_CODE_GENERATION = DEBUG_PREFIX + ".traceByteCodeGeneration";
+
+  /**
+   * Causes contents of constant pool to be dumped.
+   */
+  public static final String DUMP_CONSTANT_POOL = DEBUG_PREFIX + ".dumpConstantPool";
+
+  /**
+   * Debugging option used to enable the ASM verifier, which can be
+   * helpful for debugging errors in the code generation.
+   */
+  public static final String USE_ASM_VERIFIER = DEBUG_PREFIX + ".useAsmVerifier";
+
+  /**
+   * Set the ClassLoader for this thread that will be used for validating
+   * references to pre-existing classes from generated code.  Applications
+   * that use special ClassLoaders (such as the app server) should call this
+   * method before starting to generate a new Class.  A good place to do this
+   * is just before the _package call.
+   */
+  public static void _setClassLoader(ClassLoader cl) {
+    CurrentClassLoader.set(cl);
+  }
+
+  /**
+   * Generate byte codes for the current ClassGenerator.
+   * cl is used to resolve any references
+   * to other classes.  options may be used
+   * to control some aspects of the code generation, such as
+   * debugging options.  Supported options include
+   * DUMP_AFTER_SETUP_VISITOR, TRACE_BYTE_CODE_GENERATION,
+   * USE_ASM_VERIFIER.
+   */
+  public static byte[] _byteCode(ClassLoader cl, Properties options) {
+    return _byteCode(env().classGenerator(), cl, options);
+  }
+
+  /**
+   * Generate byte codes for the ClassGenerator.
+   * cl is used to resolve any references
+   * to other classes.  options may be used
+   * to control some aspects of the code generation, such as
+   * debugging options.  Supported options include
+   * DUMP_AFTER_SETUP_VISITOR, TRACE_BYTE_CODE_GENERATION,
+   * USE_ASM_VERIFIER.
+   */
+  public static byte[] _byteCode(ClassGenerator cgen, ClassLoader cl,
+                                 Properties options) {
+
+    ClassGeneratorImpl cg = env().classGenerator();
+    ImportList imports = env().imports();
+    return CodeGenerator.generateBytecode(cg, cl, imports, options,
+          System.out);
+  }
+
+  /**
+   * Generate a class for the current ClassGenerator.
+   * Basically equivalent to _byteCode followed by _makeClass.
+   * cl is used to resolve any references
+   * to other classes and to load the class given by
+   * the current ClassGenerator.  options may be used
+   * to control some aspects of the code generation, such as
+   * debugging options.
+   */
+  public static Class<?> _generate(ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream debugOutput) {
+    ClassGenerator cg = env().classGenerator();
+
+    return _generate(cg, cl, pd, props, debugOutput);
+  }
+
+  /**
+   * Generate a class for the ClassGenerator.
+   * Basically equivalent to _byteCode followed by _makeClass.
+   * cl is used to resolve any references
+   * to other classes and to load the class given by
+   * the current ClassGenerator.  options may be used
+   * to control some aspects of the code generation, such as
+   * debugging options.
+   */
+  public static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream debugOutput) {
+
+    ImportList imports = env().imports();
+    byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
+          cl, imports, props, debugOutput);
+    return CodeGeneratorUtil.makeClass(cg.name(), data, pd, cl);
+  }
+
+  /**
+   * Generate a class for the current ClassGenerator.
+   * Basically equivalent to _byteCode followed by _makeClass.
+   * cl is used to resolve any references
+   * to other classes and to load the class given by
+   * the current ClassGenerator.  options may be used
+   * to control some aspects of the code generation, such as
+   * debugging options.
+   */
+  public static Class<?> _generate(ClassLoader cl, ProtectionDomain pd, Properties props) {
+    ClassGenerator cg = env().classGenerator();
+    return _generate(cg, cl, pd, props);
+  }
+
+  /**
+   * Generate a class for the current ClassGenerator.
+   * Basically equivalent to _byteCode followed by _makeClass.
+   * cl is used to resolve any references
+   * to other classes and to load the class given by
+   * the current ClassGenerator.  options may be used
+   * to control some aspects of the code generation, such as
+   * debugging options.
+   */
+  public static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props) {
+    ImportList imports = env().imports();
+    byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
+          cl, imports, props, System.out);
+    return CodeGeneratorUtil.makeClass(cg.name(), data, pd, cl);
+  }
+
+  private static <T> ProtectionDomain getCurrentProtectionDomain(final Class<T> cls) {
+    if (System.getSecurityManager() == null) {
+      return cls.getProtectionDomain();
+    } else {
+      return AccessController.doPrivileged((PrivilegedAction<ProtectionDomain>) cls::getProtectionDomain);
+    }
+  }
+
+  /**
+   * Return a GenericClass instance so that we can easily create an instance
+   * of the generated class.  This form should be used as an abbreviation,
+   * where the context ClassLoader and associated ProtectionDomain are all that
+   * is needed.
+   */
+  public static <T> GenericClass<T> _generate(Class<T> cls, Properties props) {
+
+    ClassGenerator cg = env().classGenerator();
+    return _generate(cg, cls, props);
+  }
+
+  /**
+   * Return a GenericClass instance so that we can easily create an instance
+   * of the generated class.  This form should be used as an abbreviation,
+   * where the context ClassLoader and associated ProtectionDomain are all that
+   * is needed.
+   */
+  public static <T> GenericClass<T> _generate(ClassGenerator cg, Class<T> cls, Properties props) {
+
+    ClassLoader cl = CurrentClassLoader.get();
+    ProtectionDomain pd = getCurrentProtectionDomain(cls);
+
+    Class<?> implClass = _generate(cg, cl, pd, props);
+    return new GenericClass<>(cls, implClass);
+  }
+
+  /**
+   * Generate the Java source code for the current Class defined by
+   * Wrapper calls.  options may be used to control some aspects
+   * of the formatting of the source code, but no options are currently
+   * defined.  The generate source code is written to the PrintStream.
+   */
+  public static void _sourceCode(PrintStream ps,
+                                 Properties options) throws IOException {
+
+    ClassGenerator cg = env().classGenerator();
+    _sourceCode(cg, ps, options);
+  }
+
+  /**
+   * Generate the Java source code for the ClassGenerator.
+   * options may be used to control some aspects
+   * of the formatting of the source code, but no options are currently
+   * defined.  The generate source code is written to the PrintStream.
+   */
+  public static void _sourceCode(ClassGenerator cg, PrintStream ps,
+                                 Properties options) throws IOException {
+    ImportList imports = env().imports();
+    CodeGenerator.generateSourceCode(ps,
+          (ClassGeneratorImpl) cg, imports, options);
+  }
+
+  /**
+   * Generate source code into a specified output directory.
+   * options must set SOURCE_GENERATION_DIRECTORY to the name
+   * of the output directory.
+   */
+  public static void _sourceCode(Properties options) throws IOException {
+    ClassGenerator cg = env().classGenerator();
+    _sourceCode(cg, options);
+  }
+
+  /**
+   * Generate source code into a specified output directory.
+   * options must set SOURCE_GENERATION_DIRECTORY to the name
+   * of the output directory.
+   */
+  public static void _sourceCode(ClassGenerator cg,
+                                 Properties options) throws IOException {
+
+    ImportList imports = env().imports();
+    String sourceGenDir = options.getProperty(
+          Wrapper.SOURCE_GENERATION_DIRECTORY);
+    if (sourceGenDir == null) {
+      throw new IllegalArgumentException(
+            "options must specify SOURCE_GENERATION_DIRECTORY");
+    } else {
+      CodeGenerator.generateSourceCode(sourceGenDir,
+            (ClassGeneratorImpl) cg, imports,
+            options);
+    }
+  }
+
+  /**
+   * Dump the contents of the AST for the current Class defined
+   * by Wrapper calls.  The AST is dumped to the PrintStream.
+   */
+  public static void _displayAST(ClassGenerator cg, PrintStream ps) {
+    Util.display((ClassGeneratorImpl) cg, ps);
+  }
+
+  /**
+   * Discard the current Class generated by Wrapper calls, so that
+   * another Class may be generated.
+   */
+  public static void _clear() {
+    env()._clear();
+  }
+
+  /**
+   * Create a signature that may be used for calling a method or
+   * constructor.  rtype is the return type, and types gives all
+   * of the argument types.  types is empty if there are no
+   * arguments.
+   */
+  public static Signature _s(Type rtype, Type... types) {
+    return Signature.make(rtype, asList(types));
+  }
+
+  // Types
+
+  /**
+   * Return the reference type for the given class name.
+   * name may be either the Class name, if the full name has
+   * been imported using an _import statement, or a
+   * fully qualified Class name.
+   */
+  public static Type _t(String name) {
+    return env()._t(name);
+  }
+
+  /**
+   * Return a representation of the void type.  This is
+   * used whenever a method has a void return type.
+   */
+  public static Type _void() {
+    return Type._void();
+  }
+
+  /**
+   * Return a representation of the boolean type.
+   */
+  public static Type _boolean() {
+    return Type._boolean();
+  }
+
+  /**
+   * Return a representation of the byte type.
+   */
+  static Type _byte() {
+    return Type._byte();
+  }
+
+  /**
+   * Return a representation of the short type.
+   */
+  static Type _short() {
+    return Type._short();
+  }
+
+  /**
+   * Return a representation of the char type.
+   */
+  static Type _char() {
+    return Type._char();
+  }
+
+  /**
+   * Return a representation of the int type.
+   */
+  public static Type _int() {
+    return Type._int();
+  }
+
+  /**
+   * Return a representation of the long type.
+   */
+  static Type _long() {
+    return Type._long();
+  }
+
+  /**
+   * Return a representation of the float type.
+   */
+  static Type _float() {
+    return Type._float();
+  }
+
+  /**
+   * Return a representation of the double type.
+   */
+  static Type _double() {
+    return Type._double();
+  }
+
+  /**
+   * Return a representation of the java.lang.Object type.
+   */
+  public static Type _Object() {
+    return Type._Object();
+  }
+
+  /**
+   * Return a representation of the java.lang.String type.
+   */
+  public static Type _String() {
+    return Type._String();
+  }
+
+  /**
+   * Return a representation of the java.lang.Class type.
+   */
+  public static Type _Class() {
+    return Type._Class();
+  }
+
+  /**
+   * Split the class name into a pair of the package name and the unqualified class
+   * name.  If name is the name of a class in the anonymous global package,
+   * the package name is "".
+   */
+  public static Pair<String, String> splitClassName(String name) {
+    int lastDot = name.lastIndexOf('.');
+    String pname = (lastDot == -1) ? "" : name.substring(0, lastDot);
+    String cname = name.substring(lastDot + 1);
+    return new Pair<>(pname, cname);
+  }
+
+  // Declarations
+
+  /**
+   * _package must be called first to set the package name for this
+   * class.  After _package, all required _import calls must be made,
+   * followed by one _class call.  name may be "", in which case
+   * the generated class is in the default package.
+   */
+  public static void _package(String name) {
+    env()._package(name);
+  }
+
+  /**
+   * Same as _package( "" ).  Note that this method MUST be called
+   * before _class or _interface.  This is a bit surprising,
+   * since Java allows omission of the package statement, but codegen
+   * requires an explicit package call.
+   */
+  public static void _package() {
+    env()._package("");
+  }
+
+  /**
+   * Used to create short names for types.  Name must be a fully
+   * qualified class name.  The last name becomes the short
+   * name used in _t to look up the full type.  The result Type can
+   * also be used directly.
+   */
+  public static Type _import(String name) {
+    return env()._import(name);
+  }
+
+  /**
+   * Return an ImportList that can be shared across multiple
+   * class generations.
+   */
+  public static ImportList _import() {
+    return env()._import();
+  }
+
+  /**
+   * Set the ImportList for the current class generation.
+   * Mainly useful for generating source code.
+   */
+  public static void _import(ImportList ilist) {
+    env()._import(ilist);
+  }
+
+  /**
+   * Define a class.  This must be followed by calls to
+   * _data, _initializer, or _method in any order.
+   */
+  public static void _class(int modifiers, String name,
+                                  Type superClass, Type... impls) {
+    env()._class(modifiers, name, superClass, asList(impls));
+  }
+
+  /**
+   * Define a class.  This must be followed by calls to
+   * _data, _initializer, or _method in any order.
+   */
+  public static void _class(int modifiers, String name,
+                                  Type superClass, List<Type> impls) {
+    env()._class(modifiers, name, superClass, impls);
+  }
+
+  /**
+   * Define an interface.  This must be followed by calls to
+   * _method only.  All _method calls must define abstract methods.
+   * Note that static data in interfaces is not currently supported.
+   */
+  public static void _interface(int modifiers, String name,
+                                      Type... impls) {
+    env()._interface(modifiers, name, asList(impls));
+  }
+
+  /**
+   * Define an interface.  This must be followed by calls to
+   * _method only.  All _method calls must define abstract methods.
+   * Note that static data in interfaces is not currently supported.
+   */
+  public static void _interface(int modifiers, String name,
+                                      List<Type> impls) {
+    env()._interface(modifiers, name, impls);
+  }
+
+  /**
+   * Define a data member in a class.  If static, it must be
+   * initialized in the class initializer, otherwise it must be
+   * initialized in a constructor.
+   */
+  public static Expression _data(int modifiers, Type type,
+                                       String name) {
+    FieldGenerator fld = env()._data(modifiers, type, name);
+    return fld.getExpression();
+  }
+
+  /**
+   * Begin defining a method in the current class.  Must be followed
+   * first be all _arg calls for the method, then by _body(), then
+   * by any statements, and finally by _end().  _body() may be followed
+   * immediately by _end(), in which case the method has an empty body.
+   * Abstract methods must have an empty body.
+   */
+  public static void _method(int modifiers, Type type,
+                                   String name, Type... exceptions) {
+    env()._method(modifiers, type, name, asList(exceptions));
+  }
+
+  /**
+   * Begin defining a method in the current class.  Must be followed
+   * first by all _arg calls for the method, then by _body(), then
+   * by any statements, and finally by _end().  _body() may be followed
+   * immediately by _end(), in which case the method has an empty body.
+   * Abstract methods must have an empty body.
+   */
+  public static void _method(int modifiers, Type type,
+                                   String name, List<Type> exceptions) {
+    env()._method(modifiers, type, name, exceptions);
+  }
+
+  /**
+   * Begin defining a constructor in the current class.
+   * Must be followed
+   * first by all _arg calls for the constructor, then by _body(), then
+   * by optional statements, and finally by _end().
+   * Note that the first statement in any constructor must be
+   * a this() or super() call.  Constructors may not have
+   * empty bodies.
+   */
+  public static void _constructor(int modifiers,
+                                        Type... exceptions) {
+    env()._constructor(modifiers, asList(exceptions));
+  }
+
+  /**
+   * Begin defining a constructor in the current class.
+   * Must be followed
+   * first by all _arg calls for the constructor, then by _body(), then
+   * by any statements, and finally by _end().
+   * Note that the first statement in any constructor must be
+   * a _this() or _super() call.  Constructors may not have
+   * empty bodies.
+   * Note that no default constructor is automatically generated
+   * using this API.
+   */
+  public static void _constructor(int modifiers,
+                                        List<Type> exceptions) {
+    env()._constructor(modifiers, exceptions);
+  }
+
+  /**
+   * Add an argument to the current method.
+   */
+  public static Expression _arg(Type type, String name) {
+    return env()._arg(type, name);
+  }
+
+  /**
+   * Indicates the start of the definition of the body of a method.
+   * Must be followed by  0 or more statements, and be terminated by _end().
+   */
+  public static void _body() {
+    env()._body();
+  }
+
+  /**
+   * Terminates the definition of the current statement, method,
+   * constructor, initializer, class, or package.
+   * Restores the context for the previous definition.
+   */
+  public static void _end() {
+    env()._end();
+  }
+
+  // Statements
+
+  /**
+   * Indicate that expr should be executed as a statement for its
+   * side effects.
+   */
+  public static void _expr(Expression expr) {
+    env().bs().addExpression(expr);
+  }
+
+  /**
+   * Indicates an assignment statement of the form var = expr.
+   * Var must be an assignable expression, such as a local variable,
+   * a non-final field reference, ior an array index expression.
+   */
+  public static void _assign(Expression var, Expression expr) {
+    env().bs().addAssign(var, expr);
+  }
+
+  /**
+   * Indicates the introduction of a new local variable initialized to
+   * the given expression.
+   */
+  public static Expression _define(Type type, String name,
+                                         Expression expr) {
+
+    return env().bs().addDefinition(type, name, expr);
+  }
+
+  /**
+   * Indicates the end of execution in a method.  Can only occur inside
+   * a definition of a method with a void return type.
+   */
+  public static void _return() {
+    env().bs().addReturn();
+  }
+
+  /**
+   * Indicates the end of execution in a method with a return of the
+   * value of the expression.  The type of the expression must be
+   * assignment compatible with the return type of the enclosing method.
+   */
+  public static void _return(Expression expr) {
+    env().bs().addReturn(expr);
+  }
+
+  /**
+   * Indicates a throw statement that throws the given expression.
+   * The type of expr must support Throwable.
+   */
+  public static void _throw(Expression expr) {
+    env().bs().addThrow(expr);
+  }
+
+  /**
+   * Indicate the start of an if statement with the given expression
+   * as the condition.  All subsequent statements until the next
+   * matching _else are part of the true branch of this if statement.
+   */
+  public static void _if(Expression expr) {
+    env()._if(expr);
+  }
+
+  /**
+   * Indicate the start of the false branch of an if statement.
+   * All subsequent statements until the next matching _end are
+   * part of the false branch of the corresponding if statement.
+   */
+  public static void _else() {
+    env()._else();
+  }
+
+  /**
+   * Indicate the start of a try statement.
+   * All subsequent statements until the next matching _catch
+   * or _finally are part of this try statement.
+   */
+  public static void _try() {
+    env()._try();
+  }
+
+  /**
+   * Indicate the start of a catch clause in a try statement.
+   * All subsequent statements until the next matching _catch
+   * or _finally are part of this catch clause.
+   */
+  public static Expression _catch(Type type, String name) {
+    return env()._catch(type, name);
+  }
+
+  /**
+   * Indicate the start of a finally clause in a try statement.
+   * All subsequent statements until the next matching _end
+   * are part of this finally clause.
+   */
+  public static void _finally() {
+    env()._finally();
+  }
+
+  // Expressions
+
+  /**
+   * Construct the expression that refers to
+   * the variable named name.  This is looked up
+   * following the Java name scope rules.
+   */
+  public static Expression _v(String name) {
+    return env()._v(name);
+  }
+
+  /**
+   * Return the null expression.
+   */
+  public static Expression _null() {
+    return env().ef()._null();
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(boolean c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(char c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(byte c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(short c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(int c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(long c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(float c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(double c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.
+   */
+  public static Expression _const(String c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Return a constant expression representing the
+   * value c.  Here c is a type, and this corresponds
+   * to the Java ".class" reference.
+   */
+  public static Expression _const(Type c) {
+    return env().ef()._const(c);
+  }
+
+  /**
+   * Generate a call to an instance method.  The full signature
+   * must be specified.
+   */
+  public static Expression _call(Expression target, String ident,
+                                       Signature signature, Expression... args) {
+    return env().ef().call(target, ident, signature, asList(args));
+  }
+
+  /**
+   * Generate a call to an instance method.  The full signature
+   * must be specified.
+   */
+  public static Expression _call(Expression target, String ident,
+                                       Signature signature, List<Expression> args) {
+    return env().ef().call(target, ident, signature, args);
+  }
+
+  /**
+   * Generate a call to an instance method, using the Java method
+   * overload resolution algorithm to determine the signature.
+   */
+  public static Expression _call(Expression target, String ident,
+                                       Expression... args) {
+    return env().ef().call(target, ident, asList(args));
+  }
+
+  /**
+   * Generate a call to an instance method, using the Java method
+   * overload resolution algorithm to determine the signature.
+   */
+  public static Expression _call(Expression target, String ident,
+                                       List<Expression> args) {
+    return env().ef().call(target, ident, args);
+  }
+
+  /**
+   * Generate a call to a static method.  The full signature
+   * must be specified.
+   */
+  public static Expression _call(Type target, String ident,
+                                       Signature signature, Expression... args) {
+    return env().ef().staticCall(target, ident, signature, asList(args));
+  }
+
+  /**
+   * Generate a call to a static method.  The full signature
+   * must be specified.
+   */
+  public static Expression _call(Type target, String ident,
+                                       Signature signature, List<Expression> args) {
+    return env().ef().staticCall(target, ident, signature, args);
+  }
+
+  /**
+   * Generate a call to a static method, using the Java method
+   * overload resolution algorithm to determine the signature.
+   */
+  public static Expression _call(Type target, String ident,
+                                       Expression... args) {
+    return env().ef().staticCall(target, ident, asList(args));
+  }
+
+  /**
+   * Generate a call to a static method, using the Java method
+   * overload resolution algorithm to determine the signature.
+   */
+  public static Expression _call(Type target, String ident,
+                                       List<Expression> args) {
+    return env().ef().staticCall(target, ident, args);
+  }
+
+  /**
+   * Generate a call to an instance method in the current super
+   * class.  The full signature must be specified.
+   */
+  public static Expression _super(String ident,
+                                        Signature signature, Expression... exprs) {
+    return env().ef().superCall(ident, signature, asList(exprs));
+  }
+
+  /**
+   * Generate a call to an instance method in the current super
+   * class.  The full signature must be specified.
+   */
+  public static Expression _super(String ident,
+                                        Signature signature, List<Expression> exprs) {
+    return env().ef().superCall(ident, signature, exprs);
+  }
+
+  /**
+   * Generate a call to an instance method in the current super
+   * class using the Java method overload resolution algorithm to
+   * determine the signature.
+   */
+  public static Expression _super(String ident,
+                                        Expression... exprs) {
+    return env().ef().superCall(ident, asList(exprs));
+  }
+
+  /**
+   * Generate a call to an instance method in the current super
+   * class using the Java method overload resolution algorithm to
+   * determine the signature.
+   */
+  public static Expression _super(String ident,
+                                        List<Expression> exprs) {
+    return env().ef().superCall(ident, exprs);
+  }
+
+  /**
+   * Invoke a superclass constructor as the first statement
+   * in a constructor for a class.  The full signature must
+   * be specified.
+   * This may only be used as the first expression
+   * in a constructor.  Every constructor must begin with
+   * either a super(...) call or a this(...) call.
+   */
+  public static Expression _super(Signature signature,
+                                        Expression... exprs) {
+    return env().ef().superObj(signature, asList(exprs));
+  }
+
+  /**
+   * Invoke a superclass constructor as the first statement
+   * in a constructor for a class.  The full signature must
+   * be specified.
+   * This may only be used as the first expression
+   * in a constructor.  Every constructor must begin with
+   * either a super(...) call or a this(...) call.
+   */
+  public static Expression _super(Signature signature,
+                                        List<Expression> exprs) {
+    return env().ef().superObj(signature, exprs);
+  }
+
+  /**
+   * Invoke a superclass constructor as the first statement
+   * in a constructor for a class using the Java method overload
+   * resolution algorithm to determine the signature.
+   * This may only be used as the first expression
+   * in a constructor.  Every constructor must begin with
+   * either a super(...) call or a this(...) call.
+   */
+  public static Expression _super(List<Expression> exprs) {
+    return env().ef().superObj(exprs);
+  }
+
+  /**
+   * Invoke a superclass constructor as the first statement
+   * in a constructor for a class using the Java method overload
+   * resolution algorithm to determine the signature.
+   * This may only be used as the first expression
+   * in a constructor.  Every constructor must begin with
+   * either a super(...) call or a this(...) call.
+   */
+  public static Expression _super(Expression... exprs) {
+    return env().ef().superObj(asList(exprs));
+  }
+
+  /**
+   * Invoke another constructor as the first statement
+   * in a constructor for a class.  The full signature must
+   * be specified.
+   * This may only be used as the first expression
+   * in a constructor.  Every constructor must begin with
+   * either a super(...) call or a this(...) call.
+   */
+  public static Expression _this(Signature signature,
+                                       Expression... exprs) {
+    return env().ef().thisObj(signature, asList(exprs));
+  }
+
+  /**
+   * Invoke another constructor as the first statement
+   * in a constructor for a class.  The full signature must
+   * be specified.
+   * This may only be used as the first expression
+   * in a constructor.  Every constructor must begin with
+   * either a super(...) call or a this(...) call.
+   */
+  public static Expression _this(Signature signature,
+                                       List<Expression> exprs) {
+    return env().ef().thisObj(signature, exprs);
+  }
+
+  /**
+   * Invoke another constructor as the first statement
+   * in a constructor for a class using the Java method overload
+   * resolution algorithm to determine the signature.
+   * This may only be used as the first expression
+   * in a constructor.  Every constructor must begin with
+   * either a super(...) call or a this(...) call.
+   */
+  public static Expression _this(Expression... exprs) {
+    return env().ef().thisObj(asList(exprs));
+  }
+
+  /**
+   * Invoke another constructor as the first statement
+   * in a constructor for a class using the Java method overload
+   * resolution algorithm to determine the signature.
+   * This may only be used as the first expression
+   * in a constructor.  Every constructor must begin with
+   * either a super(...) call or a this(...) call.
+   */
+  public static Expression _this(List<Expression> exprs) {
+    return env().ef().thisObj(exprs);
+  }
+
+  @SuppressWarnings("SameParameterValue")
+  private static Expression _binary(Expression left,
+                                    ExpressionFactory.BinaryOperator op, Expression right) {
+    return env().ef().binaryOperator(left, op, right);
+  }
+
+  // Abbreviated forms for _binary
+
+  /**
+   * Create an expression representing the application of the
+   * != operator to the left and right expressions in the
+   * form (left op right).
+   */
+  public static Expression _ne(Expression left,
+                                     Expression right) {
+    return _binary(left, ExpressionFactory.BinaryOperator.NE,
+          right);
+  }
+
+  /**
+   * Create an expression representing the type cast of expr
+   * to type.
+   */
+  public static Expression _cast(Type type, Expression expr) {
+    return env().ef().cast(type, expr);
+  }
+
+  /**
+   * Create an expression representing the construction of a
+   * new instance of the given type using the constructor with the
+   * given signature and the list of expressions as arguments.
+   */
+  public static Expression _new(Type type,
+                                      Signature signature, Expression... args) {
+    return env().ef().newObj(type, signature, asList(args));
+  }
+
+  /**
+   * Create an expression representing the construction of a
+   * new instance of the given type using the constructor with the
+   * given signature and the list of expressions as arguments.
+   */
+  public static Expression _new(Type type,
+                                      Signature signature, List<Expression> args) {
+    return env().ef().newObj(type, signature, args);
+  }
+
+  /**
+   * Create an expression representing the construction of a
+   * new instance of the given type using the constructor with the
+   * signature determined by the Java method overload resolution
+   * algorithm and the list of expressions as arguments.
+   */
+  public static Expression _new(Type type,
+                                      Expression... args) {
+    return env().ef().newObj(type, asList(args));
+  }
+
+  /**
+   * Create an expression representing the construction of a
+   * new instance of the given type using the constructor with the
+   * signature determined by the Java method overload resolution
+   * algorithm and the list of expressions as arguments.
+   */
+  public static Expression _new(Type type,
+                                      List<Expression> args) {
+    return env().ef().newObj(type, args);
+  }
+
+  /**
+   * Create an expression representing the construction of a
+   * new array with the given component type using the given
+   * expressions to initialize the array.  We really only
+   * support single dimensional arrays here.  The size of the
+   * resulting array is the number of expressions given here.
+   */
+  public static Expression _new_array_init(Type type,
+                                                 Expression... args) {
+    return env().ef().newArrInit(type, asList(args));
+  }
+
+  /**
+   * Create an expression representing the construction of a
+   * new array with the given component type using the given
+   * expressions to initialize the array.  We really only
+   * support single dimensional arrays here.  The size of the
+   * resulting array is the number of expressions given here.
+   * Equivalent to new A[] = { exprList }.
+   */
+  public static Expression _new_array_init(Type type,
+                                                 List<Expression> args) {
+    return env().ef().newArrInit(type, args);
+  }
+
+  /**
+   * Return the type of the current class.
+   */
+  public static Type _thisClass() {
+    return env()._thisClass();
+  }
+
+  /**
+   * Return an expression representing "this".
+   */
+  public static Expression _this() {
+    return env().ef()._this();
+  }
+
+  /**
+   * Return an expression used to access a field in an object
+   * given by expr.  This expression may appear on the left side
+   * of an assignment statement.
+   */
+  public static Expression _field(Expression expr, String fieldName) {
+    return env().ef().fieldAccess(expr, fieldName);
+  }
+
+  /**
+   * Return an expression used to access a static data member in
+   * a class given by the type.  This expression may appear on the
+   * left side of an assignment statement (but probably shouldn't).
+   */
+  public static Expression _field(Type type, String fieldName) {
+    return env().ef().fieldAccess(type, fieldName);
+  }
+
+  /**
+   * Return an expression used to access an element in an array
+   * given by expr.  This expression may appear on the left side
+   * of an assignment statement.
+   */
+  public static Expression _index(Expression expr, Expression index) {
+    return env().ef().arrayIndex(expr, index);
+  }
 
-    /** Invoke another constructor as the first statement
-     * in a constructor for a class using the Java method overload
-     * resolution algorithm to determine the signature.
-     * This may only be used as the first expression
-     * in a constructor.  Every constructor must begin with
-     * either a super(...) call or a this(...) call.
-     */
-    public static final Expression _this( Expression... exprs )  {
-	return env().ef().thisObj( asList(exprs) ) ;
-    }
-
-    /** Invoke another constructor as the first statement
-     * in a constructor for a class using the Java method overload
-     * resolution algorithm to determine the signature.
-     * This may only be used as the first expression
-     * in a constructor.  Every constructor must begin with
-     * either a super(...) call or a this(...) call.
-     */
-    public static final Expression _this( List<Expression> exprs )  {
-	return env().ef().thisObj( exprs ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * unary operator op to the given expression.
-     */
-    private static final Expression _unary( ExpressionFactory.UnaryOperator op,
-	Expression expr )  {
-	return env().ef().unaryOp( op, expr ) ;
-    }
-
-    public static final Expression _not( Expression expr ) {
-	return _unary( ExpressionFactory.UnaryOperator.NOT, expr ) ;
-    }
-
-    private static final Expression _binary( Expression left,
-	ExpressionFactory.BinaryOperator op, Expression right )  {
-	return env().ef().binaryOperator( left, op, right ) ;
-    }
-
-    // Abbreviated forms for _binary
-
-    /** Create an expression representing the application of the
-     * + operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _add( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.PLUS,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * + operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _sub( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.MINUS,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * + operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _mul( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.TIMES,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * + operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _div( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.DIV,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * + operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _rem( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.REM,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * &lt; operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _lt( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.LT,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * &gt; operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _gt( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.GT,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * &lt;= operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _le( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.LE,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * &gt;= operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _ge( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.GE,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * == operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _eq( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.EQ,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * != operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _ne( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.NE,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * &amp;&amp; operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _and( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.AND,
-	    right ) ;
-    }
-
-    /** Create an expression representing the application of the
-     * || operator to the left and right expressions in the
-     * form (left op right).
-     */
-    public static final Expression _or( Expression left,
-	Expression right ) {
-	return _binary( left, ExpressionFactory.BinaryOperator.OR,
-	    right ) ;
-    }
-
-    /** Create an expression representing the type cast of expr
-     * to type.
-     */
-    public static final Expression _cast( Type type, Expression expr )  {
-	return env().ef().cast( type, expr ) ;
-    }
-
-    /** Create an expression representing the instanceof test of
-     * expr and type (expr instanceof type).
-     */
-    public static final Expression _instanceof( Expression expr, Type type )  {
-	return env().ef().instof( expr, type ) ;
-    }
-
-    /** Create an expression representing the construction of a
-     * new instance of the given type using the constructor with the
-     * given signature and the list of expressions as arguments.
-     */
-    public static final Expression _new( Type type,
-	Signature signature, Expression... args ) {
-	return env().ef().newObj( type, signature, asList(args) ) ;
-    }
-
-    /** Create an expression representing the construction of a
-     * new instance of the given type using the constructor with the
-     * given signature and the list of expressions as arguments.
-     */
-    public static final Expression _new( Type type,
-	Signature signature, List<Expression> args ) {
-	return env().ef().newObj( type, signature, args ) ;
-    }
-
-    /** Create an expression representing the construction of a
-     * new instance of the given type using the constructor with the
-     * signature determined by the Java method overload resolution
-     * algorithm and the list of expressions as arguments.
-     */
-    public static final Expression _new( Type type,
-	Expression... args )  {
-	return env().ef().newObj( type, asList(args) ) ;
-    }
-
-    /** Create an expression representing the construction of a
-     * new instance of the given type using the constructor with the
-     * signature determined by the Java method overload resolution
-     * algorithm and the list of expressions as arguments.
-     */
-    public static final Expression _new( Type type,
-	List<Expression> args )  {
-	return env().ef().newObj( type, args ) ;
-    }
-
-    /** Create an expression representing the construction of a
-     * new array with the given component type using the given
-     * expressions to initialize the array.  We really only
-     * support single dimensional arrays here.  The size of the
-     * resulting array is the number of expressions given here.
-     */
-    public static final Expression _new_array_init( Type type,
-	Expression... args )  {
-	return env().ef().newArrInit( type, asList(args) ) ;
-    }
-
-    /** Create an expression representing the construction of a
-     * new array with the given component type using the given
-     * expressions to initialize the array.  We really only
-     * support single dimensional arrays here.  The size of the
-     * resulting array is the number of expressions given here.
-     * Equivalent to new A[] = { exprList }.
-     */
-    public static final Expression _new_array_init( Type type,
-	List<Expression> args )  {
-	return env().ef().newArrInit( type, args ) ;
-    }
-
-    /** Create an expression representing the construction of a
-     * new array of the given size with the given component type. 
-     * Equivalent to new A[x].
-     */
-    public static final Expression _new_array( Type type, Expression size )  {
-	return env().ef().newArr( type, size ) ;
-
-    }
-
-    /** Return the type of the current class.
-     */
-    public static final Type _thisClass() {
-	return env()._thisClass() ;
-    }
-
-    /** Return an expression representing "this".
-     */
-    public static final Expression _this() {
-	return env().ef()._this() ;
-    }
-
-    /** Return an expression used to access a field in an object 
-     * given by expr.  This expression may appear on the left side
-     * of an assignment statement.
-     */
-    public static final Expression _field( Expression expr, String fieldName ) {
-	return env().ef().fieldAccess( expr, fieldName ) ;
-    }
-
-    /** Return an expression used to access a static data member in
-     * a class given by the type.  This expression may appear on the 
-     * left side of an assignment statement (but probably shouldn't).
-     */
-    public static final Expression _field( Type type, String fieldName ) {
-	return env().ef().fieldAccess( type, fieldName ) ;
-    }
-
-    /** Return an expression used to access an element in an array 
-     * given by expr.  This expression may appear on the left side
-     * of an assignment statement.
-     */
-    public static final Expression _index( Expression expr, Expression index ) {
-	return env().ef().arrayIndex( expr, index ) ;
-    }
-
-    /** Return an expression that gets the length of expr.  expr must be
-     * an array type.
-     */
-    public static final Expression _length( Expression expr ) {
-	return env().ef().arrayLength( expr ) ;
-    }
 }
