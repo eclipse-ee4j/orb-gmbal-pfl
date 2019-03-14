@@ -10,11 +10,34 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl ;
 
-import org.glassfish.pfl.basic.contain.Pair;
-import org.glassfish.pfl.basic.reflection.Bridge;
-import org.glassfish.pfl.dynamic.codegen.spi.Expression;
-import org.glassfish.pfl.dynamic.codegen.spi.Type;
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
+import static java.lang.reflect.Modifier.PRIVATE;
+import static java.lang.reflect.Modifier.PUBLIC;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.DUMP_AFTER_SETUP_VISITOR;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.TRACE_BYTE_CODE_GENERATION;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.USE_ASM_VERIFIER;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._Object;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._arg;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._assign;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._body;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._boolean;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._call;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._class;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._clear;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._const;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._constructor;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._data;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._end;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._expr;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._generate;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._if;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._method;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._ne;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._null;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._package;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._super;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._this;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._void;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.splitClassName;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -23,10 +46,11 @@ import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.Map;
 import java.util.Properties;
-
-import static java.lang.reflect.Modifier.PRIVATE;
-import static java.lang.reflect.Modifier.PUBLIC;
-import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.*;
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.basic.reflection.Bridge;
+import org.glassfish.pfl.dynamic.codegen.spi.Expression;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** Experimental class that generates a ClassFieldCopier using the codegen library.
  */
@@ -37,15 +61,10 @@ public class CodegenCopierGenerator {
     private String	       className ;
 
     private static final Bridge bridge = AccessController.doPrivileged(
-	new PrivilegedAction<Bridge>() {
-        @Override
-	    public Bridge run() {
-		return Bridge.get() ;
-	    }
-	} 
-    ) ;
+					(PrivilegedAction<Bridge>) Bridge::get
+		) ;
 
-    public CodegenCopierGenerator( String className, Class<?> classToCopy ) {
+    CodegenCopierGenerator(String className, Class<?> classToCopy) {
 	this.className = className ;
 	this.classToCopy = classToCopy ;
     }
