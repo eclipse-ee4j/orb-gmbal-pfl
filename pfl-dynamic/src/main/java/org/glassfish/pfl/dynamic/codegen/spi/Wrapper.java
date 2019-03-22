@@ -987,11 +987,27 @@ public final class Wrapper {
    * to control some aspects of the code generation, such as
    * debugging options.
    *
+   * @deprecated as of Java 11, use {@link #_generate(Class, Properties, PrintStream)}
+   */
+  public static Class<?> _generate(ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream ps) {
+    ClassGenerator cg = env().classGenerator();
+    return _generate(cg, cl, pd, props, ps);
+  }
+
+  /**
+   * Generate a class for the current ClassGenerator.
+   * Basically equivalent to _byteCode followed by _makeClass.
+   * cl is used to resolve any references
+   * to other classes and to load the class given by
+   * the current ClassGenerator.  options may be used
+   * to control some aspects of the code generation, such as
+   * debugging options.
+   *
    * @deprecated as of Java 11, use {@link #_generate(Class, Properties)}
    */
   public static Class<?> _generate(ClassLoader cl, ProtectionDomain pd, Properties props) {
     ClassGenerator cg = env().classGenerator();
-    return _generate(cg, cl, pd, props);
+    return _generate(cg, cl, pd, props, System.out);
   }
 
   /**
@@ -1003,11 +1019,25 @@ public final class Wrapper {
    * to control some aspects of the code generation, such as
    * debugging options.
    */
-  private static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props) {
+  private static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream ps) {
     ImportList imports = env().imports();
     byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
-          cl, imports, props, System.out);
+          cl, imports, props, ps);
     return CodeGeneratorUtil.makeClass(cg.name(), data, pd, cl);
+  }
+
+  /**
+   * Generate a class for the current ClassGenerator, in the same classloader and package
+   * as a specified "anchor" class to which the caller has access.
+   *
+   * @param anchorClass an existing class used as a reference for the new one.
+   * @param props options to control some aspects of the code generation, such as debugging.
+   * @param ps a stream to which debug messages should be written, if any
+   *
+   * @since since 4.1.0
+   */
+  public static Class<?> _generate(Class<?> anchorClass, Properties props, PrintStream ps) {
+    return _generate(env().classGenerator(), anchorClass, props, ps);
   }
 
   /**
@@ -1020,7 +1050,7 @@ public final class Wrapper {
    * @since since 4.1.0
    */
   public static Class<?> _generate(Class<?> anchorClass, Properties props) {
-    return _generate(env().classGenerator(), anchorClass, props);
+    return _generate(env().classGenerator(), anchorClass, props, System.out);
   }
 
   /**
@@ -1032,10 +1062,10 @@ public final class Wrapper {
    * to control some aspects of the code generation, such as
    * debugging options.
    */
-  private static Class<?> _generate(ClassGenerator cg, Class<?> anchorClass, Properties props) {
+  private static Class<?> _generate(ClassGenerator cg, Class<?> anchorClass, Properties props, PrintStream ps) {
     ImportList imports = env().imports();
     byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
-          anchorClass.getClassLoader(), imports, props, System.out);
+          anchorClass.getClassLoader(), imports, props, ps);
     return CodeGeneratorUtil.makeClass(cg.name(), data, anchorClass);
   }
 
@@ -1120,6 +1150,16 @@ public final class Wrapper {
    */
   public static Signature _s(Type rtype, Type... types) {
     return Signature.make(rtype, asList(types));
+  }
+
+  /**
+   * Create a signature that may be used for calling a method or
+   * constructor.  rtype is the return type, and types gives all
+   * of the argument types.  types is empty if there are no
+   * arguments.
+   */
+  public static Signature _s(Type rtype, List<Type> types) {
+    return Signature.make(rtype, types);
   }
 
   // Types
