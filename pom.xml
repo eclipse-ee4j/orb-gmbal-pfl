@@ -78,6 +78,9 @@
         <!-- The oldest Java version supported by this tool.               -->
         <!-- Will control compilation of the main code and the unit tests. -->
         <base.java.version>1.8</base.java.version>
+
+        <!-- A directory for unit tests, allowing testing against MR classes. -->
+        <combined.classes.dir>${project.build.directory}/combined-classes</combined.classes.dir>
     </properties>
     
     <modules>
@@ -93,6 +96,10 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M3</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -117,6 +124,27 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.8</version>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <executions>
+                        <execution>
+                            <id>copy-base-classes</id>
+                            <phase>process-classes</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${combined.classes.dir}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.build.outputDirectory}</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -263,6 +291,16 @@
         </plugins>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>7.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -367,8 +405,32 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-java9-classes</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <overwrite>true</overwrite>
+                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.outputDirectory}/META-INF/versions/9</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
+            <properties>
+                <maven.test.additionalClasspath>${project.build.testOutputDirectory}/</maven.test.additionalClasspath>
+            </properties>
         </profile>
 
         <!-- enable java11 compilation -->
@@ -389,6 +451,27 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-java11-classes</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <overwrite>true</overwrite>
+                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.outputDirectory}/META-INF/versions/11</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -406,9 +489,9 @@
                     <!-- Run the unit tests with the JVM used to run maven -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.21.0</version>
                         <configuration>
                             <jvm>${env.JAVA_HOME}/bin/java</jvm>
+                            <classesDirectory>${combined.classes.dir}</classesDirectory>
                         </configuration>
                     </plugin>
                 </plugins>
