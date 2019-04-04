@@ -63,6 +63,11 @@
                 </configuration>
             </plugin>
             <plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-surefire-plugin</artifactId>
+            	<version>2.21.0</version>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>2.1</version>
@@ -89,6 +94,14 @@
 
         </plugins>
     </build>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
     
     <reporting>
         <plugins>

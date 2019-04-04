@@ -10,6 +10,26 @@
 
 package org.glassfish.pfl.basic.reflection;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.sameInstance;
+import static org.junit.Assert.fail;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.io.Serializable;
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import org.glassfish.pfl.basic.testobjects.ClassWithStaticInitializer;
 import org.glassfish.pfl.basic.testobjects.ForeignClassWithPackagePrivateResolveAndReplace;
 import org.glassfish.pfl.basic.testobjects.IntHolder;
@@ -18,22 +38,6 @@ import org.glassfish.pfl.basic.testobjects.SerializableClass2;
 import org.glassfish.pfl.basic.testobjects.TestObjects;
 import org.junit.Ignore;
 import org.junit.Test;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
-import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.fail;
 
 public class BridgeTest {
     private static final byte BYTE_VALUE = (byte) (Math.random() * Byte.MAX_VALUE);
@@ -46,14 +50,8 @@ public class BridgeTest {
     private static final char CHAR_VALUE = (char) (Math.random() * Character.MAX_VALUE);
     private static final Object OBJECT_VALUE = new Object();
 
-    private static final Bridge BRIDGE = AccessController.doPrivileged(
-            new PrivilegedAction<Bridge>() {
-                @Override
-                public Bridge run() {
-                    return Bridge.get();
-                }
-            }
-    );
+    private static final Bridge BRIDGE
+          = AccessController.doPrivileged((PrivilegedAction<Bridge>) Bridge::get);
     private final ByteArrayOutputStream rawOutputStream = new ByteArrayOutputStream();
     private ObjectOutputStream objectOutputStream;
 
@@ -72,7 +70,7 @@ public class BridgeTest {
     private MultiFieldClass anInstance = new MultiFieldClass();
 
     @Test @Ignore("comments indicate required by spec, but not what this actually means")
-    public void getLatestUserDefinedLoader() throws Exception {
+    public void getLatestUserDefinedLoader() {
     }
 
     @Test
@@ -234,22 +232,22 @@ public class BridgeTest {
     }
 
     @Test
-    public void whenClassHasNoStaticInitializer_hasStaticInitializerReturnsFalse() throws Exception {
+    public void whenClassHasNoStaticInitializer_hasStaticInitializerReturnsFalse() {
         assertThat(BRIDGE.hasStaticInitializerForSerialization(SerializableClass1.class), is(false));
     }
 
     @Test
-    public void whenClassHasStaticInitializer_hasStaticInitializerReturnsTrue() throws Exception {
+    public void whenClassHasStaticInitializer_hasStaticInitializerReturnsTrue() {
         assertThat(BRIDGE.hasStaticInitializerForSerialization(ClassWithStaticInitializer.class), is(true));
     }
 
     @Test
-    public void whenClassHasNoReadObjectMethod_returnNull() throws Exception {
+    public void whenClassHasNoReadObjectMethod_returnNull() {
         assertThat(BRIDGE.readObjectForSerialization(SerializableClass1.class), nullValue());
     }
 
     @Test
-    public void whenReadObjectMethodIsStatic_returnNull() throws Exception {
+    public void whenReadObjectMethodIsStatic_returnNull() {
         assertThat(BRIDGE.readObjectForSerialization(ClassWithStaticReadObject.class), nullValue());
     }
 
@@ -259,7 +257,7 @@ public class BridgeTest {
     }
 
     @Test
-    public void whenReadObjectMethodIsNotPrivate_returnNull() throws Exception {
+    public void whenReadObjectMethodIsNotPrivate_returnNull() {
         assertThat(BRIDGE.readObjectForSerialization(ClassWithPublicReadObject.class), nullValue());
     }
 
@@ -269,7 +267,7 @@ public class BridgeTest {
     }
 
     @Test
-    public void whenReadObjectMethodHasReturnType_returnNull() throws Exception {
+    public void whenReadObjectMethodHasReturnType_returnNull() {
         assertThat(BRIDGE.readObjectForSerialization(ClassWithReadObjectWithReturnType.class), nullValue());
     }
 
@@ -279,7 +277,7 @@ public class BridgeTest {
     }
 
     @Test
-    public void whenClassHasNoWriteObjectMethod_returnNull() throws Exception {
+    public void whenClassHasNoWriteObjectMethod_returnNull() {
         assertThat(BRIDGE.writeObjectForSerialization(SerializableClass1.class), nullValue());
     }
 
@@ -316,12 +314,12 @@ public class BridgeTest {
     }
 
     @Test
-    public void whenClassHasNoReadResolveMethod_returnNull() throws Exception {
+    public void whenClassHasNoReadResolveMethod_returnNull() {
         assertThat(BRIDGE.readResolveForSerialization(SerializableClass1.class), nullValue());
     }
 
     @Test
-    public void whenReadResolveMethodIsStatic_returnNull() throws Exception {
+    public void whenReadResolveMethodIsStatic_returnNull() {
         assertThat(BRIDGE.readResolveForSerialization(ClassWithStaticReadResolve.class), nullValue());
     }
 
@@ -331,7 +329,7 @@ public class BridgeTest {
     }
 
     @Test
-    public void whenReadResolveMethodLacksObjectReturnType_returnNull() throws Exception {
+    public void whenReadResolveMethodLacksObjectReturnType_returnNull() {
         assertThat(BRIDGE.readResolveForSerialization(ClassWithReadResolveWithNoReturnType.class), nullValue());
     }
 
@@ -341,7 +339,7 @@ public class BridgeTest {
     }
 
     @Test
-    public void whenReadResolveMethodHasAnyAccess_returnMethodHandle() throws Exception {
+    public void whenReadResolveMethodHasAnyAccess_returnMethodHandle() {
         assertThat(BRIDGE.readResolveForSerialization(ClassWithPublicResolveAndReplace.class), notNullValue());
         assertThat(BRIDGE.readResolveForSerialization(ClassWithPackagePrivateResolveAndReplace.class), notNullValue());
         assertThat(BRIDGE.readResolveForSerialization(ForeignClassWithPackagePrivateResolveAndReplace.class), notNullValue());
@@ -350,31 +348,31 @@ public class BridgeTest {
     }
 
     @SuppressWarnings("unused")
-    private static class ClassWithPublicResolveAndReplace {
+    private static class ClassWithPublicResolveAndReplace implements Serializable {
         public Object readResolve() { return null; }
         public Object writeReplace() { return null; }
     }
 
     @SuppressWarnings("unused")
-    private static class ClassWithPackagePrivateResolveAndReplace {
+    private static class ClassWithPackagePrivateResolveAndReplace implements Serializable {
         Object readResolve() { return null; }
         Object writeReplace() { return null; }
     }
 
     @SuppressWarnings("unused")
-    private static class ClassWithProtectedResolveAndReplace {
+    private static class ClassWithProtectedResolveAndReplace implements Serializable {
         protected Object readResolve() { return null; }
         protected Object writeReplace() { return null; }
     }
 
     @SuppressWarnings("unused")
-    private static class ClassWithPrivateResolveAndReplace {
+    private static class ClassWithPrivateResolveAndReplace implements Serializable {
         private Object readResolve() { return null; }
         private Object writeReplace() { return null; }
     }
 
     @Test
-    public void whenParentReadResolveMethodIsAccessible_returnMethodHandle() throws Exception {
+    public void whenParentReadResolveMethodIsAccessible_returnMethodHandle() {
         assertThat(BRIDGE.readResolveForSerialization(ClassWithSuperclassPublicResolveAndReplace.class), notNullValue());
         assertThat(BRIDGE.readResolveForSerialization(ClassWithSuperclassPackagePrivateResolveAndReplace.class), notNullValue());
         assertThat(BRIDGE.readResolveForSerialization(ClassWithSuperclassProtectedResolveAndReplace.class), notNullValue());
@@ -390,7 +388,7 @@ public class BridgeTest {
     private static class ClassWithSuperclassProtectedResolveAndReplace extends ClassWithProtectedResolveAndReplace {}
 
     @Test
-    public void whenParentReadResolveMethodIsNotAccessible_returnNull() throws Exception {
+    public void whenParentReadResolveMethodIsNotAccessible_returnNull() {
         assertThat(BRIDGE.readResolveForSerialization(ClassWithSuperclassPrivateResolveAndReplace.class), nullValue());
         assertThat(BRIDGE.readResolveForSerialization(ClassWithForeignSuperclassPackagePrivateResolveAndReplace.class), nullValue());
     }
@@ -412,12 +410,12 @@ public class BridgeTest {
     }
 
     @Test
-    public void whenClassHasNoWriteReplaceMethod_returnNull() throws Exception {
+    public void whenClassHasNoWriteReplaceMethod_returnNull() {
         assertThat(BRIDGE.writeReplaceForSerialization(SerializableClass1.class), nullValue());
     }
 
     @Test
-    public void whenWriteReplaceMethodHasAnyAccess_returnMethodHandle() throws Exception {
+    public void whenWriteReplaceMethodHasAnyAccess_returnMethodHandle() {
         assertThat(BRIDGE.writeReplaceForSerialization(ClassWithPublicResolveAndReplace.class), notNullValue());
         assertThat(BRIDGE.writeReplaceForSerialization(ClassWithPackagePrivateResolveAndReplace.class), notNullValue());
         assertThat(BRIDGE.writeReplaceForSerialization(ClassWithProtectedResolveAndReplace.class), notNullValue());
