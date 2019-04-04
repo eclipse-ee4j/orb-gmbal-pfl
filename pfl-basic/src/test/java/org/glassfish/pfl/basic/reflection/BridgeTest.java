@@ -17,6 +17,12 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.fail;
+import static org.objectweb.asm.Opcodes.ACC_ABSTRACT;
+import static org.objectweb.asm.Opcodes.ACC_FINAL;
+import static org.objectweb.asm.Opcodes.ACC_INTERFACE;
+import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
+import static org.objectweb.asm.Opcodes.ACC_STATIC;
+import static org.objectweb.asm.Opcodes.V1_8;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -38,6 +44,7 @@ import org.glassfish.pfl.basic.testobjects.SerializableClass2;
 import org.glassfish.pfl.basic.testobjects.TestObjects;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.objectweb.asm.ClassWriter;
 
 public class BridgeTest {
     private static final byte BYTE_VALUE = (byte) (Math.random() * Byte.MAX_VALUE);
@@ -436,4 +443,31 @@ public class BridgeTest {
     public void createOptionalDataException() throws Exception {
         throw BRIDGE.newOptionalDataExceptionForSerialization(true);
     }
+
+    @Test
+    // Note: to verify that illegal-access warnings are not happening, run in JDK9 or later
+    // with -DargLine=--illegal-access=deny
+    public void whenClassDefined_canAccessIt() throws IllegalAccessException {
+        String className = getPackageName() + ".MyInterface";
+        byte[] classBytes = createInterfaceClassBytes(className);
+        Class<?> myInterface = BRIDGE.defineClass(getClass(), className, classBytes);
+
+        assertThat(myInterface.isInterface(), is(true));
+    }
+
+    private String getPackageName() {
+        return getClass().getPackage().getName();
+    }
+
+    private byte[] createInterfaceClassBytes(String className) {
+        ClassWriter cw = new ClassWriter(0);
+        cw.visit(V1_8, ACC_PUBLIC + ACC_ABSTRACT + ACC_INTERFACE, className.replace(".","/"), null, "java/lang/Object", new String[0]);
+        cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "LESS", "I", null, -1).visitEnd();
+        cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "EQUAL", "I", null, 0).visitEnd();
+        cw.visitField(ACC_PUBLIC + ACC_FINAL + ACC_STATIC, "GREATER", "I", null, 1).visitEnd();
+        cw.visitMethod(ACC_PUBLIC + ACC_ABSTRACT, "compareTo", "(Ljava/lang/Object;)I", null, null).visitEnd();
+        cw.visitEnd();
+        return cw.toByteArray();
+    }
+
 }
