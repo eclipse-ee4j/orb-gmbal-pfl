@@ -100,12 +100,9 @@ public class AnnotationAnalyzer {
         // added method annotations
 
         final ClassAnalyzer clsCA = ClassAnalyzer.getClassAnalyzer(cls) ;
-        System.out.println( "clsCA=" + clsCA ) ;
 
         final ClassAnalyzer ancestorCA =
             ClassAnalyzer.getClassAnalyzer( ancestor );
-        System.out.println( "ancestorCA=" + ancestorCA ) ;
-
 
         // Just construct a list of all reachable classes from ancestor.
         final Set<Class<?>> ancestorClasses =
@@ -134,11 +131,7 @@ public class AnnotationAnalyzer {
                         Pair<String,List<Class<?>>>( arg.getName(),
                             Arrays.asList( arg.getParameterTypes() ) ) ;
 
-                    Map<Class<?>,Annotation> annos = map.get( key ) ;
-                    if (annos==null) {
-                        annos = new HashMap<Class<?>,Annotation>() ;
-                        map.put( key, annos) ;
-                    }
+                    Map<Class<?>, Annotation> annos = map.computeIfAbsent(key, k -> new HashMap<>());
 
                     for (Annotation anno : arg.getDeclaredAnnotations()) {
                         putIfNotPresent(annos, anno.annotationType(), anno);
