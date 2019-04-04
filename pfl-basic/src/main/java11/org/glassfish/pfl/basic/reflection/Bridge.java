@@ -10,20 +10,20 @@
 
 package org.glassfish.pfl.basic.reflection;
 
-import java.lang.reflect.InvocationTargetException;
-import java.security.ProtectionDomain;
-import sun.reflect.ReflectionFactory;
-
 import java.io.OptionalDataException;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.Permission;
 import java.security.PrivilegedAction;
+import java.security.ProtectionDomain;
 import java.util.Optional;
 import java.util.stream.Stream;
+import sun.reflect.ReflectionFactory;
 
 /**
  * This class provides the methods for fundamental JVM operations
@@ -125,6 +125,17 @@ public final class Bridge extends BridgeBase {
                 }
         );
         return defineClassMethod;
+    }
+
+    @Override
+    public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) {
+        try {
+            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(anchorClass, MethodHandles.lookup())
+                                                .dropLookupMode(MethodHandles.Lookup.PRIVATE);
+            return lookup.defineClass(classBytes);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Unable to define class ", e);
+        }
     }
 
     private final StackWalker stackWalker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
