@@ -225,34 +225,6 @@
                 <version>3.0.0-M1</version>
             </plugin>
 
-            <!-- strip '.MD' suffix from legal files -->
-            <plugin>
-                <groupId>com.coderplus.maven.plugins</groupId>
-                <artifactId>copy-rename-maven-plugin</artifactId>
-                <version>1.0.1</version>
-                <executions>
-                    <execution>
-                        <id>copy-legal-files</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <fileSets>
-                                <fileSet>
-                                    <sourceFile>${maven.multiModuleProjectDirectory}/LICENSE.md</sourceFile>
-                                    <destinationFile>${project.build.directory}/generated-resources/META-INF/LICENSE</destinationFile>
-                                </fileSet>
-                                <fileSet>
-                                    <sourceFile>${maven.multiModuleProjectDirectory}/NOTICE.md</sourceFile>
-                                    <destinationFile>${project.build.directory}/generated-resources/META-INF/NOTICE</destinationFile>
-                                </fileSet>
-                            </fileSets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
             <!-- add the legal files to the jar -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -268,7 +240,12 @@
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>${project.build.directory}/generated-resources</directory>
+                                    <directory>${maven.multiModuleProjectDirectory}</directory>
+                                    <includes>
+                                        <include>NOTICE.md</include>
+                                        <include>LICENSE.md</include>
+                                    </includes>
+                                    <targetPath>META-INF</targetPath>
                                 </resource>
                             </resources>
                         </configuration>
