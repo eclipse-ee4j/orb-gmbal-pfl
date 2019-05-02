@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2011, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2011, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -295,7 +295,7 @@ public class AnnotationAnalyzer {
     /** Same as cons.getParameterAnnotations, with the result converted to a
      * list of maps.
      *
-     * @param cons A Java Constructor
+     * @param method A Java Method
      * @return A list of maps from annotation class to annotation value
      */
     public List<Map<Class<?>,Annotation>> getParameterAnnotations(

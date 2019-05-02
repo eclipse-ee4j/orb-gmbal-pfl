@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -64,7 +64,7 @@ public class TimerPointSourceGenerator {
      * <ul>
      * <li>private fields for Timers and TimerGroups
      * <li>public accessor methods for Timers and TimerGroups
-     * <li>A public constructor <init>(TimerFactory) that initializes the
+     * <li>A public constructor {@code <init>(TimerFactory)} that initializes the
      * Timer and TimerGroup fields, and the TimerGroup containment.
      * </ul>
      * @param dirName

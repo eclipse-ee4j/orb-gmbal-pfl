@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -191,8 +191,8 @@ public final class Algorithms {
      * @param <S> Type of elements of list.
      * @param <T> Type of elements of result.
      * @param list List of elements of type S.
-     * @param map function mapping S to List<T>.
-     * @return List<T> containg results of applying map to each element of list.
+     * @param map function mapping S to {@code List<T>}.
+     * @return {@code List<T>} containing results of applying map to each element of list.
      */
     public static <S,T> List<T> flatten( final List<S> list,
         final UnaryFunction<S,List<T>> map ) {        

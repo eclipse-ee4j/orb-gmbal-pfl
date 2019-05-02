@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  * Copyright 2004 The Apache Software Foundation
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -37,7 +37,7 @@ import org.w3c.dom.Text;
 /**
  * Writes a DOM tree to a given Writer.
  * warning: this utility currently does not declare XML Namespaces.
- * <p>Utility class used by {@link org.apache.tools.ant.XmlLogger
+ * <p>Utility class used by {@code org.apache.tools.ant.XmlLogger
  * XmlLogger} and
  * org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter
  * XMLJUnitResultFormatter}.</p>
@@ -405,7 +405,7 @@ public class DOMElementWriter {
     }
 
     /**
-     * Escape &lt;, &gt; &amp; &apos;, &quot; as their entities and
+     * Escape {@code &lt;}, {@code &gt;}, {@code &amp;}, {@code &apos;}, {@code &quot;} as their entities and
      * drop characters that are illegal in XML documents.
      * @param value the string to encode.
      * @return the encoded string.

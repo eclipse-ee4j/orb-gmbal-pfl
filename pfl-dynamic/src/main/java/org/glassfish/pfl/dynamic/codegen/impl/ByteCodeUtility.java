@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -40,7 +40,6 @@ import static org.glassfish.pfl.objectweb.asm.Opcodes.* ;
  * This will often be accompanied by type analysis, such as in determining 
  * the correct sort of return instruction to use, or how to generate code
  * for a constant.
- * </ol>
  */
 public final class ByteCodeUtility {
     private ClassWriter cw ;
