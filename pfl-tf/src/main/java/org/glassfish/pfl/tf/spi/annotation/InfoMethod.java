@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -27,15 +27,21 @@ import java.lang.annotation.RetentionPolicy ;
  * Any arguments are passed into the
  * MethodMonitor.info call in the instrumented code.
  *
- * @param tpType Indicates whether this info method represents an ENTER, EXIT, or NONE (no timing point).
- * @param tpName Gives the name of timing point to use for this info method.
- * Must not be "" if tpType is not NONE.
  * @author ken
  */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InfoMethod {
+    
+    /**
+     * Indicates whether this info method represents an ENTER, EXIT, or NONE (no timing point).
+     */
     TimingPointType tpType() default TimingPointType.NONE ;
+    
+    /**
+     * Gives the name of timing point to use for this info method.
+     * Must not be "" if tpType is not NONE.
+     */
     String tpName() default "" ;
 }

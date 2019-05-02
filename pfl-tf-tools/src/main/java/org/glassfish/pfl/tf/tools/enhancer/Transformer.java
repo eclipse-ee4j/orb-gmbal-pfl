@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -34,7 +34,7 @@ import org.glassfish.pfl.objectweb.asm.tree.ClassNode;
  * This is split into two parts.  The first part modifies the schema
  * of the class as follows:
  * <ul>
- * <li>Adds static fields as required for the SynchronizedHolder<MethodMonitor> 
+ * <li>Adds static fields as required for the {@code SynchronizedHolder<MethodMonitor>}
  * instances.
  * <li>Modifies the static initializer to set up the new fields, and register
  * the class with the MethodMonitorRegistry.  This also constructs the list
@@ -48,6 +48,7 @@ import org.glassfish.pfl.objectweb.asm.tree.ClassNode;
  * </ul>
  * <p>
  * The second part modifies the MM annotated methods as follows:
+ * <ul>
  * <li>Adds a preamble to set up some local variables, and to call 
  * the MethodMonitor.enter method when active.
  * <li>Adds a finally block at the end of the method that handles calling

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2003, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -12,7 +12,7 @@ package org.glassfish.pfl.basic.contain ;
 
 /** A utilitiy class representing a generic types Pair of elements.
  * Useful for simple data structures, returning multiple values, etc.
- * Pair<Object,Object> is similar to a cons cell.
+ * {@code Pair<Object,Object>} is similar to a cons cell.
  */
 public class Pair<S,T> {
     protected S _first ;

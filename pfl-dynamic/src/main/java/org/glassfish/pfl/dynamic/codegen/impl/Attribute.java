@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -18,7 +18,7 @@ import org.glassfish.pfl.basic.func.NullaryFunction;
 
 /** Class used to define dynamic attributes on AttributedObject instances.
  * Note that T cannot be a generic type, due to problems with
- * Class<T> when T is a generic.  To work around this problem,
+ * {@code Class<T>} when T is a generic.  To work around this problem,
  * simply create an interface that extends the generic type
  * (you are programming to interfaces, right?).
  */

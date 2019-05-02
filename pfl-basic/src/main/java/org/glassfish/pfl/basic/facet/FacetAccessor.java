@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2007, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -63,7 +63,6 @@ public interface FacetAccessor {
      * Read-only because that's all that the intended application needs.
      *
      * @param field The field to access
-     * @param debug True if debugging trace output is desired
      * @return The value of the field
      */
     Object get( Field field ) ;

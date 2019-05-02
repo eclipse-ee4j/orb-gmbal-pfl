@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -27,8 +27,8 @@ public class DenseIntMapImpl<E> implements IntMap<E>
 	    throw new IllegalArgumentException( "Key must be >= 0." ) ;
     }
 
-    /** If key >= 0, return the value bound to key, or null if none.
-     * Throws IllegalArgumentException if key <0.
+    /** If key {@literal >}= 0, return the value bound to key, or null if none.
+     * Throws IllegalArgumentException if key {@literal <}0.
      */
     public E get( int key ) 
     {
@@ -41,8 +41,8 @@ public class DenseIntMapImpl<E> implements IntMap<E>
 	return result ;
     }
 
-    /** If key >= 0, bind value to the key.
-     * Throws IllegalArgumentException if key <0.
+    /** If key {@literal >}= 0, bind value to the key.
+     * Throws IllegalArgumentException if key {@literal <}0.
      */
     public void set( int key, E value ) 
     {

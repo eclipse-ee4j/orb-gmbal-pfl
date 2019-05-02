@@ -359,17 +359,6 @@
 
     <profiles>
 
-        <!-- ignore javadoc lint checks, enabled by default in JDK 1.8 -->
-        <profile>
-            <id>disable-java8-doclint</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <properties>
-                <additionalparam>-Xdoclint:none</additionalparam>
-            </properties>
-        </profile>
-
         <profile>
             <!-- processing during site generation -->
             <id>site</id>

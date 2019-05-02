@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -63,7 +63,7 @@ import org.glassfish.pfl.basic.proxy.CompositeInvocationHandlerImpl;
  * <ul>
  * <li>@Message( String value ).  This defines the message to be placed in a resource
  * bundle (generated at build time by a separate tool).  The key to the resource
- * bundle is <loggerName>.<methodName>.  The message is prepended with the 
+ * bundle is {@code <loggerName>.<methodName>}.  The message is prepended with the 
  * idPrefix and the id from the @Log annotation (if @Log is present, otherwise nothing
  * is prepended to the message).  If this annotation is not present, a default message
  * is created from the method name and the arguments.
