@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2002, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -25,6 +26,7 @@ import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
@@ -372,9 +374,7 @@ public final class ObjectUtility {
                     fields = getDeclaredFields(current);
                 }
 
-                for (Field fld : fields) {
-                    allFields.add(fld);
-                }
+                allFields.addAll(Arrays.asList(fields));
 
                 current = current.getSuperclass();
             }

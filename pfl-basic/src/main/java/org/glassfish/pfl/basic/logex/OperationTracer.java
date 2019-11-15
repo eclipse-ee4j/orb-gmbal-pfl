@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -173,14 +174,18 @@ public class OperationTracer {
         final List<Element> elements = state.get() ;
         int count = 0 ;
         for (Element elem : elements) {
-            if (count == 0) {
-                sb.append( elem.getAsString() ) ;
-                sb.append( ':' ) ;
-            } else if (count == 1) {
-                sb.append( elem.getAsString() ) ;
-            } else {
-                sb.append( ',' ) ;
-                sb.append( elem.getAsString() ) ;
+            switch (count) {
+                case 0:
+                    sb.append( elem.getAsString() ) ;
+                    sb.append( ':' ) ;
+                    break;
+                case 1:
+                    sb.append( elem.getAsString() ) ;
+                    break;
+                default:
+                    sb.append( ',' ) ;
+                    sb.append( elem.getAsString() ) ;
+                    break;
             }
 
             count++ ;

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2003, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -10,6 +11,17 @@
 
 package org.glassfish.pfl.basic.func ;
 
-public interface BinaryVoidFunction<S,T> {
+import java.util.function.BiConsumer;
+
+/**
+ * @deprecated replaced by {@link BiConsumer}
+ */
+@Deprecated
+public interface BinaryVoidFunction<S,T> extends BiConsumer<S, T> {
     void evaluate( S arg1, T arg2 ) ;
+    
+    @Override
+    default void accept(S arg1, T arg2) {
+        evaluate(arg1, arg2);
+    }
 }

@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.basic.contain ;
 
-/** A utilitiy class representing a generic types Pair of elements.
+/** A utility class representing a generic types Pair of elements.
  * Useful for simple data structures, returning multiple values, etc.
  * {@code Pair<Object,Object>} is similar to a cons cell.
  */
