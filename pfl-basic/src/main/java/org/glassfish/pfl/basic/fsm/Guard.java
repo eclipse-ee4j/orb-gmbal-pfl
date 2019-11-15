@@ -21,7 +21,7 @@ public interface Guard {
     enum Result { ENABLED, DISABLED, DEFERRED } ;
 
     /** Called by the state engine to determine whether a
-    * transition is enabled, defered, or disabled.
+    * transition is enabled, deferred, or disabled.
     * The result is interpreted as follows:
     * <ul>
     * <li>ENABLED if the transition is ready to proceed
@@ -30,7 +30,7 @@ public interface Guard {
     * is to be deferred.  This means that the input will not be 
     * acted upon, but rather it will be saved for later execution.
     * Typically this is implemented using a CondVar wait, and the
-    * blocked thread represents the defered input.  The defered
+    * blocked thread represents the deferred input.  The deferred
     * input is retried when the thread runs again.
     * </ul>
     *
