@@ -2,6 +2,7 @@
 <!--
 
     Copyright (c) 2011, 2019 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2020 Payara Services Ltd.
 
     This program and the accompanying materials are made available under the
     terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -88,7 +89,6 @@
         <module>pfl-basic-tools</module>
         <module>pfl-tf</module>
         <module>pfl-tf-tools</module>
-        <module>pfl-asm</module>
         <module>pfl-dynamic</module>
         <module>pfl-test</module>
     </modules>
