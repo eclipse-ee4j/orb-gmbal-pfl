@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -23,15 +24,14 @@ import java.util.Set;
 import org.glassfish.pfl.tf.timer.spi.TimingInfoProcessor;
 import org.glassfish.pfl.tf.spi.Util;
 import org.glassfish.pfl.tf.spi.annotation.MethodMonitorGroup;
-import org.glassfish.pfl.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.AnnotationVisitor;
 
-import org.glassfish.pfl.objectweb.asm.ClassReader;
-import org.glassfish.pfl.objectweb.asm.ClassVisitor;
-import org.glassfish.pfl.objectweb.asm.FieldVisitor;
-import org.glassfish.pfl.objectweb.asm.MethodVisitor;
-import org.glassfish.pfl.objectweb.asm.Opcodes;
-import org.glassfish.pfl.objectweb.asm.Type;
-import org.glassfish.pfl.objectweb.asm.commons.EmptyVisitor;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 /** Scan all classes looking for annotations annotated with @MethodMonitorGroup,
  * and saves the internal names of any such annotations.
@@ -61,13 +61,17 @@ public class AnnotationScannerAction implements Scanner.Action {
         return annotationNames ;
     }
 
-    private class AnnoScanner extends EmptyVisitor {
-        private boolean visitingAnnotation = false ;
-        private String annotationValueName = null ;
+    private class ClassScanner extends ClassVisitor {
+        
+        private boolean visitingAnnotation = false;
         private String timerGroupDescription ;
         private String timerGroupName ;
         private List<Type> timerGroupMembers ;
-
+        
+        private ClassScanner() {
+            super(Opcodes.ASM7);
+        }
+        
         @Override
         public void visit( int version, int access, String name, String signature,
             String superName, String[] interfaces ) {
@@ -79,19 +83,8 @@ public class AnnotationScannerAction implements Scanner.Action {
                 currentClass = name ;
             }
         }
-
-        private String getGroupName( String desc ) {
-            String result = desc ;
-            final int index = desc.lastIndexOf('/') ;
-
-            if (index >= 0) {
-                result = desc.substring( index + 1 ) ;
-            }
-
-            return result ;
-        }
-
-        @Override
+        
+         @Override
         public AnnotationVisitor visitAnnotation( String desc,
             boolean visible ) {
 
@@ -104,12 +97,57 @@ public class AnnotationScannerAction implements Scanner.Action {
                 timerGroupName = getGroupName( currentClass ) ;
                 timerGroupDescription = "TimerGroup for Annotation "
                     + timerGroupName ;
-                timerGroupMembers = new ArrayList<Type>() ;
+                timerGroupMembers = new ArrayList<>() ;
 
-                return this ;
+                return new AnnoScanner(timerGroupDescription, timerGroupName, timerGroupMembers);
             }
 
             return null ;
+        }
+        
+        private String getGroupName(String desc) {
+            String result = desc ;
+            final int index = desc.lastIndexOf('/') ;
+
+            if (index >= 0) {
+                result = desc.substring( index + 1 ) ;
+            }
+
+            return result ;
+        }
+        
+        // Don't visit fields or methods: we don't need to look at their 
+        // annotations in this visitor.
+        @Override
+        public MethodVisitor visitMethod( final int access, final String name,
+            final String desc, final String signature, 
+            final String[] exceptions ) {
+
+            return null ;
+        }
+        
+        @Override
+        public FieldVisitor visitField( final int access, final String name,
+            final String desc, final String signature,
+            final Object value ) {
+
+            return null ;
+        }
+    }
+    
+    private class AnnoScanner extends AnnotationVisitor {
+        private boolean visitingAnnotation;
+        private String annotationValueName = null ;
+        private String timerGroupDescription ;
+        private final String timerGroupName ;
+        private List<Type> timerGroupMembers ;
+        
+        private AnnoScanner(String timerGroupDesc, String timeGroupName, List<Type> timerGroupMembers) {
+            super(Opcodes.ASM7);
+            visitingAnnotation = true;
+            this.timerGroupDescription = timerGroupDesc;
+            this.timerGroupName = timeGroupName;
+            this.timerGroupMembers = timerGroupMembers;
         }
 
         @Override 
@@ -156,31 +194,14 @@ public class AnnotationScannerAction implements Scanner.Action {
                 }
             }
         }
-
-        // Don't visit fields or methods: we don't need to look at their 
-        // annotations in this visitor.
-        @Override
-        public MethodVisitor visitMethod( final int access, final String name,
-            final String desc, final String signature, 
-            final String[] exceptions ) {
-
-            return null ;
-        }
-
-        @Override
-        public FieldVisitor visitField( final int access, final String name,
-            final String desc, final String signature,
-            final Object value ) {
-
-            return null ;
-        }
     }
 
+    @Override
     public boolean evaluate(FileWrapper fw) {
         try {
             byte[] inputData = fw.readAll();
             ClassReader cr = new ClassReader( inputData ) ;
-            ClassVisitor as = new AnnoScanner() ;
+            ClassVisitor as = new ClassScanner();
             cr.accept( as, 0 );
         } catch (IOException ex) {
             return true ; // ignore things we can't read

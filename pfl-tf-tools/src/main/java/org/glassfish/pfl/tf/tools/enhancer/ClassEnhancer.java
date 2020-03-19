@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -10,13 +11,12 @@
 
 package org.glassfish.pfl.tf.tools.enhancer;
 
-import org.glassfish.pfl.objectweb.asm.ClassVisitor;
-import org.glassfish.pfl.objectweb.asm.Label;
-import org.glassfish.pfl.objectweb.asm.MethodAdapter;
-import org.glassfish.pfl.objectweb.asm.MethodVisitor;
-import org.glassfish.pfl.objectweb.asm.Opcodes;
-import org.glassfish.pfl.objectweb.asm.Type;
-import org.glassfish.pfl.objectweb.asm.commons.GeneratorAdapter;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.GeneratorAdapter;
 
 import org.glassfish.pfl.basic.contain.SynchronizedHolder ;
 import org.glassfish.pfl.tf.spi.EnhancedClassData;
@@ -67,7 +67,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
             if (util.getDebug()) {
                 mv = new SimpleMethodTracer(mv, util) ;
             }
-            MethodAdapter ma = new StaticInitVisitor( siacc, "()V", mv,
+            MethodVisitor ma = new StaticInitVisitor( siacc, "()V", mv,
                 util, ecd ) ;
 
             ma.visitCode() ;

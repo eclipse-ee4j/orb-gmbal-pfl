@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -21,11 +22,10 @@ import org.glassfish.pfl.tf.spi.EnhancedClassDataASMImpl;
 import org.glassfish.pfl.tf.spi.TraceEnhancementException;
 import org.glassfish.pfl.tf.spi.Util;
 
-import org.glassfish.pfl.objectweb.asm.ClassAdapter;
-import org.glassfish.pfl.objectweb.asm.ClassReader;
-import org.glassfish.pfl.objectweb.asm.ClassVisitor;
-import org.glassfish.pfl.objectweb.asm.Opcodes;
-import org.glassfish.pfl.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.ClassNode;
 
 /** ClassFile enhancer for the tracing facility.  This modifies the bytecode
  * for an applicable class, then returns the updated bytecode.
@@ -159,13 +159,7 @@ public class Transformer implements UnaryFunction<byte[],byte[]> {
             byte[] phase1 = null ;
             if ((mode == EnhanceTool.ProcessingMode.UpdateSchemas) ||
                (mode == EnhanceTool.ProcessingMode.TraceEnhance)) {
-                phase1 = util.transform( false, arg,
-                    new UnaryFunction<ClassVisitor, ClassAdapter>() {
-                        public ClassAdapter evaluate(ClassVisitor arg) {
-                            return new ClassEnhancer( util, ecd, arg ) ;
-                        }
-                    }
-                ) ;
+                phase1 = util.transform(false, arg, (ClassVisitor arg1) -> new ClassEnhancer(util, ecd, arg1)) ;
             }
 
             // Only communication from part 1 to part2 is a byte[] and
@@ -183,13 +177,7 @@ public class Transformer implements UnaryFunction<byte[],byte[]> {
             //     infinite series of calls to onMethodExit...)
 
             if (mode == EnhanceTool.ProcessingMode.TraceEnhance) {
-                final byte[] phase2 = util.transform( util.getDebug(), phase1,
-                    new UnaryFunction<ClassVisitor, ClassAdapter>() {
-
-                    public ClassAdapter evaluate(ClassVisitor arg) {
-                        return new ClassTracer( util, ecd, arg ) ;
-                    }
-                }) ;
+                final byte[] phase2 = util.transform(util.getDebug(), phase1, (ClassVisitor arg1) -> new ClassTracer(util, ecd, arg1)) ;
 
                 return phase2 ;
             } else {

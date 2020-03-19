@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -14,18 +15,18 @@ import org.glassfish.pfl.tf.spi.EnhancedClassData;
 import org.glassfish.pfl.tf.spi.TraceEnhancementException;
 import org.glassfish.pfl.tf.spi.annotation.TFEnhanced;
 import org.glassfish.pfl.tf.spi.annotation.TraceEnhanceLevel;
-import org.glassfish.pfl.objectweb.asm.AnnotationVisitor;
-import org.glassfish.pfl.objectweb.asm.ClassAdapter;
-import org.glassfish.pfl.objectweb.asm.ClassVisitor;
-import org.glassfish.pfl.objectweb.asm.FieldVisitor;
-import org.glassfish.pfl.objectweb.asm.MethodVisitor;
-import org.glassfish.pfl.objectweb.asm.Type;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 
 /**
  *
  * @author ken
  */
-public class TFEnhanceAdapter extends ClassAdapter {
+public class TFEnhanceAdapter extends ClassVisitor {
     private static final String TFENHANCED_ANNO_DESC =
         Type.getDescriptor( TFEnhanced.class ) ;
     private static final String TRACE_ENHANCE_LEVEL_DESC =
@@ -45,7 +46,7 @@ public class TFEnhanceAdapter extends ClassAdapter {
 
     public TFEnhanceAdapter( ClassVisitor cv, TraceEnhanceLevel required,
         TraceEnhanceLevel result, EnhancedClassData ecd ) {
-        super( cv ) ;
+        super(Opcodes.ASM7, cv);
         this.required = required ;
         this.result = result ;
         this.ecd = ecd ;
@@ -99,7 +100,7 @@ public class TFEnhanceAdapter extends ClassAdapter {
         if (desc.equals( TFENHANCED_ANNO_DESC )) {
             // Consume the TFEnhanced annotation here.  We'll write out a new
             // one above.
-            return new AnnotationVisitor() {
+            return new AnnotationVisitor(Opcodes.ASM7) {
                 public void visit(String name, Object value) {
                 }
 

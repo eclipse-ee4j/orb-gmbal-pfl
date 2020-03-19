@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -16,7 +17,7 @@ import java.util.Map;
 import org.glassfish.pfl.basic.contain.SynchronizedHolder;
 import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
 import org.glassfish.pfl.tf.spi.annotation.Description;
-import org.glassfish.pfl.objectweb.asm.Type;
+import org.objectweb.asm.Type;
 
 /**
  *
