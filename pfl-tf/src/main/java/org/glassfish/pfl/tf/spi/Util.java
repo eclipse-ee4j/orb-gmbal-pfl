@@ -22,7 +22,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.glassfish.pfl.objectweb.asm.util.AbstractVisitor;
+import org.objectweb.asm.util.Printer;
 import org.objectweb.asm.util.CheckClassAdapter;
 
 /** Some useful utilities for generating code using ASM.  Nothing in here
@@ -323,7 +323,7 @@ public class Util {
     }
 
     public static String opcodeToString( int opcode ) {
-        String[] opcodes = AbstractVisitor.OPCODES ;
+        String[] opcodes = Printer.OPCODES ;
         if ((opcode < 0) || (opcode > opcodes.length)) {
             return "ILLEGAL[" + opcode + "]" ;
         } else {

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -17,15 +18,14 @@ import org.glassfish.pfl.tf.spi.EnhancedClassData;
 import org.glassfish.pfl.tf.spi.MethodMonitor;
 import org.glassfish.pfl.tf.spi.Util;
 import org.glassfish.pfl.tf.spi.annotation.TraceEnhanceLevel;
-import org.glassfish.pfl.objectweb.asm.ClassVisitor;
-import org.glassfish.pfl.objectweb.asm.Label;
-import org.glassfish.pfl.objectweb.asm.MethodVisitor;
-import org.glassfish.pfl.objectweb.asm.Opcodes;
-import org.glassfish.pfl.objectweb.asm.Type;
-import org.glassfish.pfl.objectweb.asm.tree.LabelNode;
-import org.glassfish.pfl.objectweb.asm.tree.LocalVariableNode;
-import org.glassfish.pfl.objectweb.asm.MethodAdapter;
-import org.glassfish.pfl.objectweb.asm.commons.LocalVariablesSorter;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LocalVariableNode;
+import org.objectweb.asm.commons.LocalVariablesSorter;
 
 public class ClassTracer extends TFEnhanceAdapter {
     // Worst case: call to MethodMonitor.info requires 4 words on the stack.
@@ -142,7 +142,7 @@ public class ClassTracer extends TFEnhanceAdapter {
     //     complex expressions make recognizing the start quite difficult)
     // - add preamble
     // - add outer exception handler
-    private class MonitoredMethodEnhancer extends MethodAdapter {
+    private class MonitoredMethodEnhancer extends MethodVisitor {
         private final int access ;
         private final String name ;
         private final String desc ;
@@ -195,7 +195,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         public MonitoredMethodEnhancer( final int access, final String name,
             final String desc, final MethodVisitor mv ) {
-            super( mv ) ;
+            super(Opcodes.ASM7, mv);
             this.access = access ;
             this.name = name ;
             this.desc = desc ;

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -27,13 +28,14 @@ import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
 import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
 import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo ;
 
-import org.glassfish.pfl.objectweb.asm.MethodVisitor ;
-import org.glassfish.pfl.objectweb.asm.ClassWriter ;
-import org.glassfish.pfl.objectweb.asm.Label ;
-import org.glassfish.pfl.objectweb.asm.util.TraceMethodVisitor ;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.util.Textifier;
+import org.objectweb.asm.util.TraceMethodVisitor;
 
 import static java.lang.reflect.Modifier.* ;
-import static org.glassfish.pfl.objectweb.asm.Opcodes.* ;
+import static org.objectweb.asm.Opcodes.*;
 
 /** Class that is responsible for low-level bytecode generation using ASM.
  * It provides methods that directly generate bytecode in a MethodVisitor.
@@ -92,14 +94,14 @@ public final class ByteCodeUtility {
     }
 
     private void dump() {
-	if (debug) {
-	    List<String> data = TraceMethodVisitor.class.cast( mv ).getText() ;
-	    ps.printf( "MethodVisitor calls for method %s%s\n", 
-		methodName, methodSignature ) ;
-	    for (String str : data) {
-		ps.print( str ) ;
-	    }
-	}
+        if (debug) {
+            List<Object> data = TraceMethodVisitor.class.cast(mv).p.getText();
+            ps.printf("MethodVisitor calls for method %s%s\n",
+                    methodName, methodSignature);
+            for (Object str : data) {
+                ps.print(str.toString());
+            }
+        }
     }
 
     public void emitMethodStart( MethodGenerator mg ) {
@@ -125,7 +127,7 @@ public final class ByteCodeUtility {
 	    strs ) ;
 
 	if (debug) {
-            mv = new TraceMethodVisitor(mv);
+            mv = new TraceMethodVisitor(mv, new Textifier());
         }
 
 	mv.visitCode() ;
@@ -274,8 +276,8 @@ public final class ByteCodeUtility {
 	} else if (type.equals(Type._Class())) {
 	    // value is a Type, so get a corresponding ASM type.
 	    Type vtype = Type.class.cast( value ) ;
-	    org.glassfish.pfl.objectweb.asm.Type atype =
-		org.glassfish.pfl.objectweb.asm.Type.getType( vtype.signature() ) ;
+	    org.objectweb.asm.Type atype =
+		org.objectweb.asm.Type.getType( vtype.signature() ) ;
 	    mv.visitLdcInsn( atype ) ;
 	} else if (type.equals( Type._String())) {
 	    mv.visitLdcInsn( value ) ;
@@ -364,10 +366,9 @@ public final class ByteCodeUtility {
 	    MyLabel label = attr.get( node ) ;
 
 	    if (label.emitted()) {
-		if (debug) {
-                    TraceMethodVisitor.class.cast(mv).getText().
-                        add("    Already emitted label " + label);
-                }
+            if (debug) {
+                TraceMethodVisitor.class.cast(mv).p.getText().add("    Already emitted label " + label);
+            }
 	    } else {
 		int lineNumber = CodegenPrinter.lineNumberAttribute.get( node ) ;
 		if (lineNumber > 0) {

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -10,7 +11,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.objectweb.asm.Label ;
+import org.objectweb.asm.Label ;
 
 /** This trivial class exists only to give a slightly
  *  more readable toString method for ASM labels.
