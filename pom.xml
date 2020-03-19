@@ -165,7 +165,6 @@
                     <toolchains>
                         <jdk>
                             <version>${base.java.version}</version>
-                            <vendor>oracle</vendor>
                         </jdk>
                     </toolchains>
                 </configuration>
@@ -324,7 +323,7 @@
             <dependency>
                 <groupId>org.ow2.asm</groupId>
                 <artifactId>asm</artifactId>
-                <version>7.0</version>
+                <version>7.3.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
