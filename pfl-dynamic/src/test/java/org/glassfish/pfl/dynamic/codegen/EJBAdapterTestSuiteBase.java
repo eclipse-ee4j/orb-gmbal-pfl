@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.dynamic.codegen;
 
-import javax.ejb.EJBException;
+import jakarta.ejb.EJBException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

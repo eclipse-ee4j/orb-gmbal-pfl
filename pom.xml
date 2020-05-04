@@ -91,6 +91,7 @@
         <module>pfl-tf-tools</module>
         <module>pfl-dynamic</module>
         <module>pfl-test</module>
+        <module>shading</module>
     </modules>
 
     <build>
