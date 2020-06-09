@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -14,18 +15,17 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import org.glassfish.pfl.tf.spi.Util;
-import org.glassfish.pfl.objectweb.asm.AnnotationVisitor;
-import org.glassfish.pfl.objectweb.asm.Attribute;
-import org.glassfish.pfl.objectweb.asm.Label;
-import org.glassfish.pfl.objectweb.asm.MethodVisitor;
-import org.glassfish.pfl.objectweb.asm.Opcodes;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.Attribute;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 /**
  *
  * @author ken
  */
-public class SimpleMethodTracer implements MethodVisitor {
-    final MethodVisitor mv ;
+public class SimpleMethodTracer extends MethodVisitor {
     final Util util ;
     final Set<Label> visitedLables = new HashSet<Label>() ;
 
@@ -34,7 +34,7 @@ public class SimpleMethodTracer implements MethodVisitor {
     }
 
     public SimpleMethodTracer( MethodVisitor mv, Util util ) {
-        this.mv = mv ;
+        super(Opcodes.ASM7, mv);
         this.util = util ;
     }
 

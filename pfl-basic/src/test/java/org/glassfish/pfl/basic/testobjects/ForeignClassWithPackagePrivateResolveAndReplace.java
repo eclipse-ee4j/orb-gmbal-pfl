@@ -10,8 +10,10 @@
 
 package org.glassfish.pfl.basic.testobjects;
 
+import java.io.Serializable;
+
 @SuppressWarnings("unused")
-public class ForeignClassWithPackagePrivateResolveAndReplace {
+public class ForeignClassWithPackagePrivateResolveAndReplace implements Serializable {
     Object readResolve() { return null; }
     Object writeReplace() { return null; }
 }

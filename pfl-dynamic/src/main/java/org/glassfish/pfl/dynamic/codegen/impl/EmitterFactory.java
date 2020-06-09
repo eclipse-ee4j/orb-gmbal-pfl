@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -21,9 +22,9 @@ import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
 import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
 import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo ;
 
-import org.glassfish.pfl.objectweb.asm.MethodVisitor ;
+import org.objectweb.asm.MethodVisitor ;
 
-import static org.glassfish.pfl.objectweb.asm.Opcodes.* ;
+import static org.objectweb.asm.Opcodes.* ;
 
 /** This class provides methods that allow the construction of an 
  * object that can later be used to emit a bytecode.  This is useful 

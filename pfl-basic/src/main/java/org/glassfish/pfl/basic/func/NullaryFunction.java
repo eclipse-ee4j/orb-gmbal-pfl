@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2004, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -10,6 +11,11 @@
 
 package org.glassfish.pfl.basic.func ;
 
+/**
+ * A function that takes no arguments and returns a result.
+ * @deprecated replaced by {@link java.util.function.Supplier}
+ */
+@Deprecated
 public interface NullaryFunction<T> {
     public T evaluate() ;
 

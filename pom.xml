@@ -2,6 +2,7 @@
 <!--
 
     Copyright (c) 2011, 2019 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2020 Payara Services Ltd.
 
     This program and the accompanying materials are made available under the
     terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -78,6 +79,9 @@
         <!-- The oldest Java version supported by this tool.               -->
         <!-- Will control compilation of the main code and the unit tests. -->
         <base.java.version>1.8</base.java.version>
+
+        <!-- A directory for unit tests, allowing testing against MR classes. -->
+        <combined.classes.dir>${project.build.directory}/combined-classes</combined.classes.dir>
     </properties>
     
     <modules>
@@ -85,7 +89,6 @@
         <module>pfl-basic-tools</module>
         <module>pfl-tf</module>
         <module>pfl-tf-tools</module>
-        <module>pfl-asm</module>
         <module>pfl-dynamic</module>
         <module>pfl-test</module>
     </modules>
@@ -93,6 +96,10 @@
     <build>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.0.0-M3</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
@@ -118,6 +125,27 @@
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>2.8</version>
                 </plugin>
+                <plugin>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <executions>
+                        <execution>
+                            <id>copy-base-classes</id>
+                            <phase>process-classes</phase>
+                            <goals>
+                                <goal>copy-resources</goal>
+                            </goals>
+                            <configuration>
+                                <outputDirectory>${combined.classes.dir}</outputDirectory>
+                                <resources>
+                                    <resource>
+                                        <directory>${project.build.outputDirectory}</directory>
+                                    </resource>
+                                </resources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
         
@@ -137,7 +165,6 @@
                     <toolchains>
                         <jdk>
                             <version>${base.java.version}</version>
-                            <vendor>oracle</vendor>
                         </jdk>
                     </toolchains>
                 </configuration>
@@ -195,6 +222,34 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.0.0-M1</version>
+            </plugin>
+
+            <!-- add the legal files to the jar -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>add-legal-resource</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>add-resource</goal>
+                        </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <directory>${maven.multiModuleProjectDirectory}</directory>
+                                    <includes>
+                                        <include>NOTICE.md</include>
+                                        <include>LICENSE.md</include>
+                                    </includes>
+                                    <targetPath>META-INF</targetPath>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <!-- override default "built-by" entry, which points to a developer's user id -->
@@ -263,6 +318,16 @@
         </plugins>
     </build>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>8.0.1</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -321,17 +386,6 @@
 
     <profiles>
 
-        <!-- ignore javadoc lint checks, enabled by default in JDK 1.8 -->
-        <profile>
-            <id>disable-java8-doclint</id>
-            <activation>
-                <jdk>[1.8,)</jdk>
-            </activation>
-            <properties>
-                <additionalparam>-Xdoclint:none</additionalparam>
-            </properties>
-        </profile>
-
         <profile>
             <!-- processing during site generation -->
             <id>site</id>
@@ -367,8 +421,32 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-java9-classes</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <overwrite>true</overwrite>
+                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.outputDirectory}/META-INF/versions/9</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
+            <properties>
+                <maven.test.additionalClasspath>${project.build.testOutputDirectory}/</maven.test.additionalClasspath>
+            </properties>
         </profile>
 
         <!-- enable java11 compilation -->
@@ -389,6 +467,27 @@
                             </execution>
                         </executions>
                     </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-java11-classes</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <overwrite>true</overwrite>
+                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.outputDirectory}/META-INF/versions/11</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
                 </plugins>
             </build>
         </profile>
@@ -406,9 +505,9 @@
                     <!-- Run the unit tests with the JVM used to run maven -->
                     <plugin>
                         <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.21.0</version>
                         <configuration>
                             <jvm>${env.JAVA_HOME}/bin/java</jvm>
+                            <classesDirectory>${combined.classes.dir}</classesDirectory>
                         </configuration>
                     </plugin>
                 </plugins>
@@ -438,46 +537,6 @@
                             </execution>
                         </executions>
                     </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <!-- include required legal artifacts in module jars -->
-            <id>install-legal-files</id>
-            <activation>
-                <file>
-                    <exists>src/main/java</exists>
-                </file>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.coderplus.maven.plugins</groupId>
-                        <artifactId>copy-rename-maven-plugin</artifactId>
-                        <version>1.0.1</version>
-                        <executions>
-                          <execution>
-                            <id>copy-legal-files</id>
-                            <phase>generate-resources</phase>
-                            <goals>
-                              <goal>copy</goal>
-                            </goals>
-                            <configuration>
-                                <fileSets>
-                                    <fileSet>
-                                        <sourceFile>${project.basedir}/../LICENSE.md</sourceFile>
-                                        <destinationFile>${project.build.outputDirectory}/META-INF/LICENSE</destinationFile>
-                                    </fileSet>
-                                    <fileSet>
-                                        <sourceFile>${project.basedir}/../NOTICE.md</sourceFile>
-                                        <destinationFile>${project.build.outputDirectory}/META-INF/NOTICE</destinationFile>
-                                    </fileSet>
-                                </fileSets>
-                            </configuration>
-                          </execution>
-                        </executions>
-                      </plugin>
                 </plugins>
             </build>
         </profile>

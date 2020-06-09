@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -11,19 +12,18 @@
 package org.glassfish.pfl.tf.spi;
 
 import java.io.PrintWriter;
-import org.glassfish.pfl.basic.func.UnaryFunction;
-import org.glassfish.pfl.objectweb.asm.ClassAdapter;
-import org.glassfish.pfl.objectweb.asm.ClassReader;
-import org.glassfish.pfl.objectweb.asm.ClassVisitor;
-import org.glassfish.pfl.objectweb.asm.ClassWriter;
-import org.glassfish.pfl.objectweb.asm.MethodVisitor;
-import org.glassfish.pfl.objectweb.asm.Opcodes;
-import org.glassfish.pfl.objectweb.asm.Type;
-import org.glassfish.pfl.objectweb.asm.tree.LocalVariableNode;
-import org.glassfish.pfl.objectweb.asm.tree.MethodInsnNode;
-import org.glassfish.pfl.objectweb.asm.tree.MethodNode;
-import org.glassfish.pfl.objectweb.asm.util.AbstractVisitor;
-import org.glassfish.pfl.objectweb.asm.util.CheckClassAdapter;
+import java.util.function.Function;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.LocalVariableNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.util.Printer;
+import org.objectweb.asm.util.CheckClassAdapter;
 
 /** Some useful utilities for generating code using ASM.  Nothing in here
  * should be specific to the classfile enhancer for tracing.
@@ -323,7 +323,7 @@ public class Util {
     }
 
     public static String opcodeToString( int opcode ) {
-        String[] opcodes = AbstractVisitor.OPCODES ;
+        String[] opcodes = Printer.OPCODES ;
         if ((opcode < 0) || (opcode > opcodes.length)) {
             return "ILLEGAL[" + opcode + "]" ;
         } else {
@@ -332,7 +332,7 @@ public class Util {
     }
 
     public byte[] transform( final boolean debug, final byte[] cls,
-        final UnaryFunction<ClassVisitor,ClassAdapter> factory ) {
+        final Function<ClassVisitor,ClassVisitor> factory ) {
 
         final ClassReader cr = new ClassReader(cls) ;
         final ClassWriter cw = new ClassWriter(
@@ -349,7 +349,7 @@ public class Util {
             // cv = tcv ;
         }
 
-        ClassAdapter xform = factory.evaluate( cv ) ;
+        ClassVisitor xform = factory.apply( cv ) ;
 
         try {
             cr.accept( xform, ClassReader.SKIP_FRAMES ) ;

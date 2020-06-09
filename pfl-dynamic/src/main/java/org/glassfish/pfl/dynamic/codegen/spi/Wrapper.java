@@ -106,13 +106,13 @@ import org.glassfish.pfl.dynamic.copyobject.impl.ClassCopierOrdinaryImpl;
  * Class&lt;?&gt;  newClass = _generate( ... ) ;
  * </PRE>
  * Alternatively, the last line could be
- * <PRE>
- * GenericClass<T> gc = _generate( T.class, props ) ;
+ * <PRE>{@code
+ * GenericClass<T> gc = _generate( T.class, props ) ;}
  * </PRE>
  * which makes it easy to create an instance of the generated class
  * by calling:
- * <PRE>
- * T instance = gc.create( <constructor args> ) ;
+ * <PRE>{@code
+ * T instance = gc.create( <constructor args> ) ;}
  * </PRE>
  * <P>
  * Currently only one class can be defined at a time.

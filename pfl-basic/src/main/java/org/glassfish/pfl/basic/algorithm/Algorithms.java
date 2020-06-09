@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2007, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2007, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -11,7 +12,6 @@
 package org.glassfish.pfl.basic.algorithm ;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -33,12 +33,15 @@ import org.glassfish.pfl.basic.func.UnaryPredicate;
 public final class Algorithms {
     private Algorithms() {}
     
+    /**
+     * Converts an array of objects into a list
+     * @param <T> type of objects
+     * @param arg the array of objects
+     * @return list of objects
+     * @deprecated replaced by {@link Arrays#asList(java.lang.Object...)}
+     */
     public static <T> List<T> list( T... arg ) {
-        List<T> result = new ArrayList<T>() ;
-        for (T obj : arg) {
-            result.add( obj ) ;
-        }
-        return result ;
+        return Arrays.asList(arg) ;
     }
 
     public static <S,T> Pair<S,T> pair( S first, T second ) {
@@ -191,8 +194,8 @@ public final class Algorithms {
      * @param <S> Type of elements of list.
      * @param <T> Type of elements of result.
      * @param list List of elements of type S.
-     * @param map function mapping S to List<T>.
-     * @return List<T> containg results of applying map to each element of list.
+     * @param map function mapping S to {@code List<T>}.
+     * @return {@code List<T>} containing results of applying map to each element of list.
      */
     public static <S,T> List<T> flatten( final List<S> list,
         final UnaryFunction<S,List<T>> map ) {        

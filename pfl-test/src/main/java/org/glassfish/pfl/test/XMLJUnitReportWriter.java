@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  * Copyright 2004 The Apache Software Foundation
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -54,7 +54,7 @@ import org.w3c.dom.Text;
 /**
  * Prints XML output of the test to a specified Writer.
  *
- * @see FormatterElement
+ * @see "FormatterElement"
  */
 
 public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {

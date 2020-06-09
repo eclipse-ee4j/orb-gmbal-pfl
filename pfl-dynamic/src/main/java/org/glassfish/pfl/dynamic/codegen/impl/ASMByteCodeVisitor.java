@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -15,7 +16,7 @@ import java.io.PrintStream ;
 
 import java.util.Map ;
 
-import org.glassfish.pfl.objectweb.asm.ClassWriter ;
+import org.objectweb.asm.ClassWriter ;
 
 import org.glassfish.pfl.dynamic.codegen.spi.Type ;
 import org.glassfish.pfl.dynamic.codegen.spi.Variable ;

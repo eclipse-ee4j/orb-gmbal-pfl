@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020 Payara Services Ltd.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -19,15 +20,14 @@ import java.io.PrintStream ;
 import java.io.FileOutputStream ;
 import java.io.File ;
 
-import org.glassfish.pfl.objectweb.asm.ClassWriter ;
-import org.glassfish.pfl.objectweb.asm.ClassVisitor ;
-import org.glassfish.pfl.objectweb.asm.MethodVisitor ;
-import org.glassfish.pfl.objectweb.asm.ClassAdapter ;
-import org.glassfish.pfl.objectweb.asm.MethodAdapter ;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
 
 // Imports for verify method
-import org.glassfish.pfl.objectweb.asm.ClassReader ;
-import org.glassfish.pfl.objectweb.asm.util.CheckClassAdapter ;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.util.CheckClassAdapter;
 // end of verify method imports
 
 import org.glassfish.pfl.dynamic.codegen.spi.ImportList ;
@@ -130,11 +130,12 @@ public class ASMUtil {
     }
 */
 
-    private static class FixStackSizeClassVisitor extends ClassAdapter {
+    private static class FixStackSizeClassVisitor extends ClassVisitor {
         public FixStackSizeClassVisitor( final ClassVisitor cv ) {
-            super( cv ) ;
+            super(Opcodes.ASM7, cv);
         }
 
+        @Override
         public MethodVisitor visitMethod( final int access, final String name,
             final String desc, final String signature, final String[] exceptions ) {
             MethodVisitor mv = cv.visitMethod( access, name, desc, signature, exceptions ) ;
@@ -142,11 +143,12 @@ public class ASMUtil {
         }
     }
 
-    private static class FixStackSizeMethodVisitor extends MethodAdapter {
+    private static class FixStackSizeMethodVisitor extends MethodVisitor {
         public FixStackSizeMethodVisitor( final MethodVisitor mv ) {
-            super( mv ) ;
+            super(Opcodes.ASM7, mv);
         }
 
+        @Override
         public void visitMaxs( int maxStack, int maxLocals ) {
             // Make ASM calculate the stack size
             mv.visitMaxs( 0, 0 ) ;

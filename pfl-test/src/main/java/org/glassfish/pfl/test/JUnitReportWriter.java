@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  * Copyright 2004 The Apache Software Foundation
  *
  * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -72,7 +72,7 @@ public interface JUnitReportWriter {
 
     /**
      * The whole testsuite started.
-     * @param suite the suite.
+     * @param name the suite.
      */
     void startTestSuite(String name, Properties props ) ;
 
@@ -122,7 +122,6 @@ public interface JUnitReportWriter {
 
     /**
      * The whole testsuite ended.
-     * @param suite the suite.
      */
     TestCounts endTestSuite() ;
 }
