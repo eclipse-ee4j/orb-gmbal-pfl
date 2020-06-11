@@ -145,16 +145,6 @@
                 <directive type="Export-Package" name="test.export"/>
             </directive-list>
         </make-bundle>
-	<make-bundle 
-            bundlename="pfl-asm"
-            outfile="pfl-asm.jar"
-            outdir="${bundle.dir}"
-            version="${version}"
-            classpath="${bnd.classpath}">
-            <directive-list>
-		<directive type="Export-Package" name="asm.export"/>
-	    </directive-list>
-	</make-bundle>
     </target>
 
     <target name="-post-jar" depends="make-bundles"/>
@@ -176,10 +166,7 @@
     </macrodef>
 
     <target name="make-poms" depends="modules.init">
-	<make-pfl-pom artifactid="pfl-asm" 
-	    description="ASM version used in the ORB">
-	</make-pfl-pom>
-	<make-pfl-pom artifactid="pfl-basic" 
+	<make-pfl-pom artifactid="pfl-basic"
 	    description="Base library for functions, logex, fsm, etc.">
 	</make-pfl-pom>
 	<make-pfl-pom artifactid="pfl-basic-tools" 
@@ -194,10 +181,6 @@
 	<make-pfl-pom artifactid="pfl-dynamic" 
 	    description="Dynamic code generation library">
 	    <dep-list>
-		<dependency
-		    groupId="org.glassfish.pfl"
-		    artifactId="pfl-asm"
-		    version="${version}"/>
 		<dependency
 		    groupId="org.glassfish.pfl"
 		    artifactId="pfl-basic"
@@ -222,10 +205,6 @@
 	    <dep-list>
 		<dependency
 		    groupId="org.glassfish.pfl"
-		    artifactId="pfl-asm"
-		    version="${version}"/>
-		<dependency
-		    groupId="org.glassfish.pfl"
 		    artifactId="pfl-basic"
 		    version="${version}"/>
 	    </dep-list>
@@ -233,10 +212,6 @@
 	<make-pfl-pom artifactid="pfl-tf-tools" 
 	    description="Tracing facility library">
 	    <dep-list>
-		<dependency
-		    groupId="org.glassfish.pfl"
-		    artifactId="pfl-asm"
-		    version="${version}"/>
 		<dependency
 		    groupId="org.glassfish.pfl"
 		    artifactId="pfl-basic"
@@ -251,10 +226,7 @@
 		    version="${version}"/>
 	    </dep-list>
 	</make-pfl-pom>
-	<make-pfl-pom artifactid="pfl-asm" 
-	    description="Tracing facility build tools">
-	</make-pfl-pom>
-	<make-pfl-pom artifactid="pfl-source" 
+	<make-pfl-pom artifactid="pfl-source"
 	    description="All pfl source code">
 	</make-pfl-pom>
     </target>
@@ -280,7 +252,6 @@
         <attribute name="destination"/>
         <sequential>
             <echo message="Releasing modules with version ${version} to @{destination}"/>
-            <pfl-push-to-maven destination="@{destination}" module="pfl-asm"/>
             <pfl-push-to-maven destination="@{destination}" module="pfl-basic" />
             <pfl-push-to-maven destination="@{destination}" module="pfl-basic-tools"/>
             <pfl-push-to-maven destination="@{destination}" module="pfl-dynamic"/>
@@ -294,7 +265,6 @@
     <macrodef name="release-to-local-maven">
         <sequential>
             <echo message="Releasing modules with version ${version} to local repository"/>
-            <pfl-push-to-local-maven module="pfl-asm"/>
             <pfl-push-to-local-maven module="pfl-basic"/>
             <pfl-push-to-local-maven module="pfl-basic-tools"/>
             <pfl-push-to-local-maven module="pfl-dynamic"/>
