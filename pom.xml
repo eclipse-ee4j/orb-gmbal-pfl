@@ -164,7 +164,7 @@
                 <configuration>
                     <toolchains>
                         <jdk>
-                            <version>${base.java.version}</version>
+                            <version>JavaSE-${base.java.version}</version>
                         </jdk>
                     </toolchains>
                 </configuration>
@@ -189,7 +189,7 @@
                         <configuration>
                             <release>9</release>
                             <jdkToolchain>
-                                <version>9</version>
+                                <version>JavaSE-9</version>
                             </jdkToolchain>
                             <compileSourceRoots>
                                 <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
@@ -207,7 +207,7 @@
                         <configuration>
                             <release>11</release>
                             <jdkToolchain>
-                                <version>11</version>
+                                <version>JavaSE-11</version>
                             </jdkToolchain>
                             <compileSourceRoots>
                                 <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
