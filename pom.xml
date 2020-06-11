@@ -82,6 +82,9 @@
 
         <!-- A directory for unit tests, allowing testing against MR classes. -->
         <combined.classes.dir>${project.build.directory}/combined-classes</combined.classes.dir>
+
+        <!-- a prefix for toolchains IDs, allowing builds to happen in different environments -->
+        <toolchains.id.prefix/>
     </properties>
     
     <modules>
@@ -164,7 +167,7 @@
                 <configuration>
                     <toolchains>
                         <jdk>
-                            <version>JavaSE-${base.java.version}</version>
+                            <version>${toolchains.id.prefix}${base.java.version}</version>
                         </jdk>
                     </toolchains>
                 </configuration>
@@ -189,7 +192,7 @@
                         <configuration>
                             <release>9</release>
                             <jdkToolchain>
-                                <version>JavaSE-9</version>
+                                <version>${toolchains.id.prefix}9</version>
                             </jdkToolchain>
                             <compileSourceRoots>
                                 <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
@@ -207,7 +210,7 @@
                         <configuration>
                             <release>11</release>
                             <jdkToolchain>
-                                <version>JavaSE-11</version>
+                                <version>${toolchains.id.prefix}11</version>
                             </jdkToolchain>
                             <compileSourceRoots>
                                 <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
