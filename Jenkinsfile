@@ -28,7 +28,7 @@ pipeline {
   agent any
   tools {
     maven 'apache-maven-latest'
-    jdk 'adoptopenjdk-hotspot-jdk8-latest'
+    jdk 'openjdk-jdk11-latest'
   }
   stages {
     stage('build') {
