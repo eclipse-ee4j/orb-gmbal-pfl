@@ -134,7 +134,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
 
             mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 EnhancedClassData.MM_NAME, "info",
-                "([Ljava/lang/Object;II)V") ;
+                "([Ljava/lang/Object;II)V", true) ;
 
             mv.visitLabel( jumpLabel ) ;
 
@@ -153,7 +153,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
 
         @Override
         public void visitMethodInsn( int opcode, String owner,
-            String name, String desc ) {
+            String name, String desc, boolean isInterface ) {
             info( 2, "InfoMethodCallRewriter: visitMethodInsn: " + owner
                 + "." + name + desc ) ;
 
@@ -180,9 +180,9 @@ public class ClassEnhancer extends TFEnhanceAdapter {
 
                 String newDesc = util.augmentInfoMethodDescriptor(desc) ;
 
-                mv.visitMethodInsn(opcode, owner, name, newDesc );
+                mv.visitMethodInsn(opcode, owner, name, newDesc, isInterface );
             } else {
-                mv.visitMethodInsn(opcode, owner, name, desc );
+                mv.visitMethodInsn(opcode, owner, name, desc, isInterface );
             }
         }
     }
@@ -199,7 +199,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
 
         @Override
         public void visitMethodInsn( int opcode, String owner,
-            String name, String desc ) {
+            String name, String desc, boolean isInterface ) {
             info( 2, "NormalMethodChecker: visitMethodInsn: " + owner
                 + "." + name + desc ) ;
 
@@ -217,7 +217,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
                     + " illegal call to an @InfoMethod method" ) ;
             }
 
-            mv.visitMethodInsn( opcode, owner, name, desc ) ;
+            mv.visitMethodInsn( opcode, owner, name, desc, isInterface ) ;
         }
     }
 

@@ -69,7 +69,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
                 "Ljava/io/PrintStream;" ) ;
             mv.visitLdcInsn( msg );
             mv.visitMethodInsn( Opcodes.INVOKEVIRTUAL, "java/io/PrintStream",
-                "println", "(Ljava/lang/String;)V");
+                "println", "(Ljava/lang/String;)V", false);
         }
     }
 
@@ -83,7 +83,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 	    Type mmrType = Type.getType( MethodMonitorRegistry.class ) ;
 	    String mdesc = "(Ljava/lang/Class;)V" ;
 	    mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-		mmrType.getInternalName(), "registerClass", mdesc ) ;
+		mmrType.getInternalName(), "registerClass", mdesc, false ) ;
 	} else {
 	    int line = 1 ;
 	    util.info( 2, "StaticInitVisitor.visitCode" ) ;
@@ -126,7 +126,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 		mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
 		mv.visitLdcInsn( str );
 		mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
-		    "java/util/List", "add", "(Ljava/lang/Object;)Z" );
+		    "java/util/List", "add", "(Ljava/lang/Object;)Z", true );
 		mv.visitInsn( Opcodes.POP ) ;
 	    }
 
@@ -153,7 +153,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 
 		mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
 		    "java/util/Map", "put",
-		    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+		    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true);
 
 		mv.visitInsn( Opcodes.POP ) ;
 	    }
@@ -170,7 +170,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 	    String mdesc =
                 "(Ljava/lang/Class;Ljava/util/List;Ljava/util/Map;)V" ;
 	    mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-		mmrType.getInternalName(), "registerClass", mdesc ) ;
+		mmrType.getInternalName(), "registerClass", mdesc, false ) ;
 
 	    mv.visitLabel( end ) ;
 

@@ -123,7 +123,7 @@ public class Util {
         mv.visitTypeInsn( Opcodes.NEW, type.getInternalName() );
         mv.visitInsn( Opcodes.DUP ) ;
         mv.visitMethodInsn( Opcodes.INVOKESPECIAL,
-            type.getInternalName(), "<init>", "()V" );
+            type.getInternalName(), "<init>", "()V", false );
     }
 
     public String augmentInfoMethodDescriptor( String desc ) {
@@ -184,49 +184,49 @@ public class Util {
                 mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
                 mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                     Type.getInternalName( Boolean.class ), "valueOf",
-                    "(Z)Ljava/lang/Boolean;" );
+                    "(Z)Ljava/lang/Boolean;", false );
                 break ;
             case Type.BYTE :
                 mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
                 mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                     Type.getInternalName( Byte.class ), "valueOf",
-                    "(B)Ljava/lang/Byte;" );
+                    "(B)Ljava/lang/Byte;", false );
                 break ;
             case Type.CHAR :
                 mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
                 mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                     Type.getInternalName( Character.class ), "valueOf",
-                    "(C)Ljava/lang/Character;" );
+                    "(C)Ljava/lang/Character;", false );
                 break ;
             case Type.SHORT :
                 mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
                 mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                     Type.getInternalName( Short.class ), "valueOf",
-                    "(S)Ljava/lang/Short;" );
+                    "(S)Ljava/lang/Short;", false );
                 break ;
             case Type.INT :
                 mv.visitVarInsn( Opcodes.ILOAD,  argIndex ) ;
                 mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                     Type.getInternalName( Integer.class ), "valueOf",
-                    "(I)Ljava/lang/Integer;" );
+                    "(I)Ljava/lang/Integer;", false );
                 break ;
             case Type.LONG :
                 mv.visitVarInsn( Opcodes.LLOAD,  argIndex ) ;
                 mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                     Type.getInternalName( Long.class ), "valueOf",
-                    "(J)Ljava/lang/Long;" );
+                    "(J)Ljava/lang/Long;", false );
                 break ;
             case Type.DOUBLE :
                 mv.visitVarInsn( Opcodes.DLOAD,  argIndex ) ;
                 mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                     Type.getInternalName( Double.class ), "valueOf",
-                    "(D)Ljava/lang/Double;" );
+                    "(D)Ljava/lang/Double;", false );
                 break ;
             case Type.FLOAT :
                 mv.visitVarInsn( Opcodes.FLOAD,  argIndex ) ;
                 mv.visitMethodInsn( Opcodes.INVOKESTATIC,
                     Type.getInternalName( Float.class ), "valueOf",
-                    "(F)Ljava/lang/Float;" );
+                    "(F)Ljava/lang/Float;", false );
                 break ;
             default :
                 mv.visitVarInsn( Opcodes.ALOAD,  argIndex ) ;
