@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2020 Payara Services Ltd.
+ * Copyright (c) 2022 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -40,7 +41,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
     public StaticInitVisitor( final int access, final String desc,
         final MethodVisitor mv, Util util, EnhancedClassData ecd ) {
 
-        super( access, desc, mv ) ;
+        super( Opcodes.ASM7, access, desc, mv ) ;
         this.util = util ;
         this.ecd = ecd ;
         util.info( 2, "StaticInitVisitor created" ) ;

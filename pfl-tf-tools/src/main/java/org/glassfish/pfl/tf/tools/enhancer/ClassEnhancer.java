@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2020 Payara Services Ltd.
+ * Copyright (c) 2022 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -92,7 +93,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         public InfoMethodRewriter( MethodVisitor mv,
             int acc, String name, String desc ) {
 
-            super( mv, acc, name, desc ) ;
+            super( Opcodes.ASM7, mv, acc, name, desc ) ;
             this.access = acc ;
             this.name = name ;
             this.desc = desc ;
@@ -147,7 +148,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         public InfoMethodCallRewriter( MethodVisitor mv,
             int acc, String name, String desc ) {
 
-            super( mv, acc, name, desc ) ;
+            super( Opcodes.ASM7, mv, acc, name, desc ) ;
         }
 
         @Override
@@ -191,7 +192,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         public NormalMethodChecker( MethodVisitor mv,
             int acc, String name, String desc ) {
 
-            super( mv, acc, name, desc ) ;
+            super( Opcodes.ASM7, mv, acc, name, desc ) ;
 
 	    mname = util.getFullMethodDescriptor(name, desc ) ;
         }
