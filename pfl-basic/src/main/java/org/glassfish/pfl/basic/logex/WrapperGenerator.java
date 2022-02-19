@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2022 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -503,7 +504,7 @@ public class WrapperGenerator {
          * of the message string that goes into the ResourceBundle.
          * Do we need yet another annotation (@OperationContext) to control
          * this?
-         *
+         */
         // XXX need to centralize isLoggable checks.
         if (logger.isLoggable(level) && isMajorLevel(level)) {
             final String context = OperationTracer.getAsString() ;
@@ -515,7 +516,6 @@ public class WrapperGenerator {
             }
             logger.log( lrec ) ;
         }
-        */
 
         switch (rtype) {
             case EXCEPTION : return exc ;
