@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2020 Payara Services Ltd.
+ * Copyright (c) 2022 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -491,7 +492,7 @@ public final class ByteCodeUtility {
 	String name, Signature sig ) {
 
 	mv.visitMethodInsn( INVOKESTATIC, ASMUtil.bcName(type), name, 
-	    sig.signature() ) ;
+	    sig.signature(), false ) ;
     }
 
     /** Emit the appropriate non-static INVOKE instruction as follows:
@@ -529,7 +530,7 @@ public final class ByteCodeUtility {
 
 	String typeName = ASMUtil.bcName(mcinfo.thisType()) ;
 
-	mv.visitMethodInsn( opcode, typeName, name, sigString ) ;
+	mv.visitMethodInsn( opcode, typeName, name, sigString, mcinfo.isInterface() ) ;
     }
 
     /** Emit the INVOKESPECIAL instruction for calling a constructor
@@ -540,7 +541,7 @@ public final class ByteCodeUtility {
 
 	String typeName = ASMUtil.bcName(type) ;
 	mv.visitMethodInsn( INVOKESPECIAL, typeName, 
-	    CodeGeneratorUtil.CONSTRUCTOR_METHOD_NAME, sig.signature()) ;
+	    CodeGeneratorUtil.CONSTRUCTOR_METHOD_NAME, sig.signature(), false) ;
     }
 
     /** Emit the INVOKESPECIAL instruction for calling a method
@@ -551,7 +552,7 @@ public final class ByteCodeUtility {
 
 	String typeName = ASMUtil.bcName(type) ;
 	mv.visitMethodInsn( INVOKESPECIAL, typeName, 
-	    name, sig.signature() ) ;
+	    name, sig.signature(), false ) ;
     }
 
     public void emitThrow() {

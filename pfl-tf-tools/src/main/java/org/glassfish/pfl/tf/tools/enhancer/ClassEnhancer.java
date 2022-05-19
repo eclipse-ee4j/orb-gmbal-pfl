@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2020 Payara Services Ltd.
+ * Copyright (c) 2022 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -92,7 +93,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         public InfoMethodRewriter( MethodVisitor mv,
             int acc, String name, String desc ) {
 
-            super( mv, acc, name, desc ) ;
+            super( Opcodes.ASM7, mv, acc, name, desc ) ;
             this.access = acc ;
             this.name = name ;
             this.desc = desc ;
@@ -133,7 +134,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
 
             mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 EnhancedClassData.MM_NAME, "info",
-                "([Ljava/lang/Object;II)V") ;
+                "([Ljava/lang/Object;II)V", true) ;
 
             mv.visitLabel( jumpLabel ) ;
 
@@ -147,12 +148,12 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         public InfoMethodCallRewriter( MethodVisitor mv,
             int acc, String name, String desc ) {
 
-            super( mv, acc, name, desc ) ;
+            super( Opcodes.ASM7, mv, acc, name, desc ) ;
         }
 
         @Override
         public void visitMethodInsn( int opcode, String owner,
-            String name, String desc ) {
+            String name, String desc, boolean isInterface ) {
             info( 2, "InfoMethodCallRewriter: visitMethodInsn: " + owner
                 + "." + name + desc ) ;
 
@@ -179,9 +180,9 @@ public class ClassEnhancer extends TFEnhanceAdapter {
 
                 String newDesc = util.augmentInfoMethodDescriptor(desc) ;
 
-                mv.visitMethodInsn(opcode, owner, name, newDesc );
+                mv.visitMethodInsn(opcode, owner, name, newDesc, isInterface );
             } else {
-                mv.visitMethodInsn(opcode, owner, name, desc );
+                mv.visitMethodInsn(opcode, owner, name, desc, isInterface );
             }
         }
     }
@@ -191,14 +192,14 @@ public class ClassEnhancer extends TFEnhanceAdapter {
         public NormalMethodChecker( MethodVisitor mv,
             int acc, String name, String desc ) {
 
-            super( mv, acc, name, desc ) ;
+            super( Opcodes.ASM7, mv, acc, name, desc ) ;
 
 	    mname = util.getFullMethodDescriptor(name, desc ) ;
         }
 
         @Override
         public void visitMethodInsn( int opcode, String owner,
-            String name, String desc ) {
+            String name, String desc, boolean isInterface ) {
             info( 2, "NormalMethodChecker: visitMethodInsn: " + owner
                 + "." + name + desc ) ;
 
@@ -216,7 +217,7 @@ public class ClassEnhancer extends TFEnhanceAdapter {
                     + " illegal call to an @InfoMethod method" ) ;
             }
 
-            mv.visitMethodInsn( opcode, owner, name, desc ) ;
+            mv.visitMethodInsn( opcode, owner, name, desc, isInterface ) ;
         }
     }
 

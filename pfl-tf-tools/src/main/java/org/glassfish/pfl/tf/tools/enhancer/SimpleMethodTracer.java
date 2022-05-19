@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2020 Payara Services Ltd.
+ * Copyright (c) 2022 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -114,10 +115,10 @@ public class SimpleMethodTracer extends MethodVisitor {
         mv.visitFieldInsn(opcode, owner, name, desc);
     }
 
-    public void visitMethodInsn(int opcode, String owner, String name, String desc) {
+    public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean isInterface) {
         msg( "visitMethodInsn(opcode=" + Util.opcodeToString(opcode)
             + ",owner=" + owner + ",name=" + name + ",desc=" + desc + ")" ) ;
-        mv.visitMethodInsn(opcode, owner, name, desc);
+        mv.visitMethodInsn(opcode, owner, name, desc, isInterface);
     }
 
     public void visitJumpInsn(int opcode, Label label) {

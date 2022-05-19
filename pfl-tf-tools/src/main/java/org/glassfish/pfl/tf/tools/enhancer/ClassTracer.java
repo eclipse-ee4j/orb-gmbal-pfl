@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2020 Payara Services Ltd.
+ * Copyright (c) 2022 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -275,7 +276,7 @@ public class ClassTracer extends TFEnhanceAdapter {
                 fname, Type.getDescriptor( SynchronizedHolder.class ));
             lmv.visitMethodInsn( Opcodes.INVOKEVIRTUAL,
                 EnhancedClassData.SH_NAME, "content",
-                "()Ljava/lang/Object;" );
+                "()Ljava/lang/Object;", false );
             lmv.visitTypeInsn( Opcodes.CHECKCAST,
                 EnhancedClassData.MM_NAME );
             lmv.visitVarInsn( Opcodes.ASTORE, __mm.index );
@@ -292,7 +293,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
             lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 EnhancedClassData.MM_NAME, "enter",
-                "(I[Ljava/lang/Object;)V" ) ;
+                "(I[Ljava/lang/Object;)V", true ) ;
 
             // }
             lmv.visitLabel( start ) ;
@@ -310,7 +311,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
             lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                 EnhancedClassData.MM_NAME, "exception",
-                "(ILjava/lang/Throwable;)V" ) ;
+                "(ILjava/lang/Throwable;)V", true ) ;
 
             lmv.visitLabel( skipLabel ) ;
         }
@@ -328,14 +329,14 @@ public class ClassTracer extends TFEnhanceAdapter {
             if (rtype.equals( Type.VOID_TYPE )) {
                 lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                     EnhancedClassData.MM_NAME, "exit",
-                    "(I)V" ) ;
+                    "(I)V", true ) ;
             } else {
                 util.wrapArg( lmv, __result.index,
                     Type.getType( __result.desc ) ) ;
 
                 lmv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
                     EnhancedClassData.MM_NAME, "exit",
-                    "(ILjava/lang/Object;)V" ) ;
+                    "(ILjava/lang/Object;)V", true ) ;
             }
 
             lmv.visitLabel( skipLabel ) ;
@@ -387,7 +388,7 @@ public class ClassTracer extends TFEnhanceAdapter {
 
         @Override
         public void visitMethodInsn( final int opcode, final String owner,
-            final String name, final String desc ) {
+            final String name, final String desc, final boolean isInterface ) {
             info( 2, "MM method: visitMethodInsn["
                 + Util.opcodeToString(opcode) + "]: " + owner
                 + "." + name + desc ) ;
@@ -408,11 +409,11 @@ public class ClassTracer extends TFEnhanceAdapter {
                 lmv.visitVarInsn( Opcodes.ALOAD, __mm.index ) ;
                 util.emitIntConstant(lmv, identVal );
 
-                lmv.visitMethodInsn(opcode, owner, name, desc );
+                lmv.visitMethodInsn(opcode, owner, name, desc, isInterface );
             } else {
                 current = current.transition( util, lmv, Input.OTHER ) ;
 
-                lmv.visitMethodInsn(opcode, owner, name, desc );
+                lmv.visitMethodInsn(opcode, owner, name, desc, isInterface );
             }
         }
 

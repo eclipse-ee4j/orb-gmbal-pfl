@@ -1,6 +1,7 @@
 /*
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2020 Payara Services Ltd.
+ * Copyright (c) 2022 Contributors to the Eclipse Foundation
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -40,7 +41,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
     public StaticInitVisitor( final int access, final String desc,
         final MethodVisitor mv, Util util, EnhancedClassData ecd ) {
 
-        super( access, desc, mv ) ;
+        super( Opcodes.ASM7, access, desc, mv ) ;
         this.util = util ;
         this.ecd = ecd ;
         util.info( 2, "StaticInitVisitor created" ) ;
@@ -68,7 +69,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
                 "Ljava/io/PrintStream;" ) ;
             mv.visitLdcInsn( msg );
             mv.visitMethodInsn( Opcodes.INVOKEVIRTUAL, "java/io/PrintStream",
-                "println", "(Ljava/lang/String;)V");
+                "println", "(Ljava/lang/String;)V", false);
         }
     }
 
@@ -82,7 +83,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 	    Type mmrType = Type.getType( MethodMonitorRegistry.class ) ;
 	    String mdesc = "(Ljava/lang/Class;)V" ;
 	    mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-		mmrType.getInternalName(), "registerClass", mdesc ) ;
+		mmrType.getInternalName(), "registerClass", mdesc, false ) ;
 	} else {
 	    int line = 1 ;
 	    util.info( 2, "StaticInitVisitor.visitCode" ) ;
@@ -125,7 +126,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 		mv.visitVarInsn( Opcodes.ALOAD, mnameList.index ) ;
 		mv.visitLdcInsn( str );
 		mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
-		    "java/util/List", "add", "(Ljava/lang/Object;)Z" );
+		    "java/util/List", "add", "(Ljava/lang/Object;)Z", true );
 		mv.visitInsn( Opcodes.POP ) ;
 	    }
 
@@ -152,7 +153,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 
 		mv.visitMethodInsn( Opcodes.INVOKEINTERFACE,
 		    "java/util/Map", "put",
-		    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;");
+		    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true);
 
 		mv.visitInsn( Opcodes.POP ) ;
 	    }
@@ -169,7 +170,7 @@ public class StaticInitVisitor extends LocalVariablesSorter {
 	    String mdesc =
                 "(Ljava/lang/Class;Ljava/util/List;Ljava/util/Map;)V" ;
 	    mv.visitMethodInsn( Opcodes.INVOKESTATIC,
-		mmrType.getInternalName(), "registerClass", mdesc ) ;
+		mmrType.getInternalName(), "registerClass", mdesc, false ) ;
 
 	    mv.visitLabel( end ) ;
 
