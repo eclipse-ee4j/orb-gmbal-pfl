@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -10,8 +10,6 @@
 
 package org.glassfish.pfl.basic.reflection;
 
-import sun.misc.Unsafe;
-
 import java.io.OptionalDataException;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Constructor;
@@ -20,6 +18,8 @@ import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
+
+import sun.misc.Unsafe;
 
 public abstract class BridgeBase {
     /**
@@ -250,7 +250,6 @@ public abstract class BridgeBase {
      * @param classBytes the bytes used to define the class
      * @return a new instantiable class, in the package and classloader of the anchor class.
      */
-    @SuppressWarnings("deprecation")
     public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) {
         return defineClass(className, classBytes, anchorClass.getClassLoader(), null);
     }
@@ -259,7 +258,7 @@ public abstract class BridgeBase {
      * Ensure that the class has been initialized.
      * @param cl the class to ensure is initialized
      */
-    public final void ensureClassInitialized(Class<?> cl) {
+    public void ensureClassInitialized(Class<?> cl) {
         unsafe.ensureClassInitialized(cl);
     }
 
