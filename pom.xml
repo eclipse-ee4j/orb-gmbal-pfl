@@ -216,6 +216,24 @@
                             <multiReleaseOutput>true</multiReleaseOutput>
                         </configuration>
                     </execution>
+                    <!-- for Java 17 -->
+                    <execution>
+                        <id>java17</id>
+                        <phase>none</phase>
+                        <goals>
+                            <goal>compile</goal>
+                        </goals>
+                        <configuration>
+                            <release>17</release>
+                            <jdkToolchain>
+                                <version>17</version>
+                            </jdkToolchain>
+                            <compileSourceRoots>
+                                <compileSourceRoot>${project.basedir}/src/main/java17</compileSourceRoot>
+                            </compileSourceRoots>
+                            <multiReleaseOutput>true</multiReleaseOutput>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
 
@@ -493,6 +511,49 @@
             </build>
         </profile>
 
+        <!-- enable java17 compilation -->
+        <profile>
+            <id>compile-java17</id>
+            <activation>
+                <jdk>[17,)</jdk>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>java17</id>
+                                <phase>compile</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>maven-resources-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>copy-java17-classes</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>copy-resources</goal>
+                                </goals>
+                                <configuration>
+                                    <overwrite>true</overwrite>
+                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
+                                    <resources>
+                                        <resource>
+                                            <directory>${project.build.outputDirectory}/META-INF/versions/17</directory>
+                                        </resource>
+                                    </resources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>test-toolchains-bypass</id>
             <activation>
@@ -522,7 +583,7 @@
             <build>
                 <plugins>
 
-                    <!-- enable java9/11 compilations -->
+                    <!-- enable java9/11/17 compilations -->
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -534,6 +595,10 @@
                             </execution>
                             <execution>
                                 <id>java11</id>
+                                <phase>compile</phase>
+                            </execution>
+                            <execution>
+                                <id>java17</id>
                                 <phase>compile</phase>
                             </execution>
                         </executions>

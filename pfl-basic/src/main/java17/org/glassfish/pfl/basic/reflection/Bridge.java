@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2023 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -15,7 +15,6 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.Permission;
@@ -23,6 +22,7 @@ import java.security.PrivilegedAction;
 import java.security.ProtectionDomain;
 import java.util.Optional;
 import java.util.stream.Stream;
+
 import sun.reflect.ReflectionFactory;
 
 /**
@@ -95,46 +95,32 @@ public final class Bridge extends BridgeBase {
     }
 
 
-    // A horrible hack, allowing JDK 11 and later to continue to use this class, Properly speaking,
-    // code should be rewritten to use the replacement method, but this will work until the JDK
-    // actually bans illegal runtime access, rather than just warning about it.
     @SuppressWarnings("deprecation")
     public Class<?> defineClass(String className, byte[] classBytes, ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        try {
-            return (Class<?>) getDefineClassMethod().invoke(classLoader, className, classBytes, 0, classBytes.length, null);
-        } catch (InvocationTargetException | IllegalAccessException exc) {
-            throw new Error("Could not access ClassLoader.defineClass()", exc);
-        }
-    }
-
-    private static Method defineClassMethod;
-
-    private static synchronized Method getDefineClassMethod() {
-        if (defineClassMethod != null) return defineClassMethod;
-
-        defineClassMethod = AccessController.doPrivileged(
-                (PrivilegedAction<Method>) () -> {
-                    try {
-                        Class<?> cl = Class.forName("java.lang.ClassLoader");
-                        Method defineClass = cl.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ProtectionDomain.class);
-                        defineClass.setAccessible(true);
-                        return defineClass;
-                    } catch (NoSuchMethodException | ClassNotFoundException exc) {
-                        throw new Error("Could not access ClassLoader.defineClass()", exc);
-                    }
-                }
-        );
-        return defineClassMethod;
+        throw new UnsupportedOperationException(
+            "defineClass(String, byte[], ClassLoader, ProtectionDomain) is no longer supported, as of JDK 17. Please use defineClass(Class, String, byte[]) instead");
     }
 
     @Override
     public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) {
         try {
-            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(anchorClass, MethodHandles.lookup())
-                                                .dropLookupMode(MethodHandles.Lookup.PRIVATE);
-            return lookup.defineClass(classBytes);
+            return getLookup(anchorClass).defineClass(classBytes);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Unable to define class ", e);
+        }
+    }
+
+    private MethodHandles.Lookup getLookup(Class<?> anchorClass) throws IllegalAccessException {
+        return MethodHandles.privateLookupIn(anchorClass, MethodHandles.lookup())
+                            .dropLookupMode(MethodHandles.Lookup.PRIVATE);
+    }
+
+    @Override
+    public void ensureClassInitialized(Class<?> cl)  {
+        try {
+            getLookup(cl).ensureInitialized(cl);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
     }
 

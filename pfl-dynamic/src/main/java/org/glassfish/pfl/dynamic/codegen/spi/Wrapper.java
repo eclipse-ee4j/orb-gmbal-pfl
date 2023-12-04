@@ -10,14 +10,13 @@
 
 package org.glassfish.pfl.dynamic.codegen.spi;
 
-import static java.util.Arrays.asList;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.security.ProtectionDomain;
 import java.util.List;
 import java.util.Properties;
 import java.util.Stack;
+
 import org.glassfish.pfl.basic.contain.Pair;
 import org.glassfish.pfl.basic.fsm.FSM;
 import org.glassfish.pfl.basic.fsm.FSMImpl;
@@ -40,7 +39,8 @@ import org.glassfish.pfl.dynamic.codegen.impl.SwitchStatement;
 import org.glassfish.pfl.dynamic.codegen.impl.TryStatement;
 import org.glassfish.pfl.dynamic.codegen.impl.Util;
 import org.glassfish.pfl.dynamic.codegen.impl.WhileStatement;
-import org.glassfish.pfl.dynamic.copyobject.impl.ClassCopierOrdinaryImpl;
+
+import static java.util.Arrays.asList;
 
 /** Main API for runtime code generation.
  * This API generates bytecode dynamically at runtime, allowing direct construction
@@ -474,7 +474,7 @@ public final class Wrapper {
     PackageContext(Stack<Context> contexts) {
       // start of no-codegen copier
       super(contexts, S_INIT);
-      ClassCopierOrdinaryImpl.setCodegenCopierAllowed(false);
+//      ClassCopierOrdinaryImpl.setCodegenCopierAllowed(false);
     }
   }
 
@@ -525,7 +525,7 @@ public final class Wrapper {
     public void _end() {
       super._end();
       // end of no-codegen copier
-      ClassCopierOrdinaryImpl.setCodegenCopierAllowed(true);
+//      ClassCopierOrdinaryImpl.setCodegenCopierAllowed(true);
     }
   }
 
@@ -1018,6 +1018,7 @@ public final class Wrapper {
    * the current ClassGenerator.  options may be used
    * to control some aspects of the code generation, such as
    * debugging options.
+   * @deprecated as of Java 11, use #_generate(Class, Properties, PrintStream)</?>
    */
   private static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream ps) {
     ImportList imports = env().imports();

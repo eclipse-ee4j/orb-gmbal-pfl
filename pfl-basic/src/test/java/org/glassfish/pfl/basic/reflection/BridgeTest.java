@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2023, Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -9,6 +9,29 @@
  */
 
 package org.glassfish.pfl.basic.reflection;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.io.Serializable;
+import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+
+import org.glassfish.pfl.basic.testobjects.ClassWithStaticInitializer;
+import org.glassfish.pfl.basic.testobjects.ForeignClassWithPackagePrivateResolveAndReplace;
+import org.glassfish.pfl.basic.testobjects.IntHolder;
+import org.glassfish.pfl.basic.testobjects.SerializableClass1;
+import org.glassfish.pfl.basic.testobjects.SerializableClass2;
+import org.glassfish.pfl.basic.testobjects.TestObjects;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.objectweb.asm.ClassWriter;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,28 +46,6 @@ import static org.objectweb.asm.Opcodes.ACC_INTERFACE;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.V1_8;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.OptionalDataException;
-import java.io.Serializable;
-import java.lang.invoke.MethodHandle;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import org.glassfish.pfl.basic.testobjects.ClassWithStaticInitializer;
-import org.glassfish.pfl.basic.testobjects.ForeignClassWithPackagePrivateResolveAndReplace;
-import org.glassfish.pfl.basic.testobjects.IntHolder;
-import org.glassfish.pfl.basic.testobjects.SerializableClass1;
-import org.glassfish.pfl.basic.testobjects.SerializableClass2;
-import org.glassfish.pfl.basic.testobjects.TestObjects;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.objectweb.asm.ClassWriter;
 
 public class BridgeTest {
     private static final byte BYTE_VALUE = (byte) (Math.random() * Byte.MAX_VALUE);
@@ -352,6 +353,11 @@ public class BridgeTest {
         assertThat(BRIDGE.readResolveForSerialization(ForeignClassWithPackagePrivateResolveAndReplace.class), notNullValue());
         assertThat(BRIDGE.readResolveForSerialization(ClassWithProtectedResolveAndReplace.class), notNullValue());
         assertThat(BRIDGE.readResolveForSerialization(ClassWithPrivateResolveAndReplace.class), notNullValue());
+    }
+
+    @Test
+    public void mayInvokeEnsureClassInitializedMethod() {
+        BRIDGE.ensureClassInitialized(ClassWithPublicResolveAndReplace.class);
     }
 
     @SuppressWarnings("unused")
