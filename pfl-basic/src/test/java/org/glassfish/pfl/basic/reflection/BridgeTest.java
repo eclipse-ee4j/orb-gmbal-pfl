@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2023, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024, Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.security.AccessController;
 import java.security.PrivilegedAction;
 
 import org.glassfish.pfl.basic.testobjects.ClassWithStaticInitializer;
@@ -48,6 +47,8 @@ import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.V1_8;
 
 public class BridgeTest {
+    private static final int ACCESS_CONTROLLER_DEPRECATION_VERSION = 17;
+
     private static final byte BYTE_VALUE = (byte) (Math.random() * Byte.MAX_VALUE);
     private static final short SHORT_VALUE = (short) (Math.random() * Short.MAX_VALUE);
     private static final int INTEGER_VALUE = (int) (Math.random() * Integer.MAX_VALUE);
@@ -58,8 +59,25 @@ public class BridgeTest {
     private static final char CHAR_VALUE = (char) (Math.random() * Character.MAX_VALUE);
     private static final Object OBJECT_VALUE = new Object();
 
-    private static final Bridge BRIDGE
-          = AccessController.doPrivileged((PrivilegedAction<Bridge>) Bridge::get);
+    private static final Bridge BRIDGE = getBridge();
+
+    private static Bridge getBridge() {
+        return isAccessControllerDeprecated() ? Bridge.get() : getBridgeViaAccessController();
+    }
+
+    private static boolean isAccessControllerDeprecated() {
+        return getSpecificationVersion() >= ACCESS_CONTROLLER_DEPRECATION_VERSION;
+    }
+
+    private static int getSpecificationVersion() {
+        return Integer.parseInt(System.getProperty("java.specification.version"));
+    }
+
+    @SuppressWarnings("removal")
+    private static Bridge getBridgeViaAccessController() {
+        return java.security.AccessController.doPrivileged((PrivilegedAction<Bridge>) Bridge::get);
+    }
+
     private final ByteArrayOutputStream rawOutputStream = new ByteArrayOutputStream();
     private ObjectOutputStream objectOutputStream;
 
@@ -75,7 +93,7 @@ public class BridgeTest {
         private Object anObject;
     }
 
-    private MultiFieldClass anInstance = new MultiFieldClass();
+    private final MultiFieldClass anInstance = new MultiFieldClass();
 
     @Test @Ignore("comments indicate required by spec, but not what this actually means")
     public void getLatestUserDefinedLoader() {

@@ -106,7 +106,8 @@ public final class Bridge extends BridgeBase {
         try {
             return getLookup(anchorClass).defineClass(classBytes);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException("Unable to define class ", e);
+            System.out.println("Unable to define class " + className + " using anchor " + anchorClass + " due to " + e);
+            throw new RuntimeException("Unable to define class " + className, e);
         }
     }
 
@@ -118,9 +119,14 @@ public final class Bridge extends BridgeBase {
     @Override
     public void ensureClassInitialized(Class<?> cl)  {
         try {
+            /**/
+            Class.forName(cl.getName(), true, cl.getClassLoader());
+            /*/
             getLookup(cl).ensureInitialized(cl);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
+            /**/
+        } catch (/*IllegalAccessException | */ClassNotFoundException e) {
+            System.out.println("Ignore failure to initialize class " + cl + " due to " + e);
+            // unable to access the class; presume it already to have been initialized
         }
     }
 
