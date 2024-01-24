@@ -119,14 +119,9 @@ public final class Bridge extends BridgeBase {
     @Override
     public void ensureClassInitialized(Class<?> cl)  {
         try {
-            /**/
             Class.forName(cl.getName(), true, cl.getClassLoader());
-            /*/
-            getLookup(cl).ensureInitialized(cl);
-            /**/
-        } catch (/*IllegalAccessException | */ClassNotFoundException e) {
-            System.out.println("Ignore failure to initialize class " + cl + " due to " + e);
-            // unable to access the class; presume it already to have been initialized
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Ignore failure to initialize class " + cl + " due to " + e);
         }
     }
 
