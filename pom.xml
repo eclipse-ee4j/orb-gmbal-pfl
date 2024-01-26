@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2011, 2019 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2011, 2024 Oracle and/or its affiliates. All rights reserved.
     Copyright (c) 2020 Payara Services Ltd.
     Copyright (c) 2022 Contributors to the Eclipse Foundation. All rights reserved.
 
@@ -79,7 +79,7 @@
     <properties>
         <!-- The oldest Java version supported by this tool.               -->
         <!-- Will control compilation of the main code and the unit tests. -->
-        <base.java.version>1.8</base.java.version>
+        <base.java.version>11</base.java.version>
 
         <!-- A directory for unit tests, allowing testing against MR classes. -->
         <combined.classes.dir>${project.build.directory}/combined-classes</combined.classes.dir>
@@ -172,69 +172,32 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-jdk</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>11</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
                     <source>${base.java.version}</source>
                     <target>${base.java.version}</target>
                 </configuration>
-                <!-- define the possible compilations -->
-                <executions>
-                    <!-- for Java 9 -->
-                    <execution>
-                        <id>java9</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <release>9</release>
-                            <jdkToolchain>
-                                <version>9</version>
-                            </jdkToolchain>
-                            <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
-                            </compileSourceRoots>
-                            <multiReleaseOutput>true</multiReleaseOutput>
-                        </configuration>
-                    </execution>
-                    <!-- for Java 11 -->
-                    <execution>
-                        <id>java11</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <release>11</release>
-                            <jdkToolchain>
-                                <version>11</version>
-                            </jdkToolchain>
-                            <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
-                            </compileSourceRoots>
-                            <multiReleaseOutput>true</multiReleaseOutput>
-                        </configuration>
-                    </execution>
-                    <!-- for Java 17 -->
-                    <execution>
-                        <id>java17</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <release>17</release>
-                            <jdkToolchain>
-                                <version>17</version>
-                            </jdkToolchain>
-                            <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java17</compileSourceRoot>
-                            </compileSourceRoots>
-                            <multiReleaseOutput>true</multiReleaseOutput>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
@@ -283,18 +246,6 @@
                         </manifestEntries>
                     </archive>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>default-jar</id>
-                        <configuration>
-                            <archive>
-                                <manifestEntries>
-                                    <Multi-Release>true</Multi-Release>
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- prevent the site plugin from deploying to the scm url -->
@@ -421,139 +372,6 @@
                 </plugins>
             </build>
         </profile>
-
-        <!-- enable java9 compilation -->
-        <profile>
-            <id>compile-java9</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>java9</id>
-                                <phase>compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-java9-classes</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <overwrite>true</overwrite>
-                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.outputDirectory}/META-INF/versions/9</directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <properties>
-                <maven.test.additionalClasspath>${project.build.testOutputDirectory}/</maven.test.additionalClasspath>
-            </properties>
-        </profile>
-
-        <!-- enable java11 compilation -->
-        <profile>
-            <id>compile-java11</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>java11</id>
-                                <phase>compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-java11-classes</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <overwrite>true</overwrite>
-                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.outputDirectory}/META-INF/versions/11</directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- enable java17 compilation -->
-        <profile>
-            <id>compile-java17</id>
-            <activation>
-                <jdk>[17,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>java17</id>
-                                <phase>compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-java17-classes</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <overwrite>true</overwrite>
-                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.outputDirectory}/META-INF/versions/17</directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
         <profile>
             <id>test-toolchains-bypass</id>
             <activation>
@@ -571,37 +389,6 @@
                             <jvm>${env.JAVA_HOME}/bin/java</jvm>
                             <classesDirectory>${combined.classes.dir}</classesDirectory>
                         </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        
-        <!-- activate on release -->
-        <profile>
-            <id>oss-release</id>
-
-            <build>
-                <plugins>
-
-                    <!-- enable java9/11/17 compilations -->
-
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>java9</id>
-                                <phase>compile</phase>
-                            </execution>
-                            <execution>
-                                <id>java11</id>
-                                <phase>compile</phase>
-                            </execution>
-                            <execution>
-                                <id>java17</id>
-                                <phase>compile</phase>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>

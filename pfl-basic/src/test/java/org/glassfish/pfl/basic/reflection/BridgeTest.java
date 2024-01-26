@@ -73,7 +73,6 @@ public class BridgeTest {
         return Integer.parseInt(System.getProperty("java.specification.version"));
     }
 
-    @SuppressWarnings("removal")
     private static Bridge getBridgeViaAccessController() {
         return java.security.AccessController.doPrivileged((PrivilegedAction<Bridge>) Bridge::get);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -12,8 +12,10 @@ package org.glassfish.pfl.basic.reflection;
 
 import java.io.OptionalDataException;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -29,18 +31,16 @@ public abstract class BridgeBase {
     public static final long INVALID_FIELD_OFFSET = -1;
 
     private final Unsafe unsafe = AccessController.doPrivileged(
-                    new PrivilegedAction<Unsafe>() {
-                        public Unsafe run() {
-                            try {
-                                Field field = Unsafe.class.getDeclaredField("theUnsafe");
-                                field.setAccessible(true);
-                                return (Unsafe) field.get(null);
-                            } catch (NoSuchFieldException | IllegalAccessException exc) {
-                                throw new Error("Could not access Unsafe", exc);
-                            }
-                        }
-                    }
-            );
+        (PrivilegedAction<Unsafe>) () -> {
+            try {
+                Field field = Unsafe.class.getDeclaredField("theUnsafe");
+                field.setAccessible(true);
+                return (Unsafe) field.get(null);
+            } catch (NoSuchFieldException | IllegalAccessException exc) {
+                throw new Error("Could not access Unsafe", exc);
+            }
+        }
+    );
 
     /**
      * Fetches a field element within the given
@@ -233,12 +233,38 @@ public abstract class BridgeBase {
      * @param classLoader the classloader in which it is to be defined
      * @param protectionDomain the domain in which the class should be defined
      *
-     * @deprecated will not work in Java 11 or later. Use {@link #defineClass(Class, String, byte[])} instead
+     * @deprecated Use {@link #defineClass(Class, String, byte[])} instead. This implementation is currently
+     * a horrible hack to allow it to be used until the JDK actually bans illegal runtime access,
+     * rather than just warning about it.
      */
     @SuppressWarnings("DeprecatedIsStillUsed")
     @Deprecated
     public Class<?> defineClass(String className, byte[] classBytes, ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        return unsafe.defineClass(className, classBytes, 0, classBytes.length, classLoader, null);
+        try {
+            return (Class<?>) getDefineClassMethod().invoke(classLoader, className, classBytes, 0, classBytes.length, null);
+        } catch (InvocationTargetException | IllegalAccessException exc) {
+            throw new Error("Could not access ClassLoader.defineClass()", exc);
+        }
+    }
+
+    private static Method defineClassMethod;
+
+    private static synchronized Method getDefineClassMethod() {
+        if (defineClassMethod != null) return defineClassMethod;
+
+        defineClassMethod = AccessController.doPrivileged(
+                (PrivilegedAction<Method>) () -> {
+                    try {
+                        Class<?> cl = Class.forName("java.lang.ClassLoader");
+                        Method defineClass = cl.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ProtectionDomain.class);
+                        defineClass.setAccessible(true);
+                        return defineClass;
+                    } catch (NoSuchMethodException | ClassNotFoundException exc) {
+                        throw new Error("Could not access ClassLoader.defineClass()", exc);
+                    }
+                }
+        );
+        return defineClassMethod;
     }
 
     /**
@@ -251,7 +277,13 @@ public abstract class BridgeBase {
      * @return a new instantiable class, in the package and classloader of the anchor class.
      */
     public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) {
-        return defineClass(className, classBytes, anchorClass.getClassLoader(), null);
+        try {
+            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(anchorClass, MethodHandles.lookup())
+                                                .dropLookupMode(MethodHandles.Lookup.PRIVATE);
+            return lookup.defineClass(classBytes);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException("Unable to define class ", e);
+        }
     }
 
     /**
@@ -259,7 +291,11 @@ public abstract class BridgeBase {
      * @param cl the class to ensure is initialized
      */
     public void ensureClassInitialized(Class<?> cl) {
-        unsafe.ensureClassInitialized(cl);
+        try {
+            Class.forName(cl.getName(), true, cl.getClassLoader());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Ignore failure to initialize class " + cl + " due to " + e);
+        }
     }
 
     /**
@@ -272,7 +308,7 @@ public abstract class BridgeBase {
      * Return a constructor that can be used to create an instance of the class for externalization.
      * @param cl the class
      */
-    public abstract <T> Constructor<?> newConstructorForExternalization(Class<T> cl);
+    public abstract <T> Constructor<T> newConstructorForExternalization(Class<T> cl);
 
     /**
      * Return a no-arg constructor for the specified class which invokes the specified constructor.
@@ -331,7 +367,7 @@ public abstract class BridgeBase {
      * @param callingClass the class which wants to access it.
      * @return the original field, rendered accessible, or null.
      */
-    public Field toAccessibleField(Field field, Class callingClass) {
+    public Field toAccessibleField(Field field, Class<?> callingClass) {
         field.setAccessible(true);
         return field;
     }
@@ -342,8 +378,12 @@ public abstract class BridgeBase {
      * @param callingClass the class which wants to access it.
      * @return the original method, rendered accessible, or null.
      */
-    public Method toAccessibleMethod(Method method, Class callingClass) {
-        method.setAccessible(true);
+    public Method toAccessibleMethod(Method method, Class<?> callingClass) {
+        toAccessibleMethod(method);
         return method;
+    }
+
+    private static void toAccessibleMethod(Method method) {
+        method.setAccessible(true);
     }
 }
