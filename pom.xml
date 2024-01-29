@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2011, 2019 Oracle and/or its affiliates. All rights reserved.
+    Copyright (c) 2011, 2024 Oracle and/or its affiliates. All rights reserved.
     Copyright (c) 2020 Payara Services Ltd.
     Copyright (c) 2022 Contributors to the Eclipse Foundation. All rights reserved.
 
@@ -10,6 +10,12 @@
     http://www.eclipse.org/org/documents/edl-v10.php.
 
     SPDX-License-Identifier: BSD-3-Clause
+
+    NOTE: This master POM will create a multi-release jar for a subproject that has directories at src/main/javaNN,
+    where NN is the JDK version. It will select the compilers for the contained classes using the toolchain configuration.
+    If the oss-release profile is selected (which will happen whenever running the release plugin), it will ensure
+    that compilers are configured for all such directories; otherwise, it will build those up to the JDK level of the
+    compiler used to build the project, thus allowing the unit tests to be run against that version.
 
 -->
 
@@ -27,7 +33,7 @@
     <packaging>pom</packaging>
     
     <name>Eclipse ORB</name>
-    <description>GMBAL- Java EE Primative Function Library</description>
+    <description>GMBAL- Java EE Primitive Function Library</description>
     <url>https://github.com/eclipse-ee4j/orb-gmbal-pfl</url>
     <inceptionYear>2011</inceptionYear>
     
@@ -212,24 +218,6 @@
                             </jdkToolchain>
                             <compileSourceRoots>
                                 <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
-                            </compileSourceRoots>
-                            <multiReleaseOutput>true</multiReleaseOutput>
-                        </configuration>
-                    </execution>
-                    <!-- for Java 17 -->
-                    <execution>
-                        <id>java17</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <release>17</release>
-                            <jdkToolchain>
-                                <version>17</version>
-                            </jdkToolchain>
-                            <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java17</compileSourceRoot>
                             </compileSourceRoots>
                             <multiReleaseOutput>true</multiReleaseOutput>
                         </configuration>
@@ -511,49 +499,6 @@
             </build>
         </profile>
 
-        <!-- enable java17 compilation -->
-        <profile>
-            <id>compile-java17</id>
-            <activation>
-                <jdk>[17,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>java17</id>
-                                <phase>compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-java17-classes</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <overwrite>true</overwrite>
-                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.outputDirectory}/META-INF/versions/17</directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
         <profile>
             <id>test-toolchains-bypass</id>
             <activation>
@@ -583,7 +528,7 @@
             <build>
                 <plugins>
 
-                    <!-- enable java9/11/17 compilations -->
+                    <!-- enable java9/11 compilations -->
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
@@ -595,10 +540,6 @@
                             </execution>
                             <execution>
                                 <id>java11</id>
-                                <phase>compile</phase>
-                            </execution>
-                            <execution>
-                                <id>java17</id>
                                 <phase>compile</phase>
                             </execution>
                         </executions>
