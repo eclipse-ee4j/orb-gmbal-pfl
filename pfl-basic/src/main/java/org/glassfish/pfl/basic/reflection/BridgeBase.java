@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, 2023 Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Distribution License v. 1.0, which is available at
@@ -28,6 +28,7 @@ public abstract class BridgeBase {
      */
     public static final long INVALID_FIELD_OFFSET = -1;
 
+    @SuppressWarnings("java:S3011")
     private final Unsafe unsafe = AccessController.doPrivileged(
                     new PrivilegedAction<Unsafe>() {
                         public Unsafe run() {
@@ -259,7 +260,11 @@ public abstract class BridgeBase {
      * @param cl the class to ensure is initialized
      */
     public void ensureClassInitialized(Class<?> cl) {
-        unsafe.ensureClassInitialized(cl);
+        try {
+            Class.forName(cl.getName(), true, cl.getClassLoader());
+        } catch (ClassNotFoundException e) {
+            throw new IllegalStateException("Ignore failure to initialize class " + cl + " due to " + e);
+        }
     }
 
     /**
@@ -272,7 +277,7 @@ public abstract class BridgeBase {
      * Return a constructor that can be used to create an instance of the class for externalization.
      * @param cl the class
      */
-    public abstract <T> Constructor<?> newConstructorForExternalization(Class<T> cl);
+    public abstract <T> Constructor<T> newConstructorForExternalization(Class<T> cl);
 
     /**
      * Return a no-arg constructor for the specified class which invokes the specified constructor.
@@ -331,7 +336,8 @@ public abstract class BridgeBase {
      * @param callingClass the class which wants to access it.
      * @return the original field, rendered accessible, or null.
      */
-    public Field toAccessibleField(Field field, Class callingClass) {
+    @SuppressWarnings("java:S3011")
+    public Field toAccessibleField(Field field, Class<?> callingClass) {
         field.setAccessible(true);
         return field;
     }
@@ -342,7 +348,8 @@ public abstract class BridgeBase {
      * @param callingClass the class which wants to access it.
      * @return the original method, rendered accessible, or null.
      */
-    public Method toAccessibleMethod(Method method, Class callingClass) {
+    @SuppressWarnings("java:S3011")
+    public Method toAccessibleMethod(Method method, Class<?> callingClass) {
         method.setAccessible(true);
         return method;
     }
