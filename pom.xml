@@ -13,8 +13,8 @@
 
     NOTE: This master POM will create a multi-release jar for a subproject that has directories at src/main/javaNN,
     where NN is the JDK version. It will select the compilers for the contained classes using the toolchain configuration.
-    If the oss-release profile is selected (which will happen whenever running the release plugin), it will ensure
-    that compilers are configured for all such directories; otherwise, it will build those up to the JDK level of the
+    If the oss-release profile is selected (which will happen whenever running the release plugin), it will require the
+    JDK needed to enable the MR jar builds; otherwise, it will build those up to the JDK level of the
     compiler used to build the project, thus allowing the unit tests to be run against that version.
 
 -->
@@ -32,7 +32,7 @@
     <version>5.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     
-    <name>Eclipse ORB</name>
+    <name>Eclipse ORB Primitive Function Library</name>
     <description>GMBAL- Java EE Primitive Function Library</description>
     <url>https://github.com/eclipse-ee4j/orb-gmbal-pfl</url>
     <inceptionYear>2011</inceptionYear>
@@ -86,6 +86,9 @@
         <!-- The oldest Java version supported by this tool.               -->
         <!-- Will control compilation of the main code and the unit tests. -->
         <base.java.version>1.8</base.java.version>
+
+        <!-- The minimum Java version required to build for release to ensure that the MR classes are built -->
+        <release.java.version>11</release.java.version>
 
         <!-- A directory for unit tests, allowing testing against MR classes. -->
         <combined.classes.dir>${project.build.directory}/combined-classes</combined.classes.dir>
@@ -528,19 +531,24 @@
             <build>
                 <plugins>
 
-                    <!-- enable java9/11 compilations -->
+                    <!-- force the build to run with the specified JDK, which will trigger the MR compilations -->
 
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
+                        <artifactId>maven-enforcer-plugin</artifactId>
                         <executions>
                             <execution>
-                                <id>java9</id>
-                                <phase>compile</phase>
-                            </execution>
-                            <execution>
-                                <id>java11</id>
-                                <phase>compile</phase>
+                                <id>enforce-jdk</id>
+                                  <goals>
+                                      <goal>enforce</goal>
+                                  </goals>
+                                  <configuration>
+                                      <rules>
+                                          <requireJavaVersion>
+                                              <version>[${release.java.version},)</version>
+                                          </requireJavaVersion>
+                                      </rules>
+                                  </configuration>
                             </execution>
                         </executions>
                     </plugin>
