@@ -29,7 +29,7 @@
 
     <groupId>org.glassfish.pfl</groupId>
     <artifactId>pfl</artifactId>
-    <version>5.0.0</version>
+    <version>5.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     
     <name>Eclipse ORB Primitive Function Library</name>
