@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  * Copyright (c) 2018, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -18,7 +19,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.ProtectionDomain;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import sun.misc.Unsafe;
 
@@ -28,8 +30,8 @@ public abstract class BridgeBase {
      * {@link #objectFieldOffset}.
      */
     public static final long INVALID_FIELD_OFFSET = -1;
+    private final StackWalker stackWalker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
-    @SuppressWarnings("java:S3011")
     private final Unsafe unsafe = AccessController.doPrivileged(
                     new PrivilegedAction<Unsafe>() {
                         @Override
@@ -272,7 +274,30 @@ public abstract class BridgeBase {
      * Obtain the latest user defined ClassLoader from the call stack.
      * This is required by the RMI-IIOP specification.
      */
-    public abstract ClassLoader getLatestUserDefinedLoader();
+    public ClassLoader getLatestUserDefinedLoader() {
+        PrivilegedAction<ClassLoader> pa = () ->
+        stackWalker.walk(this::getLatestUserDefinedLoaderFrame)
+                .map(sf -> sf.getDeclaringClass().getClassLoader())
+                .orElseGet(ClassLoader::getPlatformClassLoader);
+        return AccessController.doPrivileged(pa);
+    }
+
+    private Optional<StackWalker.StackFrame> getLatestUserDefinedLoaderFrame(Stream<StackWalker.StackFrame> stream) {
+        return stream.filter(this::isUserLoader).findFirst();
+    }
+
+    private boolean isUserLoader(StackWalker.StackFrame sf) {
+        ClassLoader cl = sf.getDeclaringClass().getClassLoader();
+        if (cl == null) {
+            return false;
+        }
+
+        ClassLoader platformClassLoader = ClassLoader.getPlatformClassLoader();
+        while (platformClassLoader != null && cl != platformClassLoader) {
+            platformClassLoader = platformClassLoader.getParent();
+        }
+        return cl != platformClassLoader;
+    }
 
     /**
      * Return a constructor that can be used to create an instance of the class for externalization.
@@ -337,10 +362,12 @@ public abstract class BridgeBase {
      * @param callingClass the class which wants to access it.
      * @return the original field, rendered accessible, or null.
      */
-    @SuppressWarnings("java:S3011")
     public Field toAccessibleField(Field field, Class<?> callingClass) {
-        field.setAccessible(true);
-        return field;
+        if (isClassOpenToModule(field.getDeclaringClass(), callingClass.getModule())) {
+            field.setAccessible(true);
+            return field;
+        }
+        return null;
     }
 
     /**
@@ -349,9 +376,17 @@ public abstract class BridgeBase {
      * @param callingClass the class which wants to access it.
      * @return the original method, rendered accessible, or null.
      */
-    @SuppressWarnings("java:S3011")
     public Method toAccessibleMethod(Method method, Class<?> callingClass) {
-        method.setAccessible(true);
-        return method;
+        if (isClassOpenToModule(method.getDeclaringClass(), callingClass.getModule())) {
+            method.setAccessible(true);
+            return method;
+        }
+        return null;
+    }
+
+    private boolean isClassOpenToModule(Class<?> candidateClass, Module callingModule) {
+        return callingModule.isNamed()
+              ? candidateClass.getModule().isOpen(candidateClass.getPackageName(), callingModule)
+              : candidateClass.getModule().isOpen(candidateClass.getPackageName());
     }
 }

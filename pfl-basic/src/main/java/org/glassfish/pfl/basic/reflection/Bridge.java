@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  * Copyright (c) 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -12,17 +13,9 @@ package org.glassfish.pfl.basic.reflection;
 
 import java.io.OptionalDataException;
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.AccessController;
 import java.security.Permission;
-import java.security.PrivilegedAction;
-import java.security.ProtectionDomain;
-import java.util.Optional;
-import java.util.stream.Stream;
+
 import sun.reflect.ReflectionFactory;
 
 /**
@@ -58,10 +51,9 @@ import sun.reflect.ReflectionFactory;
  */
 public final class Bridge extends BridgeBase {
     private static final Permission GET_BRIDGE_PERMISSION = new BridgePermission("getBridge");
-    private static Bridge bridge = null;
+    private static Bridge bridge;
 
     private final ReflectionFactory reflectionFactory;
-
 
 
     private Bridge() {
@@ -94,85 +86,15 @@ public final class Bridge extends BridgeBase {
         return bridge;
     }
 
-
-    // A horrible hack, allowing JDK 11 and later to continue to use this class, Properly speaking,
-    // code should be rewritten to use the replacement method, but this will work until the JDK
-    // actually bans illegal runtime access, rather than just warning about it.
-    @SuppressWarnings("deprecation")
-    public Class<?> defineClass(String className, byte[] classBytes, ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        try {
-            return (Class<?>) getDefineClassMethod().invoke(classLoader, className, classBytes, 0, classBytes.length, null);
-        } catch (InvocationTargetException | IllegalAccessException exc) {
-            throw new Error("Could not access ClassLoader.defineClass()", exc);
-        }
-    }
-
-    private static Method defineClassMethod;
-
-    private static synchronized Method getDefineClassMethod() {
-        if (defineClassMethod != null) return defineClassMethod;
-
-        defineClassMethod = AccessController.doPrivileged(
-                (PrivilegedAction<Method>) () -> {
-                    try {
-                        Class<?> cl = Class.forName("java.lang.ClassLoader");
-                        Method defineClass = cl.getDeclaredMethod("defineClass", String.class, byte[].class, int.class, int.class, ProtectionDomain.class);
-                        defineClass.setAccessible(true);
-                        return defineClass;
-                    } catch (NoSuchMethodException | ClassNotFoundException exc) {
-                        throw new Error("Could not access ClassLoader.defineClass()", exc);
-                    }
-                }
-        );
-        return defineClassMethod;
-    }
-
-    @Override
-    public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) {
-        try {
-            MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(anchorClass, MethodHandles.lookup())
-                                                .dropLookupMode(MethodHandles.Lookup.PRIVATE);
-            return lookup.defineClass(classBytes);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException("Unable to define class ", e);
-        }
-    }
-
-    private final StackWalker stackWalker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-
-    // New implementation for Java 9, supplied by Alan Bateman
-    @Override
-    public final ClassLoader getLatestUserDefinedLoader() {
-        // requires getClassLoader permission => needs doPrivileged.
-        PrivilegedAction<ClassLoader> pa = () ->
-                stackWalker.walk(this::getLatestUserDefinedLoaderFrame)
-                        .map(sf -> sf.getDeclaringClass().getClassLoader())
-                        .orElseGet(ClassLoader::getPlatformClassLoader);
-        return AccessController.doPrivileged(pa);
-    }
-
-    private Optional<StackWalker.StackFrame> getLatestUserDefinedLoaderFrame(Stream<StackWalker.StackFrame> stream) {
-        return stream.filter(this::isUserLoader).findFirst();
-    }
-
-    private boolean isUserLoader(StackWalker.StackFrame sf) {
-        ClassLoader cl = sf.getDeclaringClass().getClassLoader();
-        if (cl == null) return false;
-
-        ClassLoader platformClassLoader = ClassLoader.getPlatformClassLoader();
-        while (platformClassLoader != null && cl != platformClassLoader) platformClassLoader = platformClassLoader.getParent();
-        return cl != platformClassLoader;
-    }
-
     @Override
     @SuppressWarnings("unchecked")
-    public final <T> Constructor<T> newConstructorForExternalization(Class<T> cl) {
+    public <T> Constructor<T> newConstructorForExternalization(Class<T> cl) {
         return (Constructor<T>) reflectionFactory.newConstructorForExternalization( cl );
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public final <T> Constructor<T> newConstructorForSerialization(Class<T> aClass, Constructor<?> cons) {
+    public <T> Constructor<T> newConstructorForSerialization(Class<T> aClass, Constructor<?> cons) {
         return (Constructor<T>) reflectionFactory.newConstructorForSerialization(aClass, cons);
     }
 
@@ -187,56 +109,36 @@ public final class Bridge extends BridgeBase {
      * false otherwise.
      */
     @Override
-    public final boolean hasStaticInitializerForSerialization(Class<?> cl) {
+    public boolean hasStaticInitializerForSerialization(Class<?> cl) {
         return reflectionFactory.hasStaticInitializerForSerialization(cl);
     }
 
     @Override
-    public final MethodHandle writeObjectForSerialization(Class<?> cl) {
+    public MethodHandle writeObjectForSerialization(Class<?> cl) {
         return reflectionFactory.writeObjectForSerialization(cl);
     }
 
     @Override
-    public final MethodHandle readObjectForSerialization(Class<?> cl) {
+    public MethodHandle readObjectForSerialization(Class<?> cl) {
         return reflectionFactory.readObjectForSerialization(cl);
     }
 
-    public final MethodHandle readObjectNoDataForSerialization(Class<?> cl) {
+    public MethodHandle readObjectNoDataForSerialization(Class<?> cl) {
         return reflectionFactory.readObjectNoDataForSerialization(cl);
     }
 
     @Override
-    public final MethodHandle readResolveForSerialization(Class<?> cl) {
+    public MethodHandle readResolveForSerialization(Class<?> cl) {
         return reflectionFactory.readResolveForSerialization(cl);
     }
 
     @Override
-    public final MethodHandle writeReplaceForSerialization(Class<?> cl) {
+    public MethodHandle writeReplaceForSerialization(Class<?> cl) {
         return reflectionFactory.writeReplaceForSerialization(cl);
     }
 
     @Override
-    public final OptionalDataException newOptionalDataExceptionForSerialization(boolean bool) {
+    public OptionalDataException newOptionalDataExceptionForSerialization(boolean bool) {
         return reflectionFactory.newOptionalDataExceptionForSerialization(bool);
-    }
-
-    @Override
-    public Field toAccessibleField(Field field, Class callingClass) {
-        return isClassOpenToModule(field.getDeclaringClass(), callingClass.getModule())
-              ? super.toAccessibleField(field, callingClass)
-              : null;
-    }
-
-    private boolean isClassOpenToModule(Class<?> candidateClass, Module callingModule) {
-        return callingModule.isNamed()
-              ? candidateClass.getModule().isOpen(candidateClass.getPackageName(), callingModule)
-              : candidateClass.getModule().isOpen(candidateClass.getPackageName());
-    }
-
-    @Override
-    public Method toAccessibleMethod(Method method, Class callingClass) {
-        return isClassOpenToModule(method.getDeclaringClass(), callingClass.getModule())
-              ? super.toAccessibleMethod(method, callingClass)
-              : null;
     }
 }
