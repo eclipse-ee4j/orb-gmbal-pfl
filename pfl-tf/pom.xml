@@ -35,7 +35,10 @@
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
-            <version>9.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -49,16 +52,15 @@
                         <Bundle-Name>${project.name}</Bundle-Name>
                         <Bundle-Version>${project.version}</Bundle-Version>
                         <Export-Package>
-                            org.glassfish.pfl.tf.spi.*,                   
-                            org.glassfish.pfl.tf.timer.*                   
-                        </Export-Package>             
+                            org.glassfish.pfl.tf.spi.*,
+                            org.glassfish.pfl.tf.timer.*
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
                 <configuration>
                     <includePom>true</includePom>
                 </configuration>
@@ -66,7 +68,7 @@
                     <execution>
                        <id>attach-sources</id>
                        <goals>
-                           <goal>jar-no-fork</goal> 
+                           <goal>jar-no-fork</goal>
                        </goals>
                     </execution>
                 </executions>
@@ -78,7 +80,7 @@
            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-            </plugin> 
+            </plugin>
          </plugins>
     </build>
 
