@@ -270,7 +270,7 @@
                 <configuration>
                     <archive>
                         <manifestEntries>
-                            <Built-By>Oracle</Built-By>
+                            <Built-By>Eclipse</Built-By>
                         </manifestEntries>
                     </archive>
                 </configuration>
