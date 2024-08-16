@@ -22,18 +22,12 @@
     <artifactId>pfl-dynamic</artifactId>
     <name>PFL Dynamic</name>
     <description>Functionality that may include class generation</description>
-    
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>pfl-basic</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jakarta.ejb</groupId>
-            <artifactId>jakarta.ejb-api</artifactId>
-            <version>3.2.3</version>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
@@ -42,8 +36,19 @@
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
-            <version>9.1</version>
-            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.ejb</groupId>
+            <artifactId>jakarta.ejb-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
         </dependency>
     </dependencies>
     <build>
@@ -57,8 +62,8 @@
                         <Bundle-Name>${project.name}</Bundle-Name>
                         <Bundle-Version>${project.version}</Bundle-Version>
                         <Export-Package>
-                            org.glassfish.pfl.dynamic.*                   
-                        </Export-Package>             
+                            org.glassfish.pfl.dynamic.*
+                        </Export-Package>
                     </instructions>
                 </configuration>
                 <executions>
@@ -83,7 +88,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1</version>
                 <configuration>
                     <includePom>true</includePom>
                 </configuration>
@@ -91,7 +95,7 @@
                     <execution>
                        <id>attach-sources</id>
                        <goals>
-                           <goal>jar-no-fork</goal> 
+                           <goal>jar-no-fork</goal>
                        </goals>
                     </execution>
                 </executions>
@@ -103,7 +107,7 @@
            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-            </plugin> 
+            </plugin>
         </plugins>
     </build>
 
