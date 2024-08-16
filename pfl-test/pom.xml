@@ -23,11 +23,6 @@
     <name>PFL Test</name>
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.13.2</version>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>pfl-basic-tools</artifactId>
             <version>${project.version}</version>
@@ -37,6 +32,12 @@
             <artifactId>pfl-basic</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>pfl-tf</artifactId>
@@ -58,7 +59,6 @@
         <dependency>
             <groupId>jakarta.ejb</groupId>
             <artifactId>jakarta.ejb-api</artifactId>
-            <version>4.0.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -73,15 +73,14 @@
                         <Bundle-Name>${project.name}</Bundle-Name>
                         <Bundle-Version>${project.version}</Bundle-Version>
                         <Export-Package>
-                            org.glassfish.pfl.test.*                   
-                        </Export-Package>             
+                            org.glassfish.pfl.test.*
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version>
                 <configuration>
                      <excludes>
                          <exclude>**/TfTest*.java</exclude>
