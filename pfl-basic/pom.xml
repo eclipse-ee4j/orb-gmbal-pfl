@@ -23,11 +23,6 @@
     <name>PFL Basic</name>
     <description>Basic functions</description>
 
-    <properties>
-        <java9.sourceDirectory>${project.basedir}/src/main/java9</java9.sourceDirectory>
-        <java9.build.outputDirectory>${project.build.outputDirectory}/META-INF/versions/9</java9.build.outputDirectory>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
