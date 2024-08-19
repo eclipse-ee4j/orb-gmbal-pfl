@@ -50,8 +50,8 @@
                         <Bundle-Name>${project.name}</Bundle-Name>
                         <Bundle-Version>${project.version}</Bundle-Version>
                         <Export-Package>
-                            org.glassfish.pfl.tf.tools.*                   
-                        </Export-Package>             
+                            org.glassfish.pfl.tf.tools.*
+                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
@@ -77,7 +77,7 @@
            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-           </plugin> 
+           </plugin>
          </plugins>
     </build>
 
