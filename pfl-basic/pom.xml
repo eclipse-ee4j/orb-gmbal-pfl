@@ -31,25 +31,12 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.name}</Bundle-Name>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Export-Package>
-                            !org.glassfish.pfl.basic.tools.*,
-                            org.glassfish.pfl.basic.*
-                        </Export-Package>
-                        <Import-Package>
-                            sun.misc;resolution:=optional,
-                            sun.reflect;resolution:=optional,
-                            *
-                        </Import-Package>
                     </instructions>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>manifest</goal>
-                            <goal>install</goal>
-                            <goal>deploy</goal>
                         </goals>
                     </execution>
                 </executions>

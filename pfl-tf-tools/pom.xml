@@ -47,11 +47,6 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.name}</Bundle-Name>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Export-Package>
-                            org.glassfish.pfl.tf.tools.*
-                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
