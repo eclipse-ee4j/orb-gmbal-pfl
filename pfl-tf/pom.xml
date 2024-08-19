@@ -49,12 +49,6 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.name}</Bundle-Name>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Export-Package>
-                            org.glassfish.pfl.tf.spi.*,
-                            org.glassfish.pfl.tf.timer.*
-                        </Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
