@@ -196,26 +196,6 @@
                 <configuration>
                     <release>${release.java.version}</release>
                 </configuration>
-                <!-- define the possible compilations -->
-                <executions>
-                    <execution>
-                        <id>java11</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <release>11</release>
-                            <jdkToolchain>
-                                <version>11</version>
-                            </jdkToolchain>
-                            <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
-                            </compileSourceRoots>
-                            <multiReleaseOutput>true</multiReleaseOutput>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
 
             <plugin>
