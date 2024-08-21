@@ -49,6 +49,8 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <!-- TimerFactoryImpl is used by gmbal -->
+                        <Export-Package>*</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>
