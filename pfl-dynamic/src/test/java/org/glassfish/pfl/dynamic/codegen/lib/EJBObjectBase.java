@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -10,10 +11,11 @@
 
 package org.glassfish.pfl.dynamic.codegen.lib;
 
-import javax.ejb.EJBHome;
-import javax.ejb.EJBObject;
-import javax.ejb.Handle;
-import javax.ejb.RemoveException;
+import jakarta.ejb.EJBHome;
+import jakarta.ejb.EJBObject;
+import jakarta.ejb.Handle;
+import jakarta.ejb.RemoveException;
+
 import java.rmi.RemoteException;
 
 /** This is a base class that provides trivial implementations
@@ -21,21 +23,26 @@ import java.rmi.RemoteException;
  * the codegen framework can be compiled.
  */
 public abstract class EJBObjectBase implements EJBObject {
+    @Override
     public EJBHome getEJBHome() throws RemoteException {
 	return null ;
     }
 
+    @Override
     public Object getPrimaryKey() throws RemoteException {
 	return null ;
     }
 
+    @Override
     public void remove() throws RemoteException, RemoveException {
     }
 
+    @Override
     public Handle getHandle() throws RemoteException {
 	return null ;
     }
 
+    @Override
     public boolean isIdentical( EJBObject obj ) throws RemoteException {
 	return obj == this ;
     }
