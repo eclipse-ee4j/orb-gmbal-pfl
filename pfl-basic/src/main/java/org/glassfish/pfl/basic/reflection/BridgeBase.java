@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  * Copyright (c) 2018, 2024 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -12,12 +13,14 @@ package org.glassfish.pfl.basic.reflection;
 
 import java.io.OptionalDataException;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.security.ProtectionDomain;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import sun.misc.Unsafe;
 
@@ -27,10 +30,11 @@ public abstract class BridgeBase {
      * {@link #objectFieldOffset}.
      */
     public static final long INVALID_FIELD_OFFSET = -1;
+    private final StackWalker stackWalker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
-    @SuppressWarnings("java:S3011")
     private final Unsafe unsafe = AccessController.doPrivileged(
                     new PrivilegedAction<Unsafe>() {
+                        @Override
                         public Unsafe run() {
                             try {
                                 Field field = Unsafe.class.getDeclaredField("theUnsafe");
@@ -82,8 +86,9 @@ public abstract class BridgeBase {
      *                          {@link NullPointerException}
      */
     public final void putInt(Object o, long offset, int x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putInt(o, offset, x);
+        }
     }
 
     /**
@@ -98,8 +103,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putObject(Object o, long offset, Object x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putObject(o, offset, x);
+        }
     }
 
     /**
@@ -113,8 +119,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putBoolean(Object o, long offset, boolean x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putBoolean(o, offset, x);
+        }
     }
 
     /**
@@ -128,8 +135,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putByte(Object o, long offset, byte x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putByte(o, offset, x);
+        }
     }
 
     /**
@@ -143,8 +151,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putShort(Object o, long offset, short x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putShort(o, offset, x);
+        }
     }
 
     /**
@@ -158,8 +167,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putChar(Object o, long offset, char x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putChar(o, offset, x);
+        }
     }
 
     /**
@@ -173,8 +183,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putLong(Object o, long offset, long x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putLong(o, offset, x);
+        }
     }
 
     /**
@@ -188,8 +199,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putFloat(Object o, long offset, float x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putFloat(o, offset, x);
+        }
     }
 
     /**
@@ -203,8 +215,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putDouble(Object o, long offset, double x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putDouble(o, offset, x);
+        }
     }
 
     /**
@@ -228,21 +241,6 @@ public abstract class BridgeBase {
     }
 
     /**
-     * Defines a class is a specified classloader.
-     * @param className the name of the class
-     * @param classBytes the byte code for the class
-     * @param classLoader the classloader in which it is to be defined
-     * @param protectionDomain the domain in which the class should be defined
-     *
-     * @deprecated will not work in Java 11 or later. Use {@link #defineClass(Class, String, byte[])} instead
-     */
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    @Deprecated
-    public Class<?> defineClass(String className, byte[] classBytes, ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        return unsafe.defineClass(className, classBytes, 0, classBytes.length, classLoader, null);
-    }
-
-    /**
      * Defines a new class from bytecode. The class will be defined in the classloader and package associated with a
      * specified 'anchor class'.
      *
@@ -252,7 +250,12 @@ public abstract class BridgeBase {
      * @return a new instantiable class, in the package and classloader of the anchor class.
      */
     public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) {
-        return defineClass(className, classBytes, anchorClass.getClassLoader(), null);
+        try {
+            return MethodHandles.privateLookupIn(anchorClass, MethodHandles.lookup())
+                .dropLookupMode(MethodHandles.Lookup.PRIVATE).defineClass(classBytes);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Unable to define class " + className, e);
+        }
     }
 
     /**
@@ -271,7 +274,30 @@ public abstract class BridgeBase {
      * Obtain the latest user defined ClassLoader from the call stack.
      * This is required by the RMI-IIOP specification.
      */
-    public abstract ClassLoader getLatestUserDefinedLoader();
+    public ClassLoader getLatestUserDefinedLoader() {
+        PrivilegedAction<ClassLoader> pa = () ->
+        stackWalker.walk(this::getLatestUserDefinedLoaderFrame)
+                .map(sf -> sf.getDeclaringClass().getClassLoader())
+                .orElseGet(ClassLoader::getPlatformClassLoader);
+        return AccessController.doPrivileged(pa);
+    }
+
+    private Optional<StackWalker.StackFrame> getLatestUserDefinedLoaderFrame(Stream<StackWalker.StackFrame> stream) {
+        return stream.filter(this::isUserLoader).findFirst();
+    }
+
+    private boolean isUserLoader(StackWalker.StackFrame sf) {
+        ClassLoader cl = sf.getDeclaringClass().getClassLoader();
+        if (cl == null) {
+            return false;
+        }
+
+        ClassLoader platformClassLoader = ClassLoader.getPlatformClassLoader();
+        while (platformClassLoader != null && cl != platformClassLoader) {
+            platformClassLoader = platformClassLoader.getParent();
+        }
+        return cl != platformClassLoader;
+    }
 
     /**
      * Return a constructor that can be used to create an instance of the class for externalization.
@@ -336,10 +362,12 @@ public abstract class BridgeBase {
      * @param callingClass the class which wants to access it.
      * @return the original field, rendered accessible, or null.
      */
-    @SuppressWarnings("java:S3011")
     public Field toAccessibleField(Field field, Class<?> callingClass) {
-        field.setAccessible(true);
-        return field;
+        if (isClassOpenToModule(field.getDeclaringClass(), callingClass.getModule())) {
+            field.setAccessible(true);
+            return field;
+        }
+        return null;
     }
 
     /**
@@ -348,9 +376,17 @@ public abstract class BridgeBase {
      * @param callingClass the class which wants to access it.
      * @return the original method, rendered accessible, or null.
      */
-    @SuppressWarnings("java:S3011")
     public Method toAccessibleMethod(Method method, Class<?> callingClass) {
-        method.setAccessible(true);
-        return method;
+        if (isClassOpenToModule(method.getDeclaringClass(), callingClass.getModule())) {
+            method.setAccessible(true);
+            return method;
+        }
+        return null;
+    }
+
+    private boolean isClassOpenToModule(Class<?> candidateClass, Module callingModule) {
+        return callingModule.isNamed()
+              ? candidateClass.getModule().isOpen(candidateClass.getPackageName(), callingModule)
+              : candidateClass.getModule().isOpen(candidateClass.getPackageName());
     }
 }

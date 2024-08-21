@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -57,8 +58,8 @@ import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 public class CodegenCopierGenerator {
     private static final String DEBUG = "false" ;
 
-    private Class<?>	       classToCopy ;
-    private String	       className ;
+    private final Class<?>	       classToCopy ;
+    private final String	       className ;
 
     private static final Bridge bridge = AccessController.doPrivileged(
 					(PrivilegedAction<Bridge>) Bridge::get
@@ -69,7 +70,7 @@ public class CodegenCopierGenerator {
 	this.classToCopy = classToCopy ;
     }
 
-    public Class<?> create( ProtectionDomain pd, ClassLoader cl ) {
+    public Class<?> create( ProtectionDomain pd, Class<?> cl ) {
 	_clear() ;
 
 	Pair<String,String> pc = splitClassName( className ) ;
@@ -77,11 +78,11 @@ public class CodegenCopierGenerator {
 
 	Type PipelineClassCopierFactory = Type.type(
 	    PipelineClassCopierFactory.class ) ;
-	Type ReflectiveCopyException = Type.type( 
+	Type ReflectiveCopyException = Type.type(
 	    ReflectiveCopyException.class ) ;
-	Type CodegenCopierBase = Type.type( 
+	Type CodegenCopierBase = Type.type(
 	    CodegenCopierBase.class ) ;
-	Type ClassFieldCopier = Type.type( 
+	Type ClassFieldCopier = Type.type(
 	    ClassCopierOrdinaryImpl.ClassFieldCopier.class ) ;
 	Type Map = Type.type(
 	    Map.class ) ;
@@ -106,7 +107,7 @@ public class CodegenCopierGenerator {
 		Expression debug    = _arg( _boolean(), "debug" ) ;
 	    _body() ;
 		_if(_ne(superCopier, _null())) ;
-		    _expr(_call( superCopier, "copy", oldToNew, src, dest, debug )) ; 
+		    _expr(_call( superCopier, "copy", oldToNew, src, dest, debug )) ;
 		_end() ;
 
 		// Generate code to copy fields of this object
@@ -115,10 +116,10 @@ public class CodegenCopierGenerator {
 			long offset = bridge.objectFieldOffset( fld ) ;
 			String mname = getCopyMethodName( fld.getType() ) ;
 			if (mname.equals( "copyObject" ))  {
-			    _expr(_call( _this(), mname, oldToNew, _const(offset), 
+			    _expr(_call( _this(), mname, oldToNew, _const(offset),
 				src, dest )) ;
 			} else {
-			    _expr(_call( _this(), mname, _const(offset), 
+			    _expr(_call( _this(), mname, _const(offset),
 				src, dest )) ;
 			}
 		    }
@@ -130,8 +131,8 @@ public class CodegenCopierGenerator {
 	debugProps.setProperty( DUMP_AFTER_SETUP_VISITOR, DEBUG ) ;
 	debugProps.setProperty( TRACE_BYTE_CODE_GENERATION, DEBUG ) ;
 	debugProps.setProperty( USE_ASM_VERIFIER, DEBUG ) ;
-	
-	Class<?> cls = _generate( cl, pd, debugProps ) ;
+
+	Class<?> cls = _generate( cl, debugProps ) ;
 	return cls ;
     }
 

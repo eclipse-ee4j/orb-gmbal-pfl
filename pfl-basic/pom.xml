@@ -23,11 +23,6 @@
     <name>PFL Basic</name>
     <description>Basic functions</description>
 
-    <properties>
-        <java9.sourceDirectory>${project.basedir}/src/main/java9</java9.sourceDirectory>
-        <java9.build.outputDirectory>${project.build.outputDirectory}/META-INF/versions/9</java9.build.outputDirectory>
-    </properties>
-
     <build>
         <plugins>
             <plugin>
@@ -36,25 +31,12 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.name}</Bundle-Name>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Export-Package>
-                            !org.glassfish.pfl.basic.tools.*,
-                            org.glassfish.pfl.basic.*
-                        </Export-Package>
-                        <Import-Package>
-                            sun.misc;resolution:=optional,
-                            sun.reflect;resolution:=optional,
-                            *
-                        </Import-Package>
                     </instructions>
                 </configuration>
                 <executions>
                     <execution>
                         <goals>
                             <goal>manifest</goal>
-                            <goal>install</goal>
-                            <goal>deploy</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -69,14 +51,12 @@
                 </configuration>
             </plugin>
             <plugin>
-            	<groupId>org.apache.maven.plugins</groupId>
-            	<artifactId>maven-surefire-plugin</artifactId>
-            	<version>2.21.0</version>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.1</version>
                 <configuration>
                     <includePom>true</includePom>
                 </configuration>
@@ -84,7 +64,7 @@
                     <execution>
                        <id>attach-sources</id>
                        <goals>
-                           <goal>jar-no-fork</goal> 
+                           <goal>jar-no-fork</goal>
                        </goals>
                     </execution>
                 </executions>
@@ -107,8 +87,16 @@
             <artifactId>asm</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-all</artifactId>
+        </dependency>
     </dependencies>
-    
+
     <reporting>
         <plugins>
             <plugin>

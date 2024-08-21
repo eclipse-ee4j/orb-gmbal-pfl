@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -9,12 +10,6 @@
  */
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
-
-import org.glassfish.pfl.basic.reflection.Bridge;
-import org.glassfish.pfl.dynamic.copyobject.spi.Copy;
-import org.glassfish.pfl.dynamic.copyobject.spi.CopyInterceptor;
-import org.glassfish.pfl.dynamic.copyobject.spi.LibraryClassLoader;
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 import java.io.Externalizable;
 import java.io.Serializable;
@@ -30,6 +25,11 @@ import java.security.ProtectionDomain;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.glassfish.pfl.basic.reflection.Bridge;
+import org.glassfish.pfl.dynamic.copyobject.spi.Copy;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyInterceptor;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
+
 // General Object: use proper constructor, iterate over fields,
 // get/set fields using Unsafe or reflection.  This also handles readResolve,
 // but I don't think writeReplace is needed.
@@ -37,7 +37,7 @@ import java.util.WeakHashMap;
 public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
 //******************************************************************************
-// Static utilities 
+// Static utilities
 //******************************************************************************
 
     /**
@@ -129,7 +129,9 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
                 }
             }
 
-            if (constructor == null) return null;
+            if (constructor == null) {
+                return null;
+            }
 
             return BRIDGE_REF.newConstructorForSerialization(clazz, constructor);
         }
@@ -172,12 +174,12 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
     // that fully support the unsafe approach, so the old reflective code has been
     // removed.
     //
-    // Unfortunately, we always need 9 field copier 
-    // classes: Object plus the 8 primitive type wrappers.  Otherwise every 
-    // getObject call would create a new primitive type wrapper, needlessly 
+    // Unfortunately, we always need 9 field copier
+    // classes: Object plus the 8 primitive type wrappers.  Otherwise every
+    // getObject call would create a new primitive type wrapper, needlessly
     // creating lots of garbage objects.
     //
-    // Note that if a super class is copied in some other way, we must not attempt 
+    // Note that if a super class is copied in some other way, we must not attempt
     // to build a ClassFieldCopier for the derived class.  We should just
     // throw a ReflectiveCopyException and fallback in that case.
 
@@ -197,8 +199,8 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
     // Maps classes to ClassFieldCopier instances.
     private static Map<Class<?>, ClassFieldCopier> classToClassFieldCopier =
             DefaultClassCopierFactories.USE_FAST_CACHE ?
-                    new FastCache<Class<?>, ClassFieldCopier>(new WeakHashMap<Class<?>, ClassFieldCopier>()) :
-                    new WeakHashMap<Class<?>, ClassFieldCopier>();
+                    new FastCache<>(new WeakHashMap<>()) :
+                    new WeakHashMap<>();
 
     private static boolean useCodegenCopier() {
         return Boolean.getBoolean(
@@ -211,7 +213,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
             org.glassfish.pfl.dynamic.codegen.impl.Node.class.getPackage();
 
     private static ThreadLocal<Boolean> isCodegenCopierAllowed =
-            new ThreadLocal<Boolean>() {
+            new ThreadLocal<>() {
                 @Override
                 public Boolean initialValue() {
                     return Boolean.TRUE;
@@ -305,21 +307,21 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
      * This copier also supports @Copy annotations on fields.
      */
     private static class ClassFieldCopierUnsafeImpl implements ClassFieldCopier {
-        private Class<?> myClass;
+        private final Class<?> myClass;
 
         // Note that fieldOffsets and fieldCopiers must always be the
         // same length.
-        private long[] fieldOffsets;        // The field offsets of all
+        private final long[] fieldOffsets;        // The field offsets of all
         // fields in this class, not
         // including inherited fields.
-        private UnsafeFieldCopier[] fieldCopiers;   // The FieldCopier instances for
+        private final UnsafeFieldCopier[] fieldCopiers;   // The FieldCopier instances for
         // this class.
 
         // The ClassCopierFactory needed inside objectUnsafeFieldCopier.
-        private PipelineClassCopierFactory classCopierFactory;
+        private final PipelineClassCopierFactory classCopierFactory;
 
         // ClassFieldCopier for the immediate super class, if any.
-        private ClassFieldCopier superCopier;
+        private final ClassFieldCopier superCopier;
 
         // Note that most instances of UnsafeFieldCopier are stateless, in that
         // all needed info is passed in the copy call.  This means that
@@ -650,7 +652,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
         //
         // The objectUnsafeFieldCopier is not stateless, as it requires access to the
         // ClassCopierFactory, so it cannot be static.
-        private UnsafeFieldCopier objectUnsafeFieldCopier =
+        private final UnsafeFieldCopier objectUnsafeFieldCopier =
                 new UnsafeFieldCopier(BRIDGE_REF) {
 
                     @Override
@@ -814,8 +816,8 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
             // ones we must copy.
             Field[] fields = cls.getDeclaredFields();
             int numFields = 0;
-            for (int ctr = 0; ctr < fields.length; ctr++) {
-                if (fieldIsCopyable(fields[ctr])) {
+            for (Field field : fields) {
+                if (fieldIsCopyable(field)) {
                     numFields++;
                 }
             }
@@ -826,8 +828,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
             // Initialze offsets and field copiers for non-static
             // fields.
             int pos = 0;
-            for (int ctr = 0; ctr < fields.length; ctr++) {
-                Field fld = fields[ctr];
+            for (Field fld : fields) {
                 if (fieldIsCopyable(fld)) {
                     fieldOffsets[pos] = BRIDGE_REF.objectFieldOffset(fld);
                     fieldCopiers[pos] = getUnsafeFieldCopier(fld);
@@ -871,9 +872,9 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 
     private static Map<Class<?>, Constructor<?>> classToConstructor =
             DefaultClassCopierFactories.USE_FAST_CACHE ?
-                    new FastCache<Class<?>, Constructor<?>>(
-                            new WeakHashMap<Class<?>, Constructor<?>>()) :
-                    new WeakHashMap<Class<?>, Constructor<?>>();
+                    new FastCache<>(
+                            new WeakHashMap<>()) :
+                    new WeakHashMap<>();
 
     /**
      * Use bridge with code generated by codegen to copy objects.
@@ -892,8 +893,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
             final CodegenCopierGenerator generator =
                     new CodegenCopierGenerator(className, cls);
             final ProtectionDomain pd = cls.getProtectionDomain();
-            final Class<?> copierClass = generator.create(pd,
-                    LibraryClassLoader.getClassLoader());
+            final Class<?> copierClass = generator.create(pd, cls);
 
             try {
                 cons = copierClass.getDeclaredConstructor(
@@ -928,14 +928,14 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
 //******************************************************************************
 
     // Actually copies the declared fields in this class.
-    private ClassFieldCopier classFieldCopier;
+    private final ClassFieldCopier classFieldCopier;
 
-    // The appropriate constructor for this class, as defined by Java 
+    // The appropriate constructor for this class, as defined by Java
     // serialization, or the default constructor if the class is not serializable.
-    private Constructor<?> constructor;
+    private final Constructor<?> constructor;
 
     // Null unless the class defines a readResolve() method.
-    private MethodHandle readResolveMethod;
+    private final MethodHandle readResolveMethod;
 
 //******************************************************************************
 // Implementation
@@ -963,7 +963,7 @@ public class ClassCopierOrdinaryImpl extends ClassCopierBase {
         }
     }
 
-    // Copy all of the non-static fields from source to dest, starting with 
+    // Copy all of the non-static fields from source to dest, starting with
     // java.lang.Object.
     @Override
     public Object doCopy(Map<Object, Object> oldToNew, Object source,

@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2024 Contributors to the Eclipse Foundation
  * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -12,7 +13,6 @@ package org.glassfish.pfl.dynamic.codegen.spi;
 
 import java.io.IOException;
 import java.io.PrintStream;
-import java.security.ProtectionDomain;
 import java.util.List;
 import java.util.Properties;
 import java.util.Stack;
@@ -49,12 +49,12 @@ import static java.util.Arrays.asList;
  * advanced applications aimed at extending the Java language or providing
  * significant performance enhancements.
  * <P>
- * The supported language is best thought of as a subset of Java 1.0.2.  
+ * The supported language is best thought of as a subset of Java 1.0.2.
  * The following features from Java 5 and earlier are currently NOT supported:
  * <UL>
  * <LI>Generics.
  * <LI>Annotations (this may be added at some point).
- * <LI>For loops (of any sort, but this may be added through extension at some 
+ * <LI>For loops (of any sort, but this may be added through extension at some
  * point).
  * <LI>Enums.
  * <LI>Autoboxing.
@@ -67,13 +67,13 @@ import static java.util.Arrays.asList;
  * <LI>Static fields in interfaces.
  * <LI>Labels, or labelled break or continue.
  * </UL>
- * The intent is that dynamically generated code should be a simplified form of 
- * Java, much like the original Java 1.0 definition.  This moves dynamic code 
+ * The intent is that dynamically generated code should be a simplified form of
+ * Java, much like the original Java 1.0 definition.  This moves dynamic code
  * generation to a level much closer to Java than to raw bytecode manipulation.
  * <P>
- * As much as possible, this class uses standard Java keywords prefixed by "_" as 
+ * As much as possible, this class uses standard Java keywords prefixed by "_" as
  * method names.  This helps to remember what the method name is for creating
- * an if statement (_if of course).  All public methods are static, and 
+ * an if statement (_if of course).  All public methods are static, and
  * using static imports for this class is advisable: simple use
  * <PRE>
  * import static org.glassfish.dynamic.codegen.spi.Wrapper.*
@@ -84,21 +84,21 @@ import static java.util.Arrays.asList;
  * _clear() ;		    // clean up any state from previous uses
  *			    // optional:
  * _setClassLoader(cl) ;    // If you need a specific ClassLoader, set it early
-			    // so that your generated code can be checked against 
+			    // so that your generated code can be checked against
 			    // those classes that it references.
  * _package( "YYY" ) ;	    // set the package to use for the generated code
  * _import( "AAA.BBB" ) ;   // repeat as needed.  As in Java, this makes "BBB"
- *			    // a synonym for "AAA.BBB".  Collisions are not 
+ *			    // a synonym for "AAA.BBB".  Collisions are not
  *			    // permitted.
  * _class( ... ) ;	    // _interface is used for interfaces.
  * _data( ... )	;	    // define the class data members (repeat as needed)
  * _initializer() ;	    // define a static initializer
  *
  *
- * _method( ... ) ;	    // define a method (use _constructor for a constructor) 
+ * _method( ... ) ;	    // define a method (use _constructor for a constructor)
  * _arg( ... ) ;	    // repeat as needed for the method arguments.
  * _body() ;		    // begin the method body definition.
- *     // define the contents of the body using any of the available 
+ *     // define the contents of the body using any of the available
  *     // statements.
  * _end() ; // of method
  * _end() ; // of class
@@ -120,30 +120,30 @@ import static java.util.Arrays.asList;
  * One small note: it is necessary to call _expr( expr ) in order to
  * convert expr into a statement that is incorporated into a body.
  * If this call is omitted, the generated code will NOT contain expr,
- * leading to a difficult to find bug. I will probably fix this 
+ * leading to a difficult to find bug. I will probably fix this
  * eventually, and treat all dangling expressions as errors.
  * <P>
  * This class provides many short
  * utility methods that operate against a current context that
- * is maintained in a ThreadLocal.  This removes the 
- * bookkeeping that would otherwise be needed to keep track 
+ * is maintained in a ThreadLocal.  This removes the
+ * bookkeeping that would otherwise be needed to keep track
  * of various internal factories needed for generating statements and expressions.
  * Note that this class is designed to be statically imported.
  * <P>
  * The point of view of the API of this class is that calls to create
- * expressions are nested, while calls to create statements are not.  
+ * expressions are nested, while calls to create statements are not.
  * That is, constructing an expression
- * will often lead to nested method calls, but constructing a 
- * statement is done with a sequence of method calls.  Note that 
- * everything could be done as a single nested method call per 
+ * will often lead to nested method calls, but constructing a
+ * statement is done with a sequence of method calls.  Note that
+ * everything could be done as a single nested method call per
  * class, but this is unnatural and hard to debug in
- * Java (Java is not Lisp, but you could make it look sort of 
+ * Java (Java is not Lisp, but you could make it look sort of
  * like Lisp if you tried hard enough).
  * <P>
- * All of the expression methods can be called any place where 
- * an expression is valid, which basically means anywhere a 
+ * All of the expression methods can be called any place where
+ * an expression is valid, which basically means anywhere a
  * statement can be defined.  The other methods can only be called
- * if the sequence of method calls is contained in the language 
+ * if the sequence of method calls is contained in the language
  * defined by the following grammar:
  *
  * <PRE>
@@ -166,7 +166,7 @@ import static java.util.Arrays.asList;
  *
  * CONSTRUCTOR      : _constructor ARGS _body STMTS _end ;
  *
- * ARGS		    : _arg ARGS 
+ * ARGS		    : _arg ARGS
  *		    | empty ;
  *
  * STMTS	    : STMT STMTS
@@ -186,9 +186,9 @@ import static java.util.Arrays.asList;
  *		    | _try STMTS CATCHES _finally STMTS _end ;
  *
  * CATCHES	    : _catch STMTS CATCHES
- *		    | empty ; 
+ *		    | empty ;
  *
- * SWITCH	    : _switch CASES 
+ * SWITCH	    : _switch CASES
  *		    | _switch CASES _default STMTS _end ;
  *
  * CASES	    : _case STMTS CASES
@@ -197,7 +197,7 @@ import static java.util.Arrays.asList;
  *
  * WHILE	    : _while STMTS _end ;
  *
- * SIMPLE	    : _assign 
+ * SIMPLE	    : _assign
  *		    | _define
  *		    | _return
  *		    | _throw
@@ -227,9 +227,9 @@ import static java.util.Arrays.asList;
  * to dump the contents of the ClassGeneratorImpl for debugging purposes.
  * <p>
  *  For convenience, methods are provided to display the AST (@see _displayAST),
- *  generate source code (@see _sourceCode), and generate byteCode 
+ *  generate source code (@see _sourceCode), and generate byteCode
  *  (@see _byteCode).
- */ 
+ */
 @SuppressWarnings({"unused", "WeakerAccess"})
 public final class Wrapper {
   private Wrapper() {
@@ -385,27 +385,30 @@ public final class Wrapper {
     private BlockStatement blockStatement;
 
     final ExpressionFactory ef() {
-      if (expressionFactory == null)
+      if (expressionFactory == null) {
         throw new IllegalStateException(
               "No ExpressionFactory is currently available");
+    }
 
       return expressionFactory;
     }
 
     final BlockStatement bs() {
-      if (blockStatement == null)
+      if (blockStatement == null) {
         throw new IllegalStateException(
               "No BlockStatement is currently available");
+    }
 
       return blockStatement;
     }
 
     final void setBlockStatement(BlockStatement bs) {
       blockStatement = bs;
-      if (bs == null)
+      if (bs == null) {
         expressionFactory = null;
-      else
+    } else {
         expressionFactory = bs.exprFactory();
+    }
     }
 
     Context(Stack<Context> contexts, State start) {
@@ -413,10 +416,11 @@ public final class Wrapper {
       this.runner = new Runner(fsm);
 
       this.contexts = contexts;
-      if (contexts.empty())
+      if (contexts.empty()) {
         this.parent = null;
-      else
+    } else {
         this.parent = contexts.peek();
+    }
 
       contexts.push(this);
 
@@ -448,18 +452,22 @@ public final class Wrapper {
     Expression getVariable(String ident) {
       Expression result = null;
 
-      if (blockStatement != null)
+      if (blockStatement != null) {
         result = blockStatement.getVar(ident);
+    }
 
-      if (result == null)
+      if (result == null) {
         result = alternateLookup(ident);
+    }
 
-      if ((result == null) && (parent != null))
+      if ((result == null) && (parent != null)) {
         result = parent.getVariable(ident);
+    }
 
-      if (result == null)
+      if (result == null) {
         throw new IllegalArgumentException(
               "Identifier " + ident + " not found.");
+    }
 
       return result;
     }
@@ -514,9 +522,10 @@ public final class Wrapper {
     protected Expression alternateLookup(String ident) {
       FieldInfo fld = cg.findFieldInfo(ident);
 
-      if (fld == null)
+      if (fld == null) {
         throw new IllegalArgumentException(ident
               + " not found in " + cg.name());
+    }
 
       return ((FieldGenerator) fld).getExpression();
     }
@@ -531,7 +540,7 @@ public final class Wrapper {
 
   // Context used for all methods and constructors.
   private static class MethodContext extends Context {
-    private MethodGenerator mg;
+    private final MethodGenerator mg;
 
     public MethodGenerator methodGenerator() {
       return mg;
@@ -553,9 +562,11 @@ public final class Wrapper {
 
     @Override
     protected Expression alternateLookup(String ident) {
-      for (Variable var : mg.arguments())
-        if (ident.equals(var.ident()))
-          return var;
+      for (Variable var : mg.arguments()) {
+        if (ident.equals(var.ident())) {
+            return var;
+        }
+    }
 
       return null;
     }
@@ -639,9 +650,11 @@ public final class Wrapper {
 
     @Override
     protected Expression alternateLookup(String ident) {
-      if (currentCaseVariable != null)
-        if (ident.equals(currentCaseVariable.ident()))
-          return currentCaseVariable;
+      if (currentCaseVariable != null) {
+        if (ident.equals(currentCaseVariable.ident())) {
+            return currentCaseVariable;
+        }
+    }
 
       return null;
     }
@@ -650,9 +663,10 @@ public final class Wrapper {
     public void _end() {
       super._end();
       if (trystmt.catches().entrySet().isEmpty() &&
-            trystmt.finalPart().isEmpty())
+            trystmt.finalPart().isEmpty()) {
         throw new IllegalStateException(
               "A try statement must have at least one catch clause or a final part");
+    }
     }
   }
 
@@ -700,10 +714,11 @@ public final class Wrapper {
       // look up the type in the table of imports.
       // If not found, treat as a fully qualified name.
       Type type = imports.lookup(name);
-      if (type == null)
+      if (type == null) {
         return Type._class(name);
-      else
+    } else {
         return type;
+    }
     }
 
     Expression _v(String name) {
@@ -733,8 +748,9 @@ public final class Wrapper {
     final void _package(String name) {
       checkState(Operation.PACKAGE);
 
-      if (!"".equals(name))
+      if (!"".equals(name)) {
         Identifier.isValidFullIdentifier(name);
+    }
 
       _package = name;
     }
@@ -748,9 +764,10 @@ public final class Wrapper {
       if (itype == null) {
         imports.addImport(type);
       } else {
-        if (!type.equals(itype))
-          throw new IllegalArgumentException(type.name()
-                + " conflicts with " + itype.name());
+        if (!type.equals(itype)) {
+            throw new IllegalArgumentException(type.name()
+                    + " conflicts with " + itype.name());
+        }
       }
 
       return type;
@@ -772,8 +789,9 @@ public final class Wrapper {
                              Type superClass, List<Type> impls) {
       checkState(Operation.CLASS);
       String cname = name;
-      if (!_package.equals(""))
+      if (!_package.equals("")) {
         cname = _package + "." + name;
+    }
       root = CodeGenerator.defineClass(modifiers,
             cname, superClass, impls);
       new ClassContext(contexts, root);
@@ -783,8 +801,9 @@ public final class Wrapper {
                                  List<Type> impls) {
       checkState(Operation.CLASS);
       String cname = name;
-      if (!_package.equals(""))
+      if (!_package.equals("")) {
         cname = _package + "." + name;
+    }
       root = CodeGenerator.defineInterface(modifiers,
             cname, impls);
       new ClassContext(contexts, root);
@@ -976,55 +995,6 @@ public final class Wrapper {
     ImportList imports = env().imports();
     return CodeGenerator.generateBytecode(cg, cl, imports, options,
           System.out);
-  }
-
-  /**
-   * Generate a class for the current ClassGenerator.
-   * Basically equivalent to _byteCode followed by _makeClass.
-   * cl is used to resolve any references
-   * to other classes and to load the class given by
-   * the current ClassGenerator.  options may be used
-   * to control some aspects of the code generation, such as
-   * debugging options.
-   *
-   * @deprecated as of Java 11, use {@link #_generate(Class, Properties, PrintStream)}
-   */
-  public static Class<?> _generate(ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream ps) {
-    ClassGenerator cg = env().classGenerator();
-    return _generate(cg, cl, pd, props, ps);
-  }
-
-  /**
-   * Generate a class for the current ClassGenerator.
-   * Basically equivalent to _byteCode followed by _makeClass.
-   * cl is used to resolve any references
-   * to other classes and to load the class given by
-   * the current ClassGenerator.  options may be used
-   * to control some aspects of the code generation, such as
-   * debugging options.
-   *
-   * @deprecated as of Java 11, use {@link #_generate(Class, Properties)}
-   */
-  public static Class<?> _generate(ClassLoader cl, ProtectionDomain pd, Properties props) {
-    ClassGenerator cg = env().classGenerator();
-    return _generate(cg, cl, pd, props, System.out);
-  }
-
-  /**
-   * Generate a class for the current ClassGenerator.
-   * Basically equivalent to _byteCode followed by _makeClass.
-   * cl is used to resolve any references
-   * to other classes and to load the class given by
-   * the current ClassGenerator.  options may be used
-   * to control some aspects of the code generation, such as
-   * debugging options.
-   * @deprecated as of Java 11, use #_generate(Class, Properties, PrintStream)</?>
-   */
-  private static Class<?> _generate(ClassGenerator cg, ClassLoader cl, ProtectionDomain pd, Properties props, PrintStream ps) {
-    ImportList imports = env().imports();
-    byte[] data = CodeGenerator.generateBytecode((ClassGeneratorImpl) cg,
-          cl, imports, props, ps);
-    return CodeGeneratorUtil.makeClass(cg.name(), data, pd, cl);
   }
 
   /**

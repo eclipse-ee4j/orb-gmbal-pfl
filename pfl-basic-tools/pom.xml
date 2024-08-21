@@ -37,11 +37,6 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.name}</Bundle-Name>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Export-Package>
-                            org.glassfish.pfl.basic.tools.*                   
-                        </Export-Package>             
                     </instructions>
                 </configuration>
             </plugin>
@@ -67,7 +62,7 @@
            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-            </plugin> 
+            </plugin>
          </plugins>
     </build>
 

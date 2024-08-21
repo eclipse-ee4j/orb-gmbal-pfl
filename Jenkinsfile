@@ -28,7 +28,7 @@ pipeline {
   agent any
   tools {
     maven 'apache-maven-latest'
-    jdk 'openjdk-jdk17-latest'
+    jdk 'temurin-jdk21-latest'
   }
   stages {
     stage('build') {
