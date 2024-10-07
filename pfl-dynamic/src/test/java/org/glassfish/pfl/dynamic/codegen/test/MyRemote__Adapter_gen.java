@@ -32,8 +32,8 @@ public class MyRemote__Adapter_gen implements ClassGeneratorFactory {
 	_import( "java.lang.Exception" ) ;
 	_import( "java.lang.Throwable" ) ;
 	_import( "java.io.Serializable" ) ;
-	_import( "javax.ejb.EJBObject" ) ;
-	_import( "javax.ejb.EJBException" ) ;
+	_import( "jakarta.ejb.EJBObject" ) ;
+	_import( "jakarta.ejb.EJBException" ) ;
 	_import( "java.rmi.RemoteException" ) ;
 	_import( "org.glassfish.pfl.dynamic.codegen.lib.AppException" ) ;
 	_import( "org.glassfish.pfl.dynamic.codegen.lib.MyBusinessIntf" ) ;

@@ -26,7 +26,7 @@ public class MyRemote_gen implements ClassGeneratorFactory {
     public ClassGenerator evaluate() {
 	_clear() ;
 	_package( "dynamic.codegen.gen" ) ;
-	Type EJBObject = _import( "javax.ejb.EJBObject" ) ;
+	Type EJBObject = _import( "jakarta.ejb.EJBObject" ) ;
 	Type RemoteException = _import( "java.rmi.RemoteException" ) ;
 	Type AppException = _import( "org.glassfish.pfl.dynamic.codegen.lib.AppException" ) ;
 

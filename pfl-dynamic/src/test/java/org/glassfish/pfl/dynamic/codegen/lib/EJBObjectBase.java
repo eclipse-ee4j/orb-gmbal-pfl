@@ -10,10 +10,10 @@
 
 package org.glassfish.pfl.dynamic.codegen.lib;
 
-import javax.ejb.EJBHome;
-import javax.ejb.EJBObject;
-import javax.ejb.Handle;
-import javax.ejb.RemoveException;
+import jakarta.ejb.EJBHome;
+import jakarta.ejb.EJBObject;
+import jakarta.ejb.Handle;
+import jakarta.ejb.RemoveException;
 import java.rmi.RemoteException;
 
 /** This is a base class that provides trivial implementations
