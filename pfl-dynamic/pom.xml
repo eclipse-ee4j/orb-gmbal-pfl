@@ -55,6 +55,10 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                        <!-- CodeGenerator is used by GlassFish -->
+                        <!-- ASMUtil and Identifier are used by pfl-tf.jar -->
+                        <!-- copyobject.impl classes are used by glassfish-corba-orb.jar -->
+                        <Export-Package>org.glassfish.pfl.dynamic.*</Export-Package>
                     </instructions>
                 </configuration>
                 <executions>

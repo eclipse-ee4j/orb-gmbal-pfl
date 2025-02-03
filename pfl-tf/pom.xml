@@ -50,7 +50,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
                         <!-- TimerFactoryImpl is used by gmbal -->
-                        <Export-Package>*</Export-Package>
+                        <Export-Package>org.glassfish.pfl.tf.*</Export-Package>
                     </instructions>
                 </configuration>
             </plugin>

@@ -8,11 +8,13 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-package org.glassfish.pfl.tf.spi;
+package org.glassfish.pfl.tf.spi.test;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.glassfish.pfl.tf.spi.MethodMonitorBase;
 
 /**
  *

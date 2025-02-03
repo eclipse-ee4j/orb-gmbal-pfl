@@ -13,7 +13,7 @@
  * and open the template in the editor.
  */
 
-package org.glassfish.pfl.tf.spi;
+package org.glassfish.pfl.tf.spi.test;
 
 /**
  *
