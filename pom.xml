@@ -83,9 +83,7 @@
     </mailingLists>
 
     <properties>
-        <!-- The minimum Java version required to build for release to ensure that the MR classes are built -->
-        <release.java.version>11</release.java.version>
-
+        <maven.compiler.release>11</maven.compiler.release>
         <!-- A directory for unit tests, allowing testing against MR classes. -->
         <combined.classes.dir>${project.build.directory}/combined-classes</combined.classes.dir>
     </properties>
@@ -173,29 +171,7 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-toolchains-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>toolchain</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <toolchains>
-                        <jdk>
-                            <version>${release.java.version}</version>
-                        </jdk>
-                    </toolchains>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <release>${release.java.version}</release>
-                </configuration>
             </plugin>
 
             <plugin>
