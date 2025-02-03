@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-package org.glassfish.pfl.tf.spi;
+package org.glassfish.pfl.tf.spi.test;
 
 import java.lang.annotation.Target ;
 import java.lang.annotation.Documented ;
@@ -17,10 +17,9 @@ import java.lang.annotation.Retention ;
 import java.lang.annotation.RetentionPolicy ;
 import org.glassfish.pfl.tf.spi.annotation.MethodMonitorGroup;
 
-
-@MethodMonitorGroup({ A.class, B.class })
+@MethodMonitorGroup
 @Documented
 @Target({ElementType.TYPE,ElementType.METHOD,ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface D {
+public @interface A {
 }
