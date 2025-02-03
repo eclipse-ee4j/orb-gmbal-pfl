@@ -12,6 +12,7 @@ package org.glassfish.pfl.basic.reflection;
 
 import java.io.OptionalDataException;
 import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,6 +32,7 @@ public abstract class BridgeBase {
     @SuppressWarnings("java:S3011")
     private final Unsafe unsafe = AccessController.doPrivileged(
                     new PrivilegedAction<Unsafe>() {
+                        @Override
                         public Unsafe run() {
                             try {
                                 Field field = Unsafe.class.getDeclaredField("theUnsafe");
@@ -82,8 +84,9 @@ public abstract class BridgeBase {
      *                          {@link NullPointerException}
      */
     public final void putInt(Object o, long offset, int x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putInt(o, offset, x);
+        }
     }
 
     /**
@@ -98,8 +101,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putObject(Object o, long offset, Object x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putObject(o, offset, x);
+        }
     }
 
     /**
@@ -113,8 +117,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putBoolean(Object o, long offset, boolean x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putBoolean(o, offset, x);
+        }
     }
 
     /**
@@ -128,8 +133,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putByte(Object o, long offset, byte x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putByte(o, offset, x);
+        }
     }
 
     /**
@@ -143,8 +149,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putShort(Object o, long offset, short x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putShort(o, offset, x);
+        }
     }
 
     /**
@@ -158,8 +165,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putChar(Object o, long offset, char x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putChar(o, offset, x);
+        }
     }
 
     /**
@@ -173,8 +181,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putLong(Object o, long offset, long x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putLong(o, offset, x);
+        }
     }
 
     /**
@@ -188,8 +197,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putFloat(Object o, long offset, float x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putFloat(o, offset, x);
+        }
     }
 
     /**
@@ -203,8 +213,9 @@ public abstract class BridgeBase {
      * @see #putInt(Object, long, int)
      */
     public final void putDouble(Object o, long offset, double x) {
-        if (offset != INVALID_FIELD_OFFSET)
+        if (offset != INVALID_FIELD_OFFSET) {
             unsafe.putDouble(o, offset, x);
+        }
     }
 
     /**
@@ -228,21 +239,6 @@ public abstract class BridgeBase {
     }
 
     /**
-     * Defines a class is a specified classloader.
-     * @param className the name of the class
-     * @param classBytes the byte code for the class
-     * @param classLoader the classloader in which it is to be defined
-     * @param protectionDomain the domain in which the class should be defined
-     *
-     * @deprecated will not work in Java 11 or later. Use {@link #defineClass(Class, String, byte[])} instead
-     */
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    @Deprecated
-    public Class<?> defineClass(String className, byte[] classBytes, ClassLoader classLoader, ProtectionDomain protectionDomain) {
-        return unsafe.defineClass(className, classBytes, 0, classBytes.length, classLoader, null);
-    }
-
-    /**
      * Defines a new class from bytecode. The class will be defined in the classloader and package associated with a
      * specified 'anchor class'.
      *
@@ -252,7 +248,12 @@ public abstract class BridgeBase {
      * @return a new instantiable class, in the package and classloader of the anchor class.
      */
     public Class<?> defineClass(Class<?> anchorClass, String className, byte[] classBytes) {
-        return defineClass(className, classBytes, anchorClass.getClassLoader(), null);
+        try {
+            return MethodHandles.privateLookupIn(anchorClass, MethodHandles.lookup())
+                .dropLookupMode(MethodHandles.Lookup.PRIVATE).defineClass(classBytes);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException("Unable to define class " + className, e);
+        }
     }
 
     /**

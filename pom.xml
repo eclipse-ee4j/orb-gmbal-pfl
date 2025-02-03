@@ -83,10 +83,6 @@
     </mailingLists>
 
     <properties>
-        <!-- The oldest Java version supported by this tool.               -->
-        <!-- Will control compilation of the main code and the unit tests. -->
-        <base.java.version>1.8</base.java.version>
-
         <!-- The minimum Java version required to build for release to ensure that the MR classes are built -->
         <release.java.version>11</release.java.version>
 
@@ -189,7 +185,7 @@
                 <configuration>
                     <toolchains>
                         <jdk>
-                            <version>${base.java.version}</version>
+                            <version>${release.java.version}</version>
                         </jdk>
                     </toolchains>
                 </configuration>
@@ -198,30 +194,10 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>${base.java.version}</source>
-                    <target>${base.java.version}</target>
+                    <release>${release.java.version}</release>
                 </configuration>
                 <!-- define the possible compilations -->
                 <executions>
-                    <!-- for Java 9 -->
-                    <execution>
-                        <id>java9</id>
-                        <phase>none</phase>
-                        <goals>
-                            <goal>compile</goal>
-                        </goals>
-                        <configuration>
-                            <release>9</release>
-                            <jdkToolchain>
-                                <version>9</version>
-                            </jdkToolchain>
-                            <compileSourceRoots>
-                                <compileSourceRoot>${project.basedir}/src/main/java9</compileSourceRoot>
-                            </compileSourceRoots>
-                            <multiReleaseOutput>true</multiReleaseOutput>
-                        </configuration>
-                    </execution>
-                    <!-- for Java 11 -->
                     <execution>
                         <id>java11</id>
                         <phase>none</phase>
@@ -417,148 +393,6 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-toolchains-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- enable java9 compilation -->
-        <profile>
-            <id>compile-java9</id>
-            <activation>
-                <jdk>[9,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>java9</id>
-                                <phase>compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-java9-classes</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <overwrite>true</overwrite>
-                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.outputDirectory}/META-INF/versions/9</directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-            <properties>
-                <maven.test.additionalClasspath>${project.build.testOutputDirectory}/</maven.test.additionalClasspath>
-            </properties>
-        </profile>
-
-        <!-- enable java11 compilation -->
-        <profile>
-            <id>compile-java11</id>
-            <activation>
-                <jdk>[11,)</jdk>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>java11</id>
-                                <phase>compile</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <artifactId>maven-resources-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>copy-java11-classes</id>
-                                <phase>process-classes</phase>
-                                <goals>
-                                    <goal>copy-resources</goal>
-                                </goals>
-                                <configuration>
-                                    <overwrite>true</overwrite>
-                                    <outputDirectory>${combined.classes.dir}</outputDirectory>
-                                    <resources>
-                                        <resource>
-                                            <directory>${project.build.outputDirectory}/META-INF/versions/11</directory>
-                                        </resource>
-                                    </resources>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <profile>
-            <id>test-toolchains-bypass</id>
-            <activation>
-                <property>
-                    <name>!release</name>
-                </property>
-            </activation>
-
-            <build>
-                <plugins>
-                    <!-- Run the unit tests with the JVM used to run maven -->
-                    <plugin>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <configuration>
-                            <jvm>${env.JAVA_HOME}/bin/java</jvm>
-                            <classesDirectory>${combined.classes.dir}</classesDirectory>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- activate on release -->
-        <profile>
-            <id>oss-release</id>
-
-            <build>
-                <plugins>
-
-                    <!-- force the build to run with the specified JDK, which will trigger the MR compilations -->
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-enforcer-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>enforce-jdk</id>
-                                  <goals>
-                                      <goal>enforce</goal>
-                                  </goals>
-                                  <configuration>
-                                      <rules>
-                                          <requireJavaVersion>
-                                              <version>[${release.java.version},)</version>
-                                          </requireJavaVersion>
-                                      </rules>
-                                  </configuration>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
