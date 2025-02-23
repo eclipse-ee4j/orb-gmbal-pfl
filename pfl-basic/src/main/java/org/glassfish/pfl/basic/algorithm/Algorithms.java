@@ -15,16 +15,15 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.List ;
-import java.util.Map ;
 import java.util.ArrayList ;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List ;
+import java.util.Map ;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import org.glassfish.pfl.basic.contain.Pair;
 import org.glassfish.pfl.basic.func.BinaryFunction;
 import org.glassfish.pfl.basic.func.UnaryFunction;
@@ -40,6 +39,7 @@ public final class Algorithms {
      * @return list of objects
      * @deprecated replaced by {@link Arrays#asList(java.lang.Object...)}
      */
+    @Deprecated
     public static <T> List<T> list( T... arg ) {
         return Arrays.asList(arg) ;
     }
@@ -348,39 +348,35 @@ public final class Algorithms {
         }
     }
 
-    /** Given an annotation, return a Map that maps each field (given by a 
-     * method name) to its value in the annotation.  If the value is an 
+    /** Given an annotation, return a Map that maps each field (given by a
+     * method name) to its value in the annotation.  If the value is an
      * annotation, that value is recursively converted into a Map in the
      * same way.
-     * 
+     *
      * @param ann The annotation to examine.
      * @param convertArraysToLists true if annotation values of array type
      * should be converted to an appropriate list.  This is often MUCH more
      * useful, but some contexts require arrays.
      * @return A map of annotation fields to their values.
      */
-    public static Map<String,Object> getAnnotationValues( Annotation ann,
-        boolean convertArraysToLists ) {
+    public static Map<String, Object> getAnnotationValues(Annotation ann, boolean convertArraysToLists) {
         // We must ignore all of the methods defined in the java.lang.Annotation API.
         Map<String,Object> result = new HashMap<String,Object>() ;
         for (Method m : getDeclaredMethods( ann.getClass() )) {
             String name = m.getName() ;
-            if (!annotationMethods.contains( name ) ) {
-                Object value = null ;
-                // Note: the following invoke should never fail
+            if (!annotationMethods.contains(name)) {
+                Object value;
                 try {
                     value = m.invoke(ann);
-                } catch (Exception ex) {
-                    Logger.getLogger(Algorithms.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ReflectiveOperationException e) {
+                    throw new IllegalStateException("Error invoking method " + m + " on annotation " + ann, e);
                 }
-
                 if (value != null) {
-                    Class<?> valueClass = value.getClass() ;
+                    Class<?> valueClass = value.getClass();
                     if (valueClass.isAnnotation()) {
-                        value = getAnnotationValues( (Annotation)value,
-                            convertArraysToLists ) ;
+                        value = getAnnotationValues((Annotation) value, convertArraysToLists);
                     } else if (convertArraysToLists && valueClass.isArray()) {
-                        value = convertToList(value) ;
+                        value = convertToList(value);
                     }
                 }
 
