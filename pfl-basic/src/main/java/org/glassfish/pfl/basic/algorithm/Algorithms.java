@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2025 Contributors to the Eclipse Foundation
  * Copyright (c) 2007, 2019 Oracle and/or its affiliates. All rights reserved.
  * Copyright (c) 2019 Payara Services Ltd.
  *
@@ -9,20 +10,16 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-package org.glassfish.pfl.basic.algorithm ;
+package org.glassfish.pfl.basic.algorithm;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
-import java.util.ArrayList ;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List ;
-import java.util.Map ;
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 import org.glassfish.pfl.basic.contain.Pair;
 import org.glassfish.pfl.basic.func.BinaryFunction;
@@ -321,70 +318,6 @@ public final class Algorithms {
         } else {
             return arg.toString() ;
         }
-    }
-
-    private static List<Method> getDeclaredMethods( final Class<?> cls ) {
-        SecurityManager sman = System.getSecurityManager() ;
-        if (sman == null) {
-            return Arrays.asList( cls.getDeclaredMethods() ) ;
-        } else {
-            return AccessController.doPrivileged(
-                new PrivilegedAction<List<Method>>() {
-                    @Override
-                    public List<Method> run() {
-                        return Arrays.asList( cls.getDeclaredMethods() ) ;
-                    }
-                }
-            ) ;
-
-        }
-    }
-
-    private static Set<String> annotationMethods ;
-    static {
-        annotationMethods = new HashSet<String>() ;
-        for (Method m : getDeclaredMethods( Annotation.class )) {
-            annotationMethods.add( m.getName()) ;
-        }
-    }
-
-    /** Given an annotation, return a Map that maps each field (given by a
-     * method name) to its value in the annotation.  If the value is an
-     * annotation, that value is recursively converted into a Map in the
-     * same way.
-     *
-     * @param ann The annotation to examine.
-     * @param convertArraysToLists true if annotation values of array type
-     * should be converted to an appropriate list.  This is often MUCH more
-     * useful, but some contexts require arrays.
-     * @return A map of annotation fields to their values.
-     */
-    public static Map<String, Object> getAnnotationValues(Annotation ann, boolean convertArraysToLists) {
-        // We must ignore all of the methods defined in the java.lang.Annotation API.
-        Map<String,Object> result = new HashMap<String,Object>() ;
-        for (Method m : getDeclaredMethods( ann.getClass() )) {
-            String name = m.getName() ;
-            if (!annotationMethods.contains(name)) {
-                Object value;
-                try {
-                    value = m.invoke(ann);
-                } catch (ReflectiveOperationException e) {
-                    throw new IllegalStateException("Error invoking method " + m + " on annotation " + ann, e);
-                }
-                if (value != null) {
-                    Class<?> valueClass = value.getClass();
-                    if (valueClass.isAnnotation()) {
-                        value = getAnnotationValues((Annotation) value, convertArraysToLists);
-                    } else if (convertArraysToLists && valueClass.isArray()) {
-                        value = convertToList(value);
-                    }
-                }
-
-                result.put( name, value ) ;
-            }
-        }
-
-        return result ;
     }
 
     public static interface Action<T> {
