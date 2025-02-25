@@ -28,18 +28,6 @@ import org.glassfish.pfl.basic.func.UnaryPredicate;
 
 public final class Algorithms {
     private Algorithms() {}
-    
-    /**
-     * Converts an array of objects into a list
-     * @param <T> type of objects
-     * @param arg the array of objects
-     * @return list of objects
-     * @deprecated replaced by {@link Arrays#asList(java.lang.Object...)}
-     */
-    @Deprecated
-    public static <T> List<T> list( T... arg ) {
-        return Arrays.asList(arg) ;
-    }
 
     public static <S,T> Pair<S,T> pair( S first, T second ) {
         return new Pair<S,T>( first, second ) ;
