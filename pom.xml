@@ -193,7 +193,7 @@
                         <configuration>
                             <resources>
                                 <resource>
-                                    <directory>${maven.multiModuleProjectDirectory}</directory>
+                                    <directory>${project.basedir}/..</directory>
                                     <includes>
                                         <include>NOTICE.md</include>
                                         <include>LICENSE.md</include>
