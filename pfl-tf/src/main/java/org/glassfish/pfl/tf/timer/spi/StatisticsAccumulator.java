@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation.
  * Copyright (c) 1997, 2018 Oracle and/or its affiliates. All rights reserved.
  *
  * This program and the accompanying materials are made available under the
@@ -8,25 +9,21 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-package org.glassfish.pfl.tf.timer.spi ;
+package org.glassfish.pfl.tf.timer.spi;
 
 /**
- * <p>
- * 
- * @author Hemanth Puttaswamy
- * </p>
- * <p>
  * StatisticsAccumulator accumulates the samples provided by the user and
  * computes the value of minimum, maximum, sum and sample square sum. When
  * the StatisticMonitoredAttribute calls getValue(), it will compute all
  * the statistics for the collected samples (Which are Minimum, Maximum,
  * Average, StandardDeviation) and provides a nice printable record as a
  * String.
- *
- * Users can easily extend this class and provide the implementation of 
+ * <p>
+ * Users can easily extend this class and provide the implementation of
  * toString() method to format the stats as desired. By default all the stats
  * are printed in a single line.
- * </p>
+ *
+ * @author Hemanth Puttaswamy
  */
 public class StatisticsAccumulator {
     private double max ;
