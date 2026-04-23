@@ -10,11 +10,11 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
+import java.util.List;
 
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
-import org.glassfish.pfl.dynamic.codegen.spi.ImportList ;
+import org.glassfish.pfl.dynamic.codegen.spi.ImportList;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 
 /** A Visitor that generates Java source for an expression.

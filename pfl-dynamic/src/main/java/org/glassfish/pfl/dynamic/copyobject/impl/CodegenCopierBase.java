@@ -10,12 +10,12 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
 
+import java.security.Permission;
+import java.util.Map;
+
 import org.glassfish.pfl.basic.reflection.Bridge;
 import org.glassfish.pfl.basic.reflection.BridgePermission;
 import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
-
-import java.security.Permission;
-import java.util.Map;
 
 
 /**

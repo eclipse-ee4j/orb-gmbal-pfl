@@ -10,7 +10,8 @@
 
 package org.glassfish.pfl.dynamic.codegen.spi ;
 
-import java.util.List ;
+import java.util.List;
+
 import org.glassfish.pfl.basic.contain.Pair;
 
 public interface ImportList {

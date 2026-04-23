@@ -10,22 +10,20 @@
 
 package org.glassfish.pfl.basic.tools.argparser ;
 
-import java.util.Collection ;
-import java.util.Collections ;
-import java.util.ArrayList ;
-import java.util.List ;
-import java.util.Map ;
-import java.util.Set ;
-import java.util.HashMap ;
-
-import java.lang.reflect.Array ;
-import java.lang.reflect.Method ;
-import java.lang.reflect.Proxy ;
-import java.lang.reflect.InvocationHandler ;
-
-import java.net.URL ;
-
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.glassfish.pfl.basic.contain.Pair;
 
 /** A general purpose argument parser that uses annotations, reflection,

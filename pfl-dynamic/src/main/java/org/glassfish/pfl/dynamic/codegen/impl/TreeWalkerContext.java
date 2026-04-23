@@ -10,7 +10,8 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
+import java.util.List;
+
 import org.glassfish.pfl.basic.contain.MarkStack;
 
 public class TreeWalkerContext {

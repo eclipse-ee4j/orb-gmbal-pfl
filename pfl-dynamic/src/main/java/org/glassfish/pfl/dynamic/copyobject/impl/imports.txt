@@ -16,14 +16,14 @@ GlassFish dependencies on copyobject:
 Do not move these, or change their packaging.
 
 Classes used only in ReflectObjectCopierImpl:
-    import com.sun.corba.se.impl.util.Utility ;
-    import com.sun.corba.se.spi.logging.LogWrapperBase ;
-    import com.sun.corba.se.spi.orb.ORB ;
-    import org.omg.CORBA.portable.Delegate ;
-    import org.omg.CORBA.portable.ObjectImpl ;
+    import com.sun.corba.se.impl.util.Utility;
+    import com.sun.corba.se.spi.logging.LogWrapperBase;
+    import com.sun.corba.se.spi.orb.ORB;
+    import org.omg.CORBA.portable.Delegate;
+    import org.omg.CORBA.portable.ObjectImpl;
 
 Needed in ClassCopierOrdinaryImpl for USE_BCEL_REFLECTIVE_COPYOBJECT.
-    import com.sun.corba.se.impl.orbutil.ORBConstants ;
+    import com.sun.corba.se.impl.orbutil.ORBConstants;
 
 Needed only in BCELCopierGenerator:
     import org.apache.bcel.*;

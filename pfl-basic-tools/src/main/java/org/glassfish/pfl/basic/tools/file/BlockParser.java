@@ -10,11 +10,11 @@
 
 package org.glassfish.pfl.basic.tools.file ;
 
-import org.glassfish.pfl.basic.func.BinaryFunction;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.glassfish.pfl.basic.func.BinaryFunction;
 
 /** Utility class used to convert FileWrappers into (lists of) Blocks.
  */

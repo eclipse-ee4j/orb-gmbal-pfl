@@ -10,15 +10,14 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.Date ;
+import java.lang.reflect.Modifier;
+import java.util.Date;
 
-import java.lang.reflect.Modifier ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.ImportList ;
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
-import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo ;
 import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.ImportList;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 public class SourceStatementVisitor extends TreeWalker {
     private ImportList imports ;

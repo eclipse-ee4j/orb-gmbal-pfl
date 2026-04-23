@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.basic.contain ;
 
-import java.util.EmptyStackException ;
+import java.util.EmptyStackException;
 
 // We implement a Stack here instead of using java.util.Stack because
 // java.util.Stack is thread-safe, negatively impacting performance.

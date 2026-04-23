@@ -10,11 +10,11 @@
 
 package org.glassfish.pfl.basic.tools.file ;
 
-import java.util.List ;
-import java.util.ArrayList ;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.io.File ;
-import java.io.IOException ;
 import org.glassfish.pfl.basic.tools.argparser.ArgParser;
 import org.glassfish.pfl.basic.tools.argparser.DefaultValue;
 import org.glassfish.pfl.basic.tools.argparser.Help;

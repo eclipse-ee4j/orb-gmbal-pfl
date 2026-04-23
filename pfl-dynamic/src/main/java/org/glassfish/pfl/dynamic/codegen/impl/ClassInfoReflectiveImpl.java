@@ -10,27 +10,16 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
-import java.util.ArrayList ;
-import java.util.Map ;
-import java.util.HashMap ;
-import java.util.Set ;
-import java.util.HashSet ;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.security.AccessController ;
-import java.security.PrivilegedAction ;
-
-import java.lang.reflect.Method ;
-import java.lang.reflect.Constructor ;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.Immutable ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
-
-import org.glassfish.pfl.dynamic.codegen.impl.FieldInfoImpl ;
+import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.copyobject.spi.Immutable;
 
 @Immutable
 public class ClassInfoReflectiveImpl extends ClassInfoBase {

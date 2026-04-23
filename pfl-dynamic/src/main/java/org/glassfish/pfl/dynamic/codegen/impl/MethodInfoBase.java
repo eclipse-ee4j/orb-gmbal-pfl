@@ -10,17 +10,16 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.lang.reflect.Method ;
-import java.lang.reflect.Constructor ;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.List ;
-import java.util.ArrayList ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Signature ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Signature;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 public abstract class MethodInfoBase extends MemberInfoBase
     implements MethodInfo {

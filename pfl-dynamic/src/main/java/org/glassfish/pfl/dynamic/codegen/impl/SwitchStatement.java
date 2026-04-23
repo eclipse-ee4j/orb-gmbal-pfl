@@ -10,12 +10,8 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.Map ;
-import java.util.LinkedHashMap ;
-
-import org.glassfish.pfl.dynamic.codegen.impl.ExpressionInternal ;
-
-import org.glassfish.pfl.dynamic.codegen.impl.StatementBase ;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  *

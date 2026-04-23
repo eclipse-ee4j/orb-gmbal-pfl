@@ -10,10 +10,10 @@
 
 package org.glassfish.pfl.basic.contain;
 
-import java.util.List ;
-import java.util.LinkedList ;
-import java.util.ArrayList ;
-import java.util.EmptyStackException ;
+import java.util.ArrayList;
+import java.util.EmptyStackException;
+import java.util.LinkedList;
+import java.util.List;
 
 /** A stack with additional operations that support recording
  * the current top of stack as a mark, and then later popping

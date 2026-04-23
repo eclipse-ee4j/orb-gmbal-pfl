@@ -10,18 +10,10 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
-import java.util.ArrayList ;
-import java.util.Map ;
-import java.util.HashMap ;
-import java.util.Properties ;
+import java.util.List;
 
-import java.io.PrintStream ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
-
-import org.glassfish.pfl.dynamic.codegen.impl.NodeBase ;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 public final class MethodGenerator extends MethodInfoBase implements Node {
     private Node nodeImpl ;

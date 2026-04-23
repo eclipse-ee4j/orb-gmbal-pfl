@@ -10,7 +10,8 @@
 
 package org.glassfish.pfl.basic.tools.argparser ;
 
-import java.lang.reflect.Method ;
+import java.lang.reflect.Method;
+
 import org.glassfish.pfl.basic.func.UnaryFunction;
 
 public interface ElementParser extends UnaryFunction<String,Object> {

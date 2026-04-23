@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.tf.timer.spi ;
 
-import java.util.Set ;
+import java.util.Set;
 
 /** Represents a named object that can be enabled or disabled.
  * It may also contain other Controllable instances.

@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.lib;
 
-import java.rmi.RemoteException ;
+import java.rmi.RemoteException;
 
 public interface C {
     String getName() throws RemoteException ;

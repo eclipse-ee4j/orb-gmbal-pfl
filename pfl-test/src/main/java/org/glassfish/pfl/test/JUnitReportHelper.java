@@ -10,9 +10,10 @@
 
 package org.glassfish.pfl.test ;
 
-import java.io.File ;
-import java.io.FileOutputStream ;
-import java.io.OutputStream ;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
 import org.glassfish.pfl.basic.contain.Pair;
 
 /** Helper class for generating reports for tests that do not adapt well to 

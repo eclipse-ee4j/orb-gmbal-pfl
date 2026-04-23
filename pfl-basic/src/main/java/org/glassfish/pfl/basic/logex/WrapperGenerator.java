@@ -27,8 +27,8 @@ import java.util.logging.Formatter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import org.glassfish.pfl.basic.algorithm.AnnotationAnalyzer;
 
+import org.glassfish.pfl.basic.algorithm.AnnotationAnalyzer;
 import org.glassfish.pfl.basic.proxy.CompositeInvocationHandler;
 import org.glassfish.pfl.basic.proxy.CompositeInvocationHandlerImpl;
 

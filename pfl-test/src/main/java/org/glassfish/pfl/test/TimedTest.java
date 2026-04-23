@@ -10,10 +10,10 @@
 
 package org.glassfish.pfl.test ;
 
-import junit.extensions.RepeatedTest ;
-import junit.framework.TestResult ;
-import junit.framework.Test ;
+import junit.extensions.RepeatedTest;
+import junit.framework.Test;
 import junit.framework.TestCase;
+import junit.framework.TestResult;
 import junit.framework.TestSuite;
 
 public class TimedTest extends RepeatedTest 

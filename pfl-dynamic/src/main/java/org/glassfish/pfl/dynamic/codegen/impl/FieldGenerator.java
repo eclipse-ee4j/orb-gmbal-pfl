@@ -10,13 +10,11 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.lang.reflect.Modifier ;
+import java.lang.reflect.Modifier;
+import java.util.List;
 
-import java.util.List ;
-
-import org.glassfish.pfl.dynamic.codegen.impl.ExpressionInternal ;
 import org.glassfish.pfl.dynamic.codegen.spi.Expression;
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
 
 public class FieldGenerator extends FieldInfoImpl implements Node {
     private Node nodeImpl ;

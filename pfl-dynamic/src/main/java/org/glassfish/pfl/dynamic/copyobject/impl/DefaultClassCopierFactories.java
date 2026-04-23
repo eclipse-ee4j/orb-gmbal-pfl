@@ -10,17 +10,14 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
 
-import java.lang.reflect.Method ;
-import java.lang.reflect.Modifier ;
-
-import java.util.Map ;
-
-import java.security.PrivilegedAction;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.util.Map;
 
 import org.glassfish.pfl.basic.concurrent.WeakHashMapSafeReadLock;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 public abstract class DefaultClassCopierFactories
 {

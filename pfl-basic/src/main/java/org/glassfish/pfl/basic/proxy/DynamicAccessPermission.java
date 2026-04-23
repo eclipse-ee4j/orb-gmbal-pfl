@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.basic.proxy;
 
-import java.security.*;
+import java.security.BasicPermission;
 
 /**
  * This class controls the use of dynamic proxies.

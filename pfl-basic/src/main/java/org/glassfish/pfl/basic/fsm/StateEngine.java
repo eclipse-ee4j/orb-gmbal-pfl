@@ -10,12 +10,12 @@
 
 package org.glassfish.pfl.basic.fsm ;
 
-import java.util.Collections ;
-import java.util.Map ;
-import java.util.EnumMap ;
-import java.util.HashSet ;
-import java.util.Set ;
-import java.util.Iterator ;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Encodes the state transition function for a finite state machine.

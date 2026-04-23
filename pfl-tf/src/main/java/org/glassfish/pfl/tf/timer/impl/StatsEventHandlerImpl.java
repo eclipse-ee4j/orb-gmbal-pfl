@@ -10,7 +10,8 @@
 
 package org.glassfish.pfl.tf.timer.impl ;
 
-import java.util.Stack ;
+import java.util.Stack;
+
 import org.glassfish.pfl.tf.timer.spi.StatisticsAccumulator;
 import org.glassfish.pfl.tf.timer.spi.TimerEvent;
 import org.glassfish.pfl.tf.timer.spi.TimerFactory;

@@ -12,9 +12,9 @@ package org.glassfish.pfl.dynamic.copyobject.spi ;
 
 
 import org.glassfish.pfl.dynamic.copyobject.impl.Exceptions;
-import org.glassfish.pfl.dynamic.copyobject.impl.ObjectCopierImpl ;
-import org.glassfish.pfl.dynamic.copyobject.impl.JavaStreamObjectCopierImpl ;
-import org.glassfish.pfl.dynamic.copyobject.impl.FallbackObjectCopierImpl ;
+import org.glassfish.pfl.dynamic.copyobject.impl.FallbackObjectCopierImpl;
+import org.glassfish.pfl.dynamic.copyobject.impl.JavaStreamObjectCopierImpl;
+import org.glassfish.pfl.dynamic.copyobject.impl.ObjectCopierImpl;
 
 public class DefaultCopier {
     private DefaultCopier() {}

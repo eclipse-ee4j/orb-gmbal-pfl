@@ -11,7 +11,6 @@
 
 package org.glassfish.pfl.tf.spi;
 
-import org.glassfish.pfl.tf.spi.annotation.TFEnhanced;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +18,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.glassfish.pfl.tf.spi.annotation.TFEnhanced;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;

@@ -11,15 +11,6 @@
 
 package org.glassfish.pfl.basic.algorithm;
 
-import org.glassfish.pfl.basic.contain.Pair;
-import org.glassfish.pfl.basic.reflection.FieldValueHelper;
-
-import javax.management.ObjectName;
-import javax.management.openmbean.ArrayType;
-import javax.management.openmbean.CompositeData;
-import javax.management.openmbean.CompositeType;
-import javax.management.openmbean.TabularData;
-import javax.management.openmbean.TabularType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -39,6 +30,16 @@ import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+
+import javax.management.ObjectName;
+import javax.management.openmbean.ArrayType;
+import javax.management.openmbean.CompositeData;
+import javax.management.openmbean.CompositeType;
+import javax.management.openmbean.TabularData;
+import javax.management.openmbean.TabularType;
+
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.basic.reflection.FieldValueHelper;
 
 /**
  * General object related utilities.

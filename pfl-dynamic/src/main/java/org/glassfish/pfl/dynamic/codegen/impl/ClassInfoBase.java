@@ -10,19 +10,18 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
-import java.util.Map ;
-import java.util.LinkedHashMap ;
-import java.util.Set ;
-import java.util.HashSet ;
+import java.lang.reflect.Modifier;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import java.lang.reflect.Modifier ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Signature ;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Signature;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
 
 public abstract class ClassInfoBase implements ClassInfo {
     // Initialized in the constructor

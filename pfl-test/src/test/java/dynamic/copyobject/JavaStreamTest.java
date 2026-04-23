@@ -11,9 +11,10 @@
 package dynamic.copyobject  ;
 
 
-import junit.framework.Test;
 import org.glassfish.pfl.dynamic.copyobject.spi.CopyobjectDefaults;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
+
+import junit.framework.Test;
 
 public class JavaStreamTest extends Client
 {

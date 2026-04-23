@@ -10,12 +10,8 @@
 
 package org.glassfish.pfl.tf.spi;
 
-import org.glassfish.pfl.tf.timer.spi.Timer;
-import org.glassfish.pfl.tf.timer.spi.TimerEventController;
-import org.glassfish.pfl.tf.timer.spi.TimerManager;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -23,9 +19,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.glassfish.pfl.basic.algorithm.Algorithms;
-import org.glassfish.pfl.basic.contain.Pair;
-import org.glassfish.pfl.basic.logex.OperationTracer ;
+import org.glassfish.pfl.basic.logex.OperationTracer;
+import org.glassfish.pfl.tf.timer.spi.Timer;
+import org.glassfish.pfl.tf.timer.spi.TimerEventController;
+import org.glassfish.pfl.tf.timer.spi.TimerManager;
 
 /**
  *

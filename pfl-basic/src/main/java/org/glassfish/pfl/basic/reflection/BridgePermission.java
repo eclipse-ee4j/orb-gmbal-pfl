@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.basic.reflection;
 
-import java.security.BasicPermission ;
+import java.security.BasicPermission;
 
 /** Permission class used to protect access to the sun.corba.Bridge
  * object.  The only name valid here is "getBridge".  The

@@ -12,17 +12,16 @@
 
 package org.glassfish.pfl.tf.tools.enhancer;
 
+import org.glassfish.pfl.basic.contain.SynchronizedHolder;
+import org.glassfish.pfl.tf.spi.EnhancedClassData;
+import org.glassfish.pfl.tf.spi.Util;
+import org.glassfish.pfl.tf.spi.annotation.TraceEnhanceLevel;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.GeneratorAdapter;
-
-import org.glassfish.pfl.basic.contain.SynchronizedHolder ;
-import org.glassfish.pfl.tf.spi.EnhancedClassData;
-import org.glassfish.pfl.tf.spi.Util;
-import org.glassfish.pfl.tf.spi.annotation.TraceEnhanceLevel;
 
 public class ClassEnhancer extends TFEnhanceAdapter {
     private final Util util ;

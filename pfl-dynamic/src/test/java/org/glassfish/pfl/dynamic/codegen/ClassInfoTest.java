@@ -10,16 +10,19 @@
 
 package org.glassfish.pfl.dynamic.codegen;
 
-import junit.framework.TestCase;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
-import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo;
-import org.glassfish.pfl.dynamic.codegen.spi.Type;
-
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static java.lang.reflect.Modifier.*;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+
+import junit.framework.TestCase;
+
+import static java.lang.reflect.Modifier.PRIVATE;
+import static java.lang.reflect.Modifier.PROTECTED;
+import static java.lang.reflect.Modifier.PUBLIC;
 
 public class ClassInfoTest extends TestCase {
     public ClassInfoTest() {

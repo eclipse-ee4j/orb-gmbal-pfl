@@ -10,8 +10,8 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.dynamic.codegen.spi.Expression ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
+import org.glassfish.pfl.dynamic.codegen.spi.Expression;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 public final class DefinitionStatement extends StatementBase {
     private Variable var ;

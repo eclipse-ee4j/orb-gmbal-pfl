@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.lib;
 
-import java.rmi.RemoteException ;
+import java.rmi.RemoteException;
 
 public interface D extends B, C {
     Object trinary( Object arg1, Object arg2, Object arg3 ) throws RemoteException ;

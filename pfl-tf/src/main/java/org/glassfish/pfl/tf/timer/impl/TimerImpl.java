@@ -10,7 +10,8 @@
 
 package org.glassfish.pfl.tf.timer.impl ;
 
-import java.util.concurrent.atomic.AtomicBoolean ;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.glassfish.pfl.tf.timer.spi.Timer;
 
 /** This interface exists because a Controllable is not 

@@ -10,8 +10,8 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
 
-import java.util.Map ;
-import java.util.HashMap ;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Test out whether FastCache is effective or not.
  */

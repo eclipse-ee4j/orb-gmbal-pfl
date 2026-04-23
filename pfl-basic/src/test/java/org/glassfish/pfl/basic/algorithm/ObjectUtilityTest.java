@@ -10,16 +10,17 @@
 
 package org.glassfish.pfl.basic.algorithm;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.stringContainsInOrder;
-
 import java.util.Arrays;
+
 import org.glassfish.pfl.basic.testobjects.SerializableClass2;
 import org.glassfish.pfl.basic.testobjects.TestObjects;
 import org.junit.Assume;
 import org.junit.Test;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.stringContainsInOrder;
 
 public class ObjectUtilityTest {
     @Test

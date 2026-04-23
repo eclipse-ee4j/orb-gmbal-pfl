@@ -10,10 +10,10 @@
 
 package org.glassfish.pfl.tf.timer.impl ;
 
-import java.util.Iterator ;
-import java.util.Stack ;
+import java.io.PrintStream;
+import java.util.Iterator;
+import java.util.Stack;
 
-import java.io.PrintStream ;
 import org.glassfish.pfl.tf.timer.spi.LogEventHandler;
 import org.glassfish.pfl.tf.timer.spi.NamedBase;
 import org.glassfish.pfl.tf.timer.spi.TimerEvent;

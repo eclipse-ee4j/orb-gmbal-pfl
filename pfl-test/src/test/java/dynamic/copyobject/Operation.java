@@ -10,12 +10,11 @@
 
 package dynamic.copyobject ;
 
-import java.io.Serializable;
 import java.io.ObjectStreamException;
-
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Arrays;
 
 public abstract class Operation implements Serializable {
 

@@ -11,32 +11,29 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.Properties ;
-import java.util.HashSet ;
-import java.util.HashMap ;
-
-import java.io.IOException ;
-import java.io.PrintStream ;
-import java.io.FileOutputStream ;
-import java.io.File ;
-
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.ClassVisitor;
-import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.Opcodes;
-
-// Imports for verify method
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.util.CheckClassAdapter;
-// end of verify method imports
-
-import org.glassfish.pfl.dynamic.codegen.spi.ImportList ;
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
-import org.glassfish.pfl.dynamic.codegen.spi.Wrapper ;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Properties;
+
 import org.glassfish.pfl.basic.contain.Pair;
 import org.glassfish.pfl.basic.func.NullaryFunction;
+import org.glassfish.pfl.dynamic.codegen.spi.ImportList;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
+import org.glassfish.pfl.dynamic.codegen.spi.Wrapper;
+// Imports for verify method
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.util.CheckClassAdapter;
+// end of verify method imports
 
 /** Simple class containing a few ASM-related utilities 
  * and dynamic attributes needs for the byte code generator.

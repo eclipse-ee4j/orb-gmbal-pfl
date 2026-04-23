@@ -10,20 +10,18 @@
 
 package org.glassfish.pfl.dynamic.codegen.spi;
 
-import java.util.Collections ;
-import java.util.Map ;
-import java.util.Set ;
-import java.util.HashMap ;
-import java.util.WeakHashMap ;
+import java.lang.reflect.Modifier;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.WeakHashMap;
 
-import java.lang.reflect.Modifier ;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.Immutable ;
-
-import org.glassfish.pfl.dynamic.codegen.impl.Identifier ;
-import org.glassfish.pfl.dynamic.codegen.impl.ClassInfoReflectiveImpl ;
-import org.glassfish.pfl.dynamic.codegen.impl.CurrentClassLoader ;
 import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.dynamic.codegen.impl.ClassInfoReflectiveImpl;
+import org.glassfish.pfl.dynamic.codegen.impl.CurrentClassLoader;
+import org.glassfish.pfl.dynamic.codegen.impl.Identifier;
+import org.glassfish.pfl.dynamic.copyobject.spi.Immutable;
 
 /** Representation of Types (no generic support) used for
  * codegen API.

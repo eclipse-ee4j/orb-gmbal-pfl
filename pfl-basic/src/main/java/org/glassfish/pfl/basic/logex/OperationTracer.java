@@ -11,9 +11,9 @@
 
 package org.glassfish.pfl.basic.logex ;
 
-import java.util.List ;
-import java.util.ArrayList ;
-import java.util.Arrays ;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class OperationTracer {
     private static boolean enabled = true ;

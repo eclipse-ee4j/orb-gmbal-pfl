@@ -12,7 +12,19 @@ package org.glassfish.pfl.dynamic.codegen.spi;
 
 import org.glassfish.pfl.dynamic.codegen.impl.ExpressionInternal;
 
-import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.* ;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._boolean;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._byte;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._call;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._char;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._double;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._float;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._int;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._long;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._new;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._s;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._short;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._t;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._void;
 
 public class Primitives {
     private Primitives() {}

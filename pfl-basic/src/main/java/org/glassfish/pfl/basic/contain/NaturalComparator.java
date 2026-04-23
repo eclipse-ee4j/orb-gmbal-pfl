@@ -11,7 +11,7 @@
 package org.glassfish.pfl.basic.contain ;
 
 import java.io.Serializable;
-import java.util.Comparator ;
+import java.util.Comparator;
 
 public class NaturalComparator<T> implements Serializable, Comparator<T> {
     private static final long serialVersionUID = -6702229623606444679L;

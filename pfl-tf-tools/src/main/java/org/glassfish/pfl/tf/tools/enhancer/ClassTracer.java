@@ -12,9 +12,10 @@
 
 package org.glassfish.pfl.tf.tools.enhancer;
 
-import org.glassfish.pfl.basic.contain.SynchronizedHolder;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.glassfish.pfl.basic.contain.SynchronizedHolder;
 import org.glassfish.pfl.tf.spi.EnhancedClassData;
 import org.glassfish.pfl.tf.spi.MethodMonitor;
 import org.glassfish.pfl.tf.spi.Util;
@@ -24,9 +25,9 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
+import org.objectweb.asm.commons.LocalVariablesSorter;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LocalVariableNode;
-import org.objectweb.asm.commons.LocalVariablesSorter;
 
 public class ClassTracer extends TFEnhanceAdapter {
     // Worst case: call to MethodMonitor.info requires 4 words on the stack.

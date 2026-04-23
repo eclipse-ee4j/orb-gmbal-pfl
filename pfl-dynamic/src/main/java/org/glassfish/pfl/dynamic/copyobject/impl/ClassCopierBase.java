@@ -10,10 +10,10 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl ;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** A convenient base class for making ClassCopier types.
  * This takes care of checking oldToNew and updating oldToNew

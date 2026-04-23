@@ -10,11 +10,11 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.lang.reflect.Modifier ;
+import java.lang.reflect.Modifier;
 
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
 
 public class FieldInfoImpl extends MemberInfoBase implements FieldInfo {    
     protected Type type ;

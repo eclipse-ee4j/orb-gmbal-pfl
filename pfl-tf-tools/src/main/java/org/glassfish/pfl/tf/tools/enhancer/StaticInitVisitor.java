@@ -12,17 +12,16 @@
 
 package org.glassfish.pfl.tf.tools.enhancer;
 
-import org.glassfish.pfl.basic.contain.SynchronizedHolder;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.glassfish.pfl.basic.contain.SynchronizedHolder;
 import org.glassfish.pfl.tf.spi.EnhancedClassData;
 import org.glassfish.pfl.tf.spi.MethodMonitorRegistry;
 import org.glassfish.pfl.tf.spi.Util;
 import org.objectweb.asm.Label;
-
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;

@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2026 Contributors to the Eclipse Foundation
  * Copyright (c) 1997, 2019 Oracle and/or its affiliates. All rights reserved.
  * Copyright 2004 The Apache Software Foundation
  *
@@ -20,29 +21,26 @@
 
 package org.glassfish.pfl.test;
 
-import java.io.BufferedWriter;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.Date;
-import java.util.TimeZone;
-
-import java.text.SimpleDateFormat;
-
+import java.io.Writer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+import java.util.TimeZone;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -106,25 +104,29 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
 
     /** No arg constructor. */
     public XMLJUnitReportWriter() {
-	this(true) ;
+    this(true) ;
     }
 
     public XMLJUnitReportWriter( boolean filter ) {
-	this.filterTrace = filter ;
+    this.filterTrace = filter ;
     }
 
+    @Override
     public void setOutput(OutputStream out) {
         this.out = out;
     }
 
+    @Override
     public void setSystemOutput(String out) {
         formatOutput(SYSTEM_OUT, out);
     }
 
+    @Override
     public void setSystemError(String out) {
         formatOutput(SYSTEM_ERR, out);
     }
 
+    @Override
     public void startTestSuite(String name, Properties props ) {
         runCount = 0 ;
         failureCount = 0 ;
@@ -140,9 +142,9 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         TimeZone gmt = TimeZone.getTimeZone("GMT");
         sdf.setTimeZone(gmt);
         sdf.setLenient(true);
-	final String timestamp = sdf.format( new Date() ) ;
+    final String timestamp = sdf.format( new Date() ) ;
         rootElement.setAttribute(TIMESTAMP, timestamp);
-	
+
         //and the hostname.
         rootElement.setAttribute(HOSTNAME, getHostname());
 
@@ -165,10 +167,11 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         try {
             return InetAddress.getLocalHost().getHostName();
         } catch (UnknownHostException e) {
-            return "localhost";
+            return InetAddress.getLoopbackAddress().getHostName();
         }
     }
 
+    @Override
     public TestCounts endTestSuite( ) {
         long runTime = System.currentTimeMillis() - startTime ;
         rootElement.setAttribute(ATTR_TESTS, "" + runCount);
@@ -176,7 +179,7 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         rootElement.setAttribute(ATTR_ERRORS, "" + errorCount);
         rootElement.setAttribute(ATTR_TIME, "" + runTime / 1000.0);
         if (out == null) {
-	    throw new RuntimeException( "Error: output file is null!" ) ;
+        throw new RuntimeException( "Error: output file is null!" ) ;
         } else {
             Writer wri = null;
             try {
@@ -188,13 +191,13 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
                 throw new RuntimeException("Unable to write log file", exc);
             } finally {
                 if (out != System.out && out != System.err) {
-		    if (wri != null) {
-			try {
-			    wri.close() ;
-			} catch (IOException ioexc) {
-			    // ignore
-			}
-		    }
+            if (wri != null) {
+            try {
+                wri.close() ;
+            } catch (IOException ioexc) {
+                // ignore
+            }
+            }
                 }
             }
         }
@@ -204,15 +207,18 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         return new TestCounts( pass, failureCount, errorCount ) ;
     }
 
+    @Override
     public void startTest(TestDescription t) {
         testStarts.put(t, Long.valueOf(System.currentTimeMillis()));
     }
 
+    @Override
     public void endTest(TestDescription test, long duration ) {
         Element elem = endTestHelper( test ) ;
         elem.setAttribute(ATTR_TIME, "" + duration ) ;
     }
 
+    @Override
     public void endTest(TestDescription test) {
         endTestHelper( test ) ;
     }
@@ -233,7 +239,7 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
 
             String n = test.getName();
             currentTest.setAttribute(ATTR_NAME, n == null ? UNKNOWN : n);
-	    
+
             // a TestSuite can contain Tests from multiple classes,
             // even tests with the same name - disambiguate them.
             currentTest.setAttribute(ATTR_CLASSNAME, test.getClassName());
@@ -241,21 +247,23 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
             rootElement.appendChild(currentTest);
             testElements.put(test, currentTest);
         } else {
-            currentTest = (Element) testElements.get(test);
+            currentTest = testElements.get(test);
         }
 
         long l = testStarts.get(test);
-        currentTest.setAttribute(ATTR_TIME, 
-	    "" + ((System.currentTimeMillis() - l) / 1000.0));
+        currentTest.setAttribute(ATTR_TIME,
+        "" + ((System.currentTimeMillis() - l) / 1000.0));
 
         return currentTest ;
     }
 
+    @Override
     public void addFailure(TestDescription test, Throwable t) {
         failureCount++ ;
         formatError(FAILURE, test, t);
     }
 
+    @Override
     public void addError(TestDescription test, Throwable t) {
         errorCount++ ;
         formatError(ERROR, test, t);
@@ -270,7 +278,7 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
         Element nested = doc.createElement(type);
         Element currentTest = null;
         if (test != null) {
-            currentTest = (Element) testElements.get(test);
+            currentTest = testElements.get(test);
         } else {
             currentTest = rootElement;
         }
@@ -350,8 +358,8 @@ public class XMLJUnitReportWriter implements JUnitReportWriter, XMLConstants {
     }
 
     private boolean filterLine(String line) {
-        for (int i = 0; i < DEFAULT_TRACE_FILTERS.length; i++) {
-            if (line.indexOf(DEFAULT_TRACE_FILTERS[i]) != -1) {
+        for (String element : DEFAULT_TRACE_FILTERS) {
+            if (line.indexOf(element) != -1) {
                 return true;
             }
         }

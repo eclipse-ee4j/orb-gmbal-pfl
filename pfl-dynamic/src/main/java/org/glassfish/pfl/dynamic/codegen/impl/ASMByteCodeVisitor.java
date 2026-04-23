@@ -12,15 +12,13 @@
 package org.glassfish.pfl.dynamic.codegen.impl;
 
 
-import java.io.PrintStream ;
+import java.io.PrintStream;
+import java.util.Map;
 
-import java.util.Map ;
-
-import org.objectweb.asm.ClassWriter ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
 import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
+import org.objectweb.asm.ClassWriter;
 
 
 /** Visitor that is used to generate byte code for a class.

@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.basic.contain ;
 
-import java.util.Comparator ;
+import java.util.Comparator;
 
 public class PairComparator<S,T> implements Comparator<Pair<S,T>>
 {

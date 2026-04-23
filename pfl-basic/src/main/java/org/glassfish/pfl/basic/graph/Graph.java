@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.basic.graph ;
 
-import java.util.Set ;
+import java.util.Set;
 
 public interface Graph<T extends Node> extends Set<T> // Set<Node>
 {

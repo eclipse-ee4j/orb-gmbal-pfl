@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.basic.fsm ;
 
-import java.util.StringTokenizer ;
+import java.util.StringTokenizer;
 
 public class NameBase {
     private String name ;

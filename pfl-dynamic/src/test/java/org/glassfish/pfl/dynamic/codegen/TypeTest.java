@@ -10,8 +10,9 @@
 
 package org.glassfish.pfl.dynamic.codegen;
 
-import junit.framework.TestCase;
 import org.glassfish.pfl.dynamic.codegen.spi.Type;
+
+import junit.framework.TestCase;
 
 public class TypeTest extends TestCase {
     private static final boolean DEBUG = false ;

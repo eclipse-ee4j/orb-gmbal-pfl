@@ -11,17 +11,18 @@
 package org.glassfish.pfl.test;
 
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Set ;
-import java.util.HashSet ;
-import java.lang.reflect.Method ;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.glassfish.pfl.basic.tools.argparser.ArgParser;
 import org.glassfish.pfl.basic.tools.argparser.DefaultValue;
 import org.glassfish.pfl.basic.tools.argparser.Help;
 import org.glassfish.pfl.basic.tools.argparser.Separator;
-import org.glassfish.pfl.basic.tools.argparser.ArgParser;
 
 /** A VERY quick-and-dirty test framework.
  *

@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.tf.timer.spi ;
 
-import java.io.PrintStream ;
+import java.io.PrintStream;
 
 /** A TimerEventHandler that stores all events that is receives.  It can
  * be used in the JDK 5 for loop.

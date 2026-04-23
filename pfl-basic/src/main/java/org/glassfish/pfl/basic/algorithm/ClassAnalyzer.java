@@ -10,17 +10,16 @@
 
 package org.glassfish.pfl.basic.algorithm ;
 
-import java.util.Collections ;
-import java.util.List ;
-import java.util.ArrayList ;
-
-import java.lang.reflect.Method ;
-
+import java.lang.reflect.Method;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
+
 import org.glassfish.pfl.basic.func.UnaryPredicate;
     
 /** Analyzes class inheritance hiearchy and provides methods for searching for

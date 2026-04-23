@@ -10,8 +10,6 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
-
 /** Represents a node in the AST used to generate code.  All nodes support the
  * dynamic attribute facility.
  *

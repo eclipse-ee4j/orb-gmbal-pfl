@@ -10,27 +10,17 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
 
-import java.util.LinkedHashMap ;
-import java.util.IdentityHashMap ;
-
-import java.lang.reflect.Field ;
-import java.lang.reflect.Method ;
-import java.lang.reflect.Constructor ;
-
-import java.security.AccessControlContext ;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.TreeMap;
-import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentSkipListMap;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.security.AccessControlContext;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-import java.util.logging.Logger ;
-import java.util.logging.LogManager ;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** A factory used for creating ClassCopier instances.
  * An instance of this factory can be created and customized to

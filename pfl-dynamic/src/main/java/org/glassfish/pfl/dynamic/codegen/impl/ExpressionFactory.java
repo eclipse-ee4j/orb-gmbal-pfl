@@ -10,22 +10,21 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.IdentityHashMap ;
-import java.util.Arrays ;
-import java.util.ArrayList ;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Set;
 
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Signature ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
 import org.glassfish.pfl.dynamic.codegen.spi.Expression;
-import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo ;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.Copy ;
-import org.glassfish.pfl.dynamic.copyobject.spi.CopyType ;
+import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Signature;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
+import org.glassfish.pfl.dynamic.copyobject.spi.Copy;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyType;
 
 
 /** Used to create all expressions.  BlockStatement is used as the

@@ -10,10 +10,11 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.List ;
-import java.util.ArrayList ;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.glassfish.pfl.basic.func.NullaryFunction;
 
 /** Class used to define dynamic attributes on AttributedObject instances.

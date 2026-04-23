@@ -10,12 +10,12 @@
 
 package org.glassfish.pfl.tf.timer.spi;
 
+import java.util.Map;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Map;
 
 public class TimerFactoryTest {
     private String tfName = "TFTF";

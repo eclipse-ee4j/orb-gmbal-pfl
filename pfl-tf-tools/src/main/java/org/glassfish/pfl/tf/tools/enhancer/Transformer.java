@@ -11,17 +11,17 @@
 
 package org.glassfish.pfl.tf.tools.enhancer;
 
-import java.util.Set;
 import java.util.Iterator;
-import org.glassfish.pfl.tf.timer.spi.TimingInfoProcessor;
-import org.glassfish.pfl.tf.timer.spi.TimerFactoryBuilder;
-import org.glassfish.pfl.tf.spi.TimingPointType;
+import java.util.Set;
+
 import org.glassfish.pfl.basic.func.UnaryFunction;
 import org.glassfish.pfl.tf.spi.EnhancedClassData;
 import org.glassfish.pfl.tf.spi.EnhancedClassDataASMImpl;
+import org.glassfish.pfl.tf.spi.TimingPointType;
 import org.glassfish.pfl.tf.spi.TraceEnhancementException;
 import org.glassfish.pfl.tf.spi.Util;
-
+import org.glassfish.pfl.tf.timer.spi.TimerFactoryBuilder;
+import org.glassfish.pfl.tf.timer.spi.TimingInfoProcessor;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.Opcodes;

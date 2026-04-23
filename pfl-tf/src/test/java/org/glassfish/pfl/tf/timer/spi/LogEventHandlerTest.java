@@ -10,15 +10,15 @@
 
 package org.glassfish.pfl.tf.timer.spi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
-
-// import corba.framework.TimerUtils ;
+// import corba.framework.TimerUtils;
 
 public class LogEventHandlerTest {
     private static final int NUM_TIMERS = 15;

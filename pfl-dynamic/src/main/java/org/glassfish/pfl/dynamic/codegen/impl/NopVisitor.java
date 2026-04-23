@@ -10,8 +10,8 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 
 /** This is a visitor that does nothing.  Useful occasionally

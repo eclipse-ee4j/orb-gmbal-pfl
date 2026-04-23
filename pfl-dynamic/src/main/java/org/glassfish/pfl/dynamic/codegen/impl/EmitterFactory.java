@@ -11,18 +11,17 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl ;
 
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Iterator;
+import java.util.List;
+
 import org.glassfish.pfl.basic.func.UnaryVoidFunction;
-import java.util.BitSet ;
-import java.util.List ;
-import java.util.ArrayList ;
-import java.util.Iterator ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo ;
-
-import org.objectweb.asm.MethodVisitor ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.FieldInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
+import org.objectweb.asm.MethodVisitor;
 
 import static org.objectweb.asm.Opcodes.* ;
 

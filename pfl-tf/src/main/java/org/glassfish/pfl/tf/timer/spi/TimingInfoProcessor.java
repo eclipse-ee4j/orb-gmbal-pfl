@@ -14,8 +14,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.glassfish.pfl.dynamic.codegen.impl.Identifier;
+
 import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.dynamic.codegen.impl.Identifier;
 
 public class TimingInfoProcessor {
     private boolean done = false ;

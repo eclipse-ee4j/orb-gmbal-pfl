@@ -10,8 +10,8 @@
 
 package org.glassfish.pfl.dynamic.codegen.lib;
 
-import java.rmi.Remote ;
-import java.rmi.RemoteException ;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
 public interface HelloRemote extends Remote {
 

@@ -10,11 +10,10 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
 
-import java.util.Map ;
+import java.lang.reflect.Array;
+import java.util.Map;
 
-import java.lang.reflect.Array ;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** A factory used for creating ClassCopier instances.
  * An instance of this factory can be created and customized to

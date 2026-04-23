@@ -12,7 +12,8 @@ package org.glassfish.pfl.dynamic.codegen;
 
 import java.lang.reflect.Method;
 
-import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.*;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._classGenerator;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._clear;
 
 public abstract class CodeGeneratorBase implements SimpleCodeGenerator {
     private String className;

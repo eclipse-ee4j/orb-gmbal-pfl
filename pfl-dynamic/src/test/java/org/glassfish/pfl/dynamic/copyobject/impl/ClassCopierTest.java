@@ -10,9 +10,9 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
 
-import org.junit.Test;
-
 import java.util.HashMap;
+
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 

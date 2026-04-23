@@ -10,13 +10,13 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl ;
 
-import java.io.InputStream ;
-import java.io.ByteArrayInputStream ;
-import java.io.ByteArrayOutputStream ;
-import java.io.ObjectInputStream ;
-import java.io.ObjectOutputStream ;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
 
 public class JavaStreamObjectCopierImpl implements ObjectCopier {
     @Override

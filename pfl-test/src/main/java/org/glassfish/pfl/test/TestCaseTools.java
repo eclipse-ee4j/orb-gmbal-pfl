@@ -10,11 +10,6 @@
 
 package org.glassfish.pfl.test;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
-
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -25,6 +20,11 @@ import java.lang.reflect.Modifier;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
+
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 
 public class TestCaseTools {
     public static void reportTiming(int repCount, PrintStream out,

@@ -10,10 +10,9 @@
 
 package org.glassfish.pfl.dynamic.codegen.spi;
 
-import java.util.List ;
-
-import java.lang.reflect.Method ;
-import java.lang.reflect.Constructor ;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.List;
 
 /** An interface that provides information about methods.  This can be
  * used to describe both MethodGenerators that are used to generate code

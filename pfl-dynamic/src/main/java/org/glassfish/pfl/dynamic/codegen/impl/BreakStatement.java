@@ -10,8 +10,6 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.dynamic.codegen.impl.StatementBase ;
-
 public final class BreakStatement extends StatementBase {
     BreakStatement( Node parent ) {
 	super( parent ) ;

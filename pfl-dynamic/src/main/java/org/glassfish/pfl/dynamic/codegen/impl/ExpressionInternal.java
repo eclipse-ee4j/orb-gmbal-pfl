@@ -11,7 +11,7 @@
 package org.glassfish.pfl.dynamic.codegen.impl;
 
 import org.glassfish.pfl.dynamic.codegen.spi.Expression;
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
 
 /**
  *

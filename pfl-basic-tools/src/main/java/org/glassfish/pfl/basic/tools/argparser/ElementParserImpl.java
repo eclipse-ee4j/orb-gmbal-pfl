@@ -10,15 +10,15 @@
 
 package org.glassfish.pfl.basic.tools.argparser ;
 
-import java.util.List ;
-import java.util.ArrayList ;
+import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.lang.reflect.Array ;
-import java.lang.reflect.Method ;
-import java.lang.reflect.Constructor ;
-import java.lang.reflect.Type ;
-import java.lang.reflect.ParameterizedType ;
-import java.lang.reflect.InvocationTargetException ;
 import org.glassfish.pfl.basic.contain.Pair;
 import org.glassfish.pfl.basic.func.UnaryFunction;
 

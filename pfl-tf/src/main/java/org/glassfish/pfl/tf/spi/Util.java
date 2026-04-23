@@ -14,6 +14,7 @@ package org.glassfish.pfl.tf.spi;
 
 import java.io.PrintWriter;
 import java.util.function.Function;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.ClassWriter;
@@ -23,8 +24,8 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.LocalVariableNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.util.Printer;
 import org.objectweb.asm.util.CheckClassAdapter;
+import org.objectweb.asm.util.Printer;
 
 /** Some useful utilities for generating code using ASM.  Nothing in here
  * should be specific to the classfile enhancer for tracing.

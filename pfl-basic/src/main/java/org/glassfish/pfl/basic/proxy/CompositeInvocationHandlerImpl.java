@@ -11,11 +11,11 @@
 package org.glassfish.pfl.basic.proxy ;
 
 
-import java.util.Map ;
-import java.util.LinkedHashMap ;
-  
-import java.lang.reflect.Method ;
-import java.lang.reflect.InvocationHandler ;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 import org.glassfish.pfl.basic.algorithm.ClassAnalyzer;
 import org.glassfish.pfl.basic.func.UnaryPredicateBase;
 

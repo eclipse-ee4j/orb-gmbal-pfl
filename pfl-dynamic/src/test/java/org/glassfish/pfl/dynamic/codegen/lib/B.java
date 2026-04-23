@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.lib;
 
-import java.rmi.RemoteException ;
+import java.rmi.RemoteException;
 
 public interface B extends A {
     Object binary( Object arg1, Object arg2 ) throws RemoteException ;

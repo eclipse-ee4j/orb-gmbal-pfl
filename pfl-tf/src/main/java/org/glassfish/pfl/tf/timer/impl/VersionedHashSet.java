@@ -10,10 +10,9 @@
 
 package org.glassfish.pfl.tf.timer.impl ;
 
-import java.util.Collection ;
-import java.util.Iterator ;
-import java.util.Set ;
-import java.util.HashSet ;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 
 /** This is an implementation of the Set interface that keeps track
  * of its version so that we can tell when it is modified.

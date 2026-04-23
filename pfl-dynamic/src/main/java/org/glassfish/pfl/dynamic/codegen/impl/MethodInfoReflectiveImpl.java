@@ -10,13 +10,12 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.lang.reflect.Method ;
-import java.lang.reflect.Constructor ;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.Immutable ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.copyobject.spi.Immutable;
 
 /** Implementation of MethodInfo interface for actual Method.
  * Note that this internally caches the Method, and so all the

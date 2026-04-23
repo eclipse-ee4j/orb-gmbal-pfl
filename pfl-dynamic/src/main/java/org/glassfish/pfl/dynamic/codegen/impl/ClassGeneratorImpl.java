@@ -10,16 +10,18 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.List ;
-import java.util.ArrayList ;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import org.glassfish.pfl.dynamic.codegen.spi.ClassGenerator ;
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassGenerator;
+import org.glassfish.pfl.dynamic.codegen.spi.MethodInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
 
-import static java.lang.reflect.Modifier.* ;
+import static java.lang.reflect.Modifier.ABSTRACT;
+import static java.lang.reflect.Modifier.INTERFACE;
+import static java.lang.reflect.Modifier.isAbstract;
 
 /** Class used to generate a description of a class or interface.
  * An interface is an abstract class, all of whose methods are 

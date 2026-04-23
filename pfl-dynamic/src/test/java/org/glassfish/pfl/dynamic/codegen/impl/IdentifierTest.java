@@ -10,8 +10,9 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import junit.framework.TestCase;
 import org.glassfish.pfl.basic.contain.Pair;
+
+import junit.framework.TestCase;
 
 // Simple tests for Identifier
 public class IdentifierTest extends TestCase {

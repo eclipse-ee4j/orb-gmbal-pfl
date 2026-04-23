@@ -10,7 +10,8 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.io.PrintStream ;
+import java.io.PrintStream;
+
 import org.glassfish.pfl.basic.algorithm.Printer;
 
 /** Extends the file utility Printer with line numbers that are

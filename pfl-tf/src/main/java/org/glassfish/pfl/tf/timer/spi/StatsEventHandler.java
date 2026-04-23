@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.tf.timer.spi ;
 
-import java.util.Map ;
+import java.util.Map;
 
 /** Gather statistics on the times reported to this TimerEventHandler.  It will keep 
  * events from different thread separated in order to get good results, but the

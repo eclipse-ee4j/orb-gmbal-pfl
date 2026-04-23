@@ -10,14 +10,13 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.Map ;
+import java.lang.reflect.Modifier;
+import java.util.Map;
 
-import java.lang.reflect.Modifier ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Expression;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
 import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.dynamic.codegen.spi.Expression;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 /** This is a general purpose utility that does a complete traversal
  * of a Node tree.  A stack of Visitors is maintained.  The current

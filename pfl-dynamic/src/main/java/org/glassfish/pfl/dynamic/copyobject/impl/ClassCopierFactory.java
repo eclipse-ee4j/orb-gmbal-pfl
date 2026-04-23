@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** A factory used for creating ClassCopier instances.  
  */

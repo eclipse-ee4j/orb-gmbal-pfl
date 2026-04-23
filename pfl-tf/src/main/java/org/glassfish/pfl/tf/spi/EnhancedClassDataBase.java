@@ -10,7 +10,6 @@
 
 package org.glassfish.pfl.tf.spi;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;

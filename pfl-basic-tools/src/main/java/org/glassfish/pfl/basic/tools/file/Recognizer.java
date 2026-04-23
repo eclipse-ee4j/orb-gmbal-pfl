@@ -10,10 +10,9 @@
 
 package org.glassfish.pfl.basic.tools.file ;
 
-import java.io.IOException ;
-
-import java.util.Map ;
-import java.util.HashMap ;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /** Recognizes files according to patterns, and performs actions accordingly.
  */

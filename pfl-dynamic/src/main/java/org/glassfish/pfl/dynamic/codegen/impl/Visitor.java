@@ -10,10 +10,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.impl.ExpressionInternal ;
-import org.glassfish.pfl.dynamic.codegen.spi.Signature ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 /**
  *

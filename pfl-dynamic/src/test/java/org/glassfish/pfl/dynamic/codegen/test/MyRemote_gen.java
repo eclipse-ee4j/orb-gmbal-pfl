@@ -10,11 +10,22 @@
 
 package org.glassfish.pfl.dynamic.codegen.test;
 
-import org.glassfish.pfl.dynamic.codegen.spi.Type;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassGenerator;
 import org.glassfish.pfl.dynamic.codegen.ClassGeneratorFactory;
-import static java.lang.reflect.Modifier.* ;
-import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.* ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassGenerator;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+
+import static java.lang.reflect.Modifier.ABSTRACT;
+import static java.lang.reflect.Modifier.PUBLIC;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._arg;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._classGenerator;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._clear;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._end;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._import;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._int;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._interface;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._method;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._package;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._void;
 
 public class MyRemote_gen implements ClassGeneratorFactory {
     @Override

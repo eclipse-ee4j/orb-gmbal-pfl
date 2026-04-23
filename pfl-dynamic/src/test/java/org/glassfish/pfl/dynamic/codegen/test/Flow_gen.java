@@ -10,13 +10,40 @@
 
 package org.glassfish.pfl.dynamic.codegen.test;
 
+import org.glassfish.pfl.dynamic.codegen.ClassGeneratorFactory;
 import org.glassfish.pfl.dynamic.codegen.spi.ClassGenerator;
-import org.glassfish.pfl.dynamic.codegen.spi.Type;
 import org.glassfish.pfl.dynamic.codegen.spi.Expression;
 import org.glassfish.pfl.dynamic.codegen.spi.Signature;
-import org.glassfish.pfl.dynamic.codegen.ClassGeneratorFactory;
-import static java.lang.reflect.Modifier.* ;
-import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.* ;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+
+import static java.lang.reflect.Modifier.PUBLIC;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._Class;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._Object;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._body;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._boolean;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._call;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._catch;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._class;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._classGenerator;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._clear;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._const;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._constructor;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._else;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._end;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._expr;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._finally;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._if;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._import;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._int;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._method;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._package;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._s;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._super;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._t;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._this;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._try;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._v;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._void;
 
 public class Flow_gen implements ClassGeneratorFactory {
     private static final Signature traceSignature = 

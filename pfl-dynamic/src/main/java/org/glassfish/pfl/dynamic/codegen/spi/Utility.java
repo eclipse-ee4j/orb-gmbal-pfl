@@ -10,9 +10,9 @@
 
 package org.glassfish.pfl.dynamic.codegen.spi ;
 
-import java.lang.reflect.Method ;
+import java.lang.reflect.Method;
 
-import org.glassfish.pfl.dynamic.codegen.impl.MethodInfoReflectiveImpl ;
+import org.glassfish.pfl.dynamic.codegen.impl.MethodInfoReflectiveImpl;
 
 public class Utility {
     private Utility() {}

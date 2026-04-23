@@ -10,12 +10,36 @@
 
 package org.glassfish.pfl.dynamic.codegen.test;
 
+import org.glassfish.pfl.dynamic.codegen.ClassGeneratorFactory;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassGenerator;
 import org.glassfish.pfl.dynamic.codegen.spi.Expression;
 import org.glassfish.pfl.dynamic.codegen.spi.Type;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassGenerator;
-import org.glassfish.pfl.dynamic.codegen.ClassGeneratorFactory;
-import static java.lang.reflect.Modifier.* ;
-import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper.* ;
+
+import static java.lang.reflect.Modifier.PRIVATE;
+import static java.lang.reflect.Modifier.PUBLIC;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._arg;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._assign;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._body;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._call;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._catch;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._class;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._classGenerator;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._clear;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._constructor;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._data;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._define;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._end;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._expr;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._import;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._int;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._method;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._new;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._package;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._return;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._super;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._throw;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._try;
+import static org.glassfish.pfl.dynamic.codegen.spi.Wrapper._void;
 
 public class MyRemote__Adapter_Simplified_gen implements ClassGeneratorFactory {
     @Override

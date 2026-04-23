@@ -10,16 +10,10 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
-import java.util.ArrayList ;
+import java.lang.reflect.Modifier;
 
-import java.lang.reflect.Modifier ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Signature ;
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
-import org.glassfish.pfl.dynamic.codegen.spi.MemberInfo ;
-import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo ;
+import org.glassfish.pfl.dynamic.codegen.spi.ClassInfo;
+import org.glassfish.pfl.dynamic.codegen.spi.MemberInfo;
 
 public class MemberInfoBase implements MemberInfo {
     private ClassInfo myClassInfo ;

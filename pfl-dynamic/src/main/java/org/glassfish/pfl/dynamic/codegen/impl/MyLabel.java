@@ -11,7 +11,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.objectweb.asm.Label ;
+import org.objectweb.asm.Label;
 
 /** This trivial class exists only to give a slightly
  *  more readable toString method for ASM labels.

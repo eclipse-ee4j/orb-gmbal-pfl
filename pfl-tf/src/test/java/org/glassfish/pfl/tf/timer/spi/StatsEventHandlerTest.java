@@ -10,13 +10,13 @@
 
 package org.glassfish.pfl.tf.timer.spi;
 
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 public class StatsEventHandlerTest {
     private static final int WARMUP_ITERATIONS = 10000;

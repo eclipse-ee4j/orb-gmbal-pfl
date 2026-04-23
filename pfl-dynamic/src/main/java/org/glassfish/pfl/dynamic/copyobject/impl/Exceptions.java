@@ -16,8 +16,7 @@ import org.glassfish.pfl.basic.logex.Log;
 import org.glassfish.pfl.basic.logex.LogLevel;
 import org.glassfish.pfl.basic.logex.Message;
 import org.glassfish.pfl.basic.logex.WrapperGenerator;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** Exception wrapper class.  The logex WrapperGenerator uses this interface
  * to generate an implementation which returns the appropriate exception, and

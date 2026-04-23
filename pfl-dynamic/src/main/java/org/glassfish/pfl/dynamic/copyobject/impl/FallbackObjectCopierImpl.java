@@ -10,9 +10,9 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl ;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier ;
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
 import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** Trys a first ObjectCopier.  If the first throws a ReflectiveCopyException,
  * falls back and tries a second ObjectCopier.

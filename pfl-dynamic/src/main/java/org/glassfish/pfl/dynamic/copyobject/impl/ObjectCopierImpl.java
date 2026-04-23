@@ -10,12 +10,12 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl ;
 
-import java.util.IdentityHashMap ;
-import java.util.Map ;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier ;
-import org.glassfish.pfl.dynamic.copyobject.spi.Immutable ;
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
+import org.glassfish.pfl.dynamic.copyobject.spi.Immutable;
+import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopier;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 
 /** Class used to deep copy arbitrary data.  A single 

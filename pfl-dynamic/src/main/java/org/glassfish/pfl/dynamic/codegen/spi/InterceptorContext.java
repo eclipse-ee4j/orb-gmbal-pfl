@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.spi;
 
-import java.util.List ;
+import java.util.List;
 
 public interface InterceptorContext {
     void register( Interceptor interceptor ) ;

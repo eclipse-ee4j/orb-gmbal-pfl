@@ -10,8 +10,8 @@
 
 package dynamic.copyobject ;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 public class CustomMap extends HashMap {
     public CustomMap() {

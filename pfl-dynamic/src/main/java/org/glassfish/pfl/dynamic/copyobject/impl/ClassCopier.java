@@ -10,9 +10,9 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl ;
 
-import java.util.Map ;
+import java.util.Map;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 /** Provides deep copying of one specific class.
  * An ObjectCopier (what Util.copyObject sees) uses some kind

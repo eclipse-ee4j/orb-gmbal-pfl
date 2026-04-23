@@ -8,12 +8,36 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-package dynamic.copyobject  ;
+package dynamic.copyobject;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestResult;
-import junit.framework.TestSuite;
+import java.io.Serializable;
+import java.lang.reflect.Proxy;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Stack;
+import java.util.TimeZone;
+import java.util.TreeMap;
+import java.util.TreeSet;
+import java.util.Vector;
+
 import org.glassfish.pfl.basic.contain.Holder;
 import org.glassfish.pfl.dynamic.copyobject.spi.ObjectCopierFactory;
 import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
@@ -27,13 +51,10 @@ import org.glassfish.pfl.tf.timer.spi.TimerFactory;
 import org.glassfish.pfl.tf.timer.spi.TimerFactoryBuilder;
 import org.junit.Ignore;
 
-import java.io.Serializable;
-import java.lang.reflect.Proxy;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Time;
-import java.sql.Timestamp;
-import java.util.*;
+import junit.framework.Test;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.TestSuite;
 
 @Ignore("Some strange things are happening here, and it is far from clear that the code tested by this is even used by anyone")
 public abstract class Client extends TestCase
@@ -44,13 +65,13 @@ public abstract class Client extends TestCase
     private List<TimedTest> timedTests ;
 
     protected boolean usesCDR() {
-	return false ;
+    return false ;
     }
 
     @Override
     protected void runTest() throws Throwable
     {
-	if (isTestExcluded()) {
+    if (isTestExcluded()) {
             assertTrue(true);
         } else {
             try {
@@ -74,42 +95,42 @@ public abstract class Client extends TestCase
             }
         }
     }
-    
+
     public  Object copyObject( Object obj )
     {
-	return copyObject( obj, false ) ;
+    return copyObject( obj, false ) ;
     }
 
     public  Object copyObject( Object obj, boolean debug )
     {
-	try {
-	     ObjectCopierFactory factory = getCopierFactory( ) ;
+    try {
+         ObjectCopierFactory factory = getCopierFactory( ) ;
 
-	     // Create a new ObjectCopier and use it to copy obj.
-	     return factory.make().copy( obj ) ;
-	} catch (ReflectiveCopyException rce) {
-	    throw new RuntimeException( rce ) ;
-	}
+         // Create a new ObjectCopier and use it to copy obj.
+         return factory.make().copy( obj ) ;
+    } catch (ReflectiveCopyException rce) {
+        throw new RuntimeException( rce ) ;
+    }
     }
 
-    protected boolean findInArray( String name, String[] args ) 
+    protected boolean findInArray( String name, String[] args )
     {
-	for( String str : args ) {
+    for( String str : args ) {
             if (name.equals(str)) {
                 return true;
             }
         }
 
-	return false ;
+    return false ;
     }
 
     public abstract boolean isTestExcluded() ;
 
     // Override this in subclass to indicate that some
     // tests should get a ReflectiveCopyExcetion from copy.
-    protected boolean shouldThrowReflectiveCopyException() 
+    protected boolean shouldThrowReflectiveCopyException()
     {
-	return false ;
+    return false ;
     }
 
     // Must be overridden in subclass to supply which ObjectCopierFactory is being
@@ -127,118 +148,118 @@ public abstract class Client extends TestCase
         return (Object[])copyObject(obj);
     }
 
-    public static void doMain( String[] args, Client root ) 
+    public static void doMain( String[] args, Client root )
     {
-	TestResult result = junit.textui.TestRunner.run(root.makeSuite()) ;
+    TestResult result = junit.textui.TestRunner.run(root.makeSuite()) ;
 
-	TestCaseTools.reportTiming( REP_COUNT, System.out, root.timedTests ) ;
+    TestCaseTools.reportTiming( REP_COUNT, System.out, root.timedTests ) ;
 
-	if (result.errorCount() + result.failureCount() > 0) {
-	    System.out.println( "Error: failures or errrors in JUnit test" ) ;
-	    System.exit( 1 ) ;
-	} else {
+    if (result.errorCount() + result.failureCount() > 0) {
+        System.out.println( "Error: failures or errrors in JUnit test" ) ;
+        System.exit( 1 ) ;
+    } else {
             System.exit(0);
         }
     }
 
     public Client()
     {
-	super() ;
-	timedTests = new ArrayList<TimedTest>() ;
+    super() ;
+    timedTests = new ArrayList<TimedTest>() ;
     }
 
     public Client( String name )
     {
-	super( name ) ;
-	timedTests = null ;
+    super( name ) ;
+    timedTests = null ;
     }
 
     private TestSuite makeTestSuite( String name,
-	Object[] tests )
+    Object[] tests )
     {
-	TestSuite ts = new TestSuite( name ) ;
+    TestSuite ts = new TestSuite( name ) ;
 
-	for (int ctr=0; ctr<tests.length; ctr++) {
-	    Object obj = tests[ctr] ;
-	    // System.out.println( obj.getClass() ) ;
-	    if (obj instanceof String) {
-		ts.addTest( makeTest( (String)tests[ctr] ) ) ;
-	    } else if (obj instanceof TimedTest) {
-		TimedTest tt = TimedTest.class.cast(obj) ;
-		timedTests.add( tt ) ;
-		ts.addTest( tt ) ;
-	    } else if (obj instanceof Test) {
-		ts.addTest( (Test)obj ) ;
-	    } else {
-		throw new RuntimeException(
-		    "Error in test suite construction" ) ;
-	    }
-	}
+    for (int ctr=0; ctr<tests.length; ctr++) {
+        Object obj = tests[ctr] ;
+        // System.out.println( obj.getClass() ) ;
+        if (obj instanceof String) {
+        ts.addTest( makeTest( (String)tests[ctr] ) ) ;
+        } else if (obj instanceof TimedTest) {
+        TimedTest tt = TimedTest.class.cast(obj) ;
+        timedTests.add( tt ) ;
+        ts.addTest( tt ) ;
+        } else if (obj instanceof Test) {
+        ts.addTest( (Test)obj ) ;
+        } else {
+        throw new RuntimeException(
+            "Error in test suite construction" ) ;
+        }
+    }
 
-	return ts ;
+    return ts ;
     }
 
     public Test makeSuite()
     {
-	TestSuite ts = null ;
+    TestSuite ts = null ;
 
-	try {
-	    conditionTimingTests() ;
+    try {
+        conditionTimingTests() ;
 
-	    System.out.println( 
-		"================================================================\n" +
-		"Testing copyObject with the " + this.getClass().getName() + 
-		" implementation\n" +
-		"================================================================\n" ) ;
+        System.out.println(
+        "================================================================\n" +
+        "Testing copyObject with the " + this.getClass().getName() +
+        " implementation\n" +
+        "================================================================\n" ) ;
 
-	    ts = makeTestSuite( "main", new Test[] { makeCopyObject(),
-		makeCopyObjects()
-	    } ) ;
-	} catch (Throwable t) {
-	    t.printStackTrace() ;
-	} 
+        ts = makeTestSuite( "main", new Test[] { makeCopyObject(),
+        makeCopyObjects()
+        } ) ;
+    } catch (Throwable t) {
+        t.printStackTrace() ;
+    }
 
-	return ts ;
+    return ts ;
     }
 
     public Test makeCopyObject()
     {
-	return makeTestSuite( "testCopyObject", new Object[] {
-	    makeImmutables(), makePrimitiveArray(), makeImmutableArray(),
-	    makeJavaUtil(), makeJavaMath(), makeJavaSQL(),
-            makeReadResolve(), makeComplexClass(), makeNonFinalComplexClass(), 
+    return makeTestSuite( "testCopyObject", new Object[] {
+        makeImmutables(), makePrimitiveArray(), makeImmutableArray(),
+        makeJavaUtil(), makeJavaMath(), makeJavaSQL(),
+            makeReadResolve(), makeComplexClass(), makeNonFinalComplexClass(),
             makeExternalizable(),
             makeInnerClass(), makeTransientNonSerializableField(),
-            makeNonSerializableSuperClass(), 
-	    makeIllegalTransients(),
-	    "testClassLoader", "testDynamicProxy", "testEnum", "testSimulatedTimingGraph",
-	    "testSimulatedTimingTree", "testSimulatedTimingTree1",
-	    "testSimulatedTimingTree2", "testSimulatedTimingTree3",
-	    "testSimulatedTimingTree4", "testSimulatedTimingTree5",
-	    "testSimulatedIsDirty", "testSimulatedTimingIsDirty"
+            makeNonSerializableSuperClass(),
+        makeIllegalTransients(),
+        "testClassLoader", "testDynamicProxy", "testEnum", "testSimulatedTimingGraph",
+        "testSimulatedTimingTree", "testSimulatedTimingTree1",
+        "testSimulatedTimingTree2", "testSimulatedTimingTree3",
+        "testSimulatedTimingTree4", "testSimulatedTimingTree5",
+        "testSimulatedIsDirty", "testSimulatedTimingIsDirty"
         } ) ;
     }
 
-    public Test makeIllegalTransients() 
+    public Test makeIllegalTransients()
     {
-	return makeTestSuite( "testIllegalTransients", new Object[] {
-	    "testTransientThread",
-	    "testTransientThreadGroup",
-	    // "testTransientProcess",
-	    "testTransientProcessBuilder",
-	    // "testTransientSecurityManager"
-	} ) ;
+    return makeTestSuite( "testIllegalTransients", new Object[] {
+        "testTransientThread",
+        "testTransientThreadGroup",
+        // "testTransientProcess",
+        "testTransientProcessBuilder",
+        // "testTransientSecurityManager"
+    } ) ;
     }
 
     public Test makeImmutables()
     {
         //count - 10
-	return makeTestSuite( "testImmutables", new Object[] {
-	    "testImmutableString", "testImmutableBoolean", "testImmutableByte",
-	    "testImmutableChar", "testImmutableShort", "testImmutableInteger",
-	    "testImmutableLong", "testImmutableFloat", "testImmutableDouble",
+    return makeTestSuite( "testImmutables", new Object[] {
+        "testImmutableString", "testImmutableBoolean", "testImmutableByte",
+        "testImmutableChar", "testImmutableShort", "testImmutableInteger",
+        "testImmutableLong", "testImmutableFloat", "testImmutableDouble",
             "testImmutableClass"
-	} ) ;
+    } ) ;
     }
 
     public Test makePrimitiveArray() {
@@ -249,7 +270,7 @@ public abstract class Client extends TestCase
             "testPrimitiveLongArray", "testPrimitiveFloatArray",
             "testPrimitiveDoubleArray", "testPrimitiveLatinCharArray",
             "testPrimitiveUnicodeCharArray", "testNullObject",
-	    "testObject", "testZeroLengthArray"
+        "testObject", "testZeroLengthArray"
         } );
     }
 
@@ -270,7 +291,7 @@ public abstract class Client extends TestCase
             "testImmutable2dStringArrayAlias",
             "testImmutable2dStringArrayComplex", "testImmutableClassArray",
             "testImmutableClassArrayAlias", "testNullObjects",
-	    "testObjects" 
+        "testObjects"
         } );
 
     }
@@ -316,131 +337,131 @@ public abstract class Client extends TestCase
     }
 
     public Test makeExternalizable() {
-	return makeTestSuite( "testExternalizable", new Object[] {
+    return makeTestSuite( "testExternalizable", new Object[] {
             "testExternalizableNonStaticContext"
         } );
     }
 
     private void checkDeepEquals( Object obj1, Object obj2 )
     {
-	if (!ObjectUtility.equals( obj1, obj2 )) {
-	    fail( "Deep Equals check unexpectedly failed on objects\n" +
-		ObjectUtility.defaultObjectToString( obj1 ) +
-		"\nand\n " +
-		ObjectUtility.defaultObjectToString( obj2 ) + "\n" ) ;
-	}
+    if (!ObjectUtility.equals( obj1, obj2 )) {
+        fail( "Deep Equals check unexpectedly failed on objects\n" +
+        ObjectUtility.defaultObjectToString( obj1 ) +
+        "\nand\n " +
+        ObjectUtility.defaultObjectToString( obj2 ) + "\n" ) ;
+    }
     }
 
     private void checkIdentity( Object obj1, Object obj2 )
     {
-	if (obj1 != obj2) {
-	    fail( "Reference equality check unexpectedly failed on objects\n" +
+    if (obj1 != obj2) {
+        fail( "Reference equality check unexpectedly failed on objects\n" +
                   ObjectUtility.defaultObjectToString( obj1 ) +
                   "\nand\n " +
                   ObjectUtility.defaultObjectToString( obj2 ) + "\n" ) ;
-	}
+    }
     }
 
     private void checkNotIdentity( Object obj1, Object obj2 )
     {
-	if (obj1 == obj2) {
-	    fail( "Objects are identical and should not be: obj =\n" +
-		ObjectUtility.defaultObjectToString( obj1 ) + "\n" ) ;
-	}
+    if (obj1 == obj2) {
+        fail( "Objects are identical and should not be: obj =\n" +
+        ObjectUtility.defaultObjectToString( obj1 ) + "\n" ) ;
+    }
     }
 
     private void doImmutableTest( Object data )
     {
-	if (DEBUG) {
+    if (DEBUG) {
             System.out.println("doImmutableTest called with data type " + data.getClass().getName());
         }
 
-	Object result = copyObject( data ) ;
+    Object result = copyObject( data ) ;
 
         checkDeepEquals( data, result ) ;
-	// do not check identity in this case, as it is an optimization
-	// rather than part of the copyObject contract
+    // do not check identity in this case, as it is an optimization
+    // rather than part of the copyObject contract
     }
 
     private void doStandardTest( Object data )
     {
-	if (DEBUG) {
+    if (DEBUG) {
             System.out.println("doStandardTest called with data type " + data.getClass().getName());
         }
 
-	Object result = copyObject( data ) ;
+    Object result = copyObject( data ) ;
 
         checkDeepEquals( data, result ) ;
-	checkNotIdentity( data, result ) ;
+    checkNotIdentity( data, result ) ;
     }
 
     private void doCopyObjectsTest( Object[] data )
     {
-	if (DEBUG) {
+    if (DEBUG) {
             System.out.println("doCopyObjectsTest called with data type " + data.getClass().getName());
         }
 
-	Object[] result = copyObjects( data ) ;
+    Object[] result = copyObjects( data ) ;
 
         checkDeepEquals( data, result ) ;
-	checkNotIdentity( data, result ) ;
+    checkNotIdentity( data, result ) ;
     }
 
     public void testImmutableClass()
     {
-	Class<?> arg = Client.class ;
-	Object result = copyObject( arg ) ;
-	String argName = arg.getName() ;
-	String resultName = ((Class<?>)result).getName() ;
-	if (!argName.equals( resultName )) {
+    Class<?> arg = Client.class ;
+    Object result = copyObject( arg ) ;
+    String argName = arg.getName() ;
+    String resultName = ((Class<?>)result).getName() ;
+    if (!argName.equals( resultName )) {
             fail("Class test failed: argName = " + argName + " resultName = " + resultName);
         }
     }
 
     public void testImmutableString()
     {
-	doImmutableTest( "This is a test" ) ;
+    doImmutableTest( "This is a test" ) ;
     }
 
     public void testImmutableBoolean()
     {
-	doImmutableTest( Boolean.TRUE ) ;
+    doImmutableTest( Boolean.TRUE ) ;
     }
 
     public void testImmutableByte()
     {
-	doImmutableTest( Byte.valueOf( (byte)26 ) ) ;
+    doImmutableTest( Byte.valueOf( (byte)26 ) ) ;
     }
 
     public void testImmutableChar()
     {
         doImmutableTest(Character.valueOf('a'));
-	//doImmutableTest(Character.valueOf('\u00FF'));
+    //doImmutableTest(Character.valueOf('\u00FF'));
     }
 
     public void testImmutableShort()
     {
-	doImmutableTest(Short.valueOf((short)1234));
+    doImmutableTest(Short.valueOf((short)1234));
     }
 
     public void testImmutableInteger()
     {
-	doImmutableTest(Integer.valueOf(1234));
+    doImmutableTest(Integer.valueOf(1234));
     }
 
     public void testImmutableLong()
     {
-	doImmutableTest(Long.valueOf(903283420L));
+    doImmutableTest(Long.valueOf(903283420L));
     }
 
     public void testImmutableFloat()
     {
-	doImmutableTest(Float.valueOf(93.0320F));
+    doImmutableTest(Float.valueOf(93.0320F));
     }
 
     public void testImmutableDouble()
     {
-	doImmutableTest(Double.valueOf(093209.329320));
+    doImmutableTest(Double.valueOf(093209.329320));
     }
 
     public void testPrimitiveBooleanArray() {
@@ -538,16 +559,16 @@ public abstract class Client extends TestCase
     }
 
     public void testObject() {
-	Object obj = new Object() ;
-	doImmutableTest( obj ) ;
+    Object obj = new Object() ;
+    doImmutableTest( obj ) ;
     }
 
     public void testObjects() {
-	Object[] arr = new Object[3] ;
-	arr[0] = new Object() ;
-	arr[1] = arr[0] ;
-	arr[2] = new Object() ;
-	doStandardTest( arr ) ;
+    Object[] arr = new Object[3] ;
+    arr[0] = new Object() ;
+    arr[1] = arr[0] ;
+    arr[2] = new Object() ;
+    doStandardTest( arr ) ;
     }
 
     public  void testNullObjects() {
@@ -555,12 +576,12 @@ public abstract class Client extends TestCase
         array[0] =
             new Object[] { "test", new Object[] { null } };
 
-	array[1] = new Object[] { null ,
-	    new Object[] { null, "hello" }, "test" };
+    array[1] = new Object[] { null ,
+        new Object[] { null, "hello" }, "test" };
 
-	array[2] = null;
+    array[2] = null;
 
-	doStandardTest(array);
+    doStandardTest(array);
     }
 
     //----------
@@ -937,7 +958,7 @@ public abstract class Client extends TestCase
 
     /*
     public  void testLocale() {
-	// fails on Java SE 6: 
+    // fails on Java SE 6:
         doStandardTest(Locale.JAPAN);
     }
     */
@@ -1084,109 +1105,109 @@ public abstract class Client extends TestCase
     // Slightly modified to simulate generated copy() method.
     //
     private static class ComplexClass implements java.io.Serializable {
-	public boolean publicBoolean = false ;
-	protected char protectedChar = 'D' ;
-	private byte privateByte = (byte)3 ;
-	short shrt = (short)-2345 ;
-	final public int finalPublicInt = 273415 ;
-	final protected long finalProtectedLong = 38958284 ;
-	final private float finalPrivateFloat = (float)3.1415926535 ;
-	final double finalDouble = 2.718281828 ;
-	String str1 ;
-	final String str2 ;
-	final private Object finalPrivateObject1 = new Object() ;
-	final private Object finalPrivateObject2 = finalPrivateObject1 ;
-	public Object[] references ;
+    public boolean publicBoolean = false ;
+    protected char protectedChar = 'D' ;
+    private byte privateByte = (byte)3 ;
+    short shrt = (short)-2345 ;
+    final public int finalPublicInt = 273415 ;
+    final protected long finalProtectedLong = 38958284 ;
+    final private float finalPrivateFloat = (float)3.1415926535 ;
+    final double finalDouble = 2.718281828 ;
+    String str1 ;
+    final String str2 ;
+    final private Object finalPrivateObject1 = new Object() ;
+    final private Object finalPrivateObject2 = finalPrivateObject1 ;
+    public Object[] references ;
 
-	
-	// Normally I would define hashCode, but we will not need it here.
-	// Do not use an instance of complexClass as a map key.
 
-	public String toString()
-	{
-	    return "ComplexClass[" + str2 + "]" ;
-	}
+    // Normally I would define hashCode, but we will not need it here.
+    // Do not use an instance of complexClass as a map key.
 
-	public ComplexClass( String name )
-	{
-	    str1 = name ;
-	    str2 = str1 ;
-	}
+    public String toString()
+    {
+        return "ComplexClass[" + str2 + "]" ;
+    }
 
-	public static ComplexClass makeComplexClass(String str )
-	{
-	    return new ComplexClass( str ) ;
-	}
+    public ComplexClass( String name )
+    {
+        str1 = name ;
+        str2 = str1 ;
+    }
 
-	public static ComplexClass makeComplexClassAliasedArray(String str )
-	{
-	    int num = 5 ;
-	    ComplexClass[] classes = new ComplexClass[ num ] ;
+    public static ComplexClass makeComplexClass(String str )
+    {
+        return new ComplexClass( str ) ;
+    }
 
-	    for (int ctr = 0; ctr<num; ctr++ ) {
-		classes[ctr] = makeComplexClass( str + ":member " + ctr ) ;
-		if (ctr==0) { // 0th classes references all others
-		    classes[ctr].references = new ComplexClass[num] ;
-		} else { // others reference only 0th, but allocate
-			 // different sizes reference arrays
-		    classes[ctr].references = new ComplexClass[ctr] ;
-		    classes[ctr].references[0] = classes[0] ;
-		}
+    public static ComplexClass makeComplexClassAliasedArray(String str )
+    {
+        int num = 5 ;
+        ComplexClass[] classes = new ComplexClass[ num ] ;
 
-		// Make 0th class reference the others
-		classes[0].references[ctr] = classes[ctr] ;
-	    }
+        for (int ctr = 0; ctr<num; ctr++ ) {
+        classes[ctr] = makeComplexClass( str + ":member " + ctr ) ;
+        if (ctr==0) { // 0th classes references all others
+            classes[ctr].references = new ComplexClass[num] ;
+        } else { // others reference only 0th, but allocate
+             // different sizes reference arrays
+            classes[ctr].references = new ComplexClass[ctr] ;
+            classes[ctr].references[0] = classes[0] ;
+        }
 
-	    return classes[0] ;
-	}
+        // Make 0th class reference the others
+        classes[0].references[ctr] = classes[ctr] ;
+        }
 
-	public static ComplexClass makeComplexClassGraph()
-	{
-	    int num = 5 ;
-	    ComplexClass[] classes = new ComplexClass[ num ] ;
+        return classes[0] ;
+    }
 
-	    for (int ctr = 0; ctr<num; ctr++ ) {
-		classes[ctr] = makeComplexClassAliasedArray(
-		    "group " + ctr ) ;
-		if (ctr==0) { // 0th classes references all others
-		    classes[ctr].references = new ComplexClass[num] ;
-		} else { // others reference only 0th, but allocate
-			 // different sizes reference arrays
-		    classes[ctr].references = new ComplexClass[ctr] ;
-		    classes[ctr].references[0] = classes[0] ;
-		}
+    public static ComplexClass makeComplexClassGraph()
+    {
+        int num = 5 ;
+        ComplexClass[] classes = new ComplexClass[ num ] ;
 
-		// Make 0th class reference the others
-		classes[0].references[ctr] = classes[ctr] ;
-	    }
+        for (int ctr = 0; ctr<num; ctr++ ) {
+        classes[ctr] = makeComplexClassAliasedArray(
+            "group " + ctr ) ;
+        if (ctr==0) { // 0th classes references all others
+            classes[ctr].references = new ComplexClass[num] ;
+        } else { // others reference only 0th, but allocate
+             // different sizes reference arrays
+            classes[ctr].references = new ComplexClass[ctr] ;
+            classes[ctr].references[0] = classes[0] ;
+        }
 
-	    return classes[0] ;
-	}
+        // Make 0th class reference the others
+        classes[0].references[ctr] = classes[ctr] ;
+        }
+
+        return classes[0] ;
+    }
     }
 
     public  Test makeComplexClass()
     {
-	return makeTestSuite( "testComplexClass", new Object[] {
-	    "testComplexClassArray", "testComplexClassAliasedArray",
-	    "testComplexClassGraph" } ) ;
+    return makeTestSuite( "testComplexClass", new Object[] {
+        "testComplexClassArray", "testComplexClassAliasedArray",
+        "testComplexClassGraph" } ) ;
     }
 
     public  void testComplexClassArray()
     {
-	Object data = ComplexClass.makeComplexClass( "FOO" ) ;
-	doStandardTest( data ) ;
+    Object data = ComplexClass.makeComplexClass( "FOO" ) ;
+    doStandardTest( data ) ;
     }
 
     public  void testComplexClassAliasedArray()
     {
-	Object data = ComplexClass.makeComplexClassAliasedArray( "BAR" ) ;
-	doStandardTest( data ) ;
+    Object data = ComplexClass.makeComplexClassAliasedArray( "BAR" ) ;
+    doStandardTest( data ) ;
     }
 
     public  void testComplexClassGraph()
     {
-	Object data = ComplexClass.makeComplexClassGraph( ) ;
-	doStandardTest( data ) ;
+    Object data = ComplexClass.makeComplexClassGraph( ) ;
+    doStandardTest( data ) ;
     }
 
     private static final int WARMUP_COUNT = 50 ;
@@ -1195,512 +1216,512 @@ public abstract class Client extends TestCase
     private static long theCopyEpoch = 1;
 
     private void testSimulatedTiming( NonFinalComplexClass obj, int count ) {
-	int result = 0 ;
-	for (int ctr=0; ctr<count; ctr++) {
-	    NonFinalComplexClass res = (NonFinalComplexClass)obj.copy( 
-		theCopyEpoch++ ) ;
-	    result += res.i1 ;
-	}
+    int result = 0 ;
+    for (int ctr=0; ctr<count; ctr++) {
+        NonFinalComplexClass res = (NonFinalComplexClass)obj.copy(
+        theCopyEpoch++ ) ;
+        result += res.i1 ;
+    }
     }
 
     private void testSimulatedTiming( String msg, NonFinalComplexClass data ) {
 
-	NonFinalComplexClass result = 
-	    (NonFinalComplexClass)data.copy( theCopyEpoch++ ) ;
-	result.clear() ;
-	data.clear() ; // need to clear the simulated data to avoid 
-			 // confusing deep equals check.
+    NonFinalComplexClass result =
+        (NonFinalComplexClass)data.copy( theCopyEpoch++ ) ;
+    result.clear() ;
+    data.clear() ; // need to clear the simulated data to avoid
+             // confusing deep equals check.
 
         checkDeepEquals( data, result ) ;
-	checkNotIdentity( data, result ) ;
+    checkNotIdentity( data, result ) ;
 
-	// Now, do the timing tests 
-	testSimulatedTiming( data, WARMUP_COUNT ) ;
+    // Now, do the timing tests
+    testSimulatedTiming( data, WARMUP_COUNT ) ;
 
-	long startTime = System.nanoTime() ;
-	testSimulatedTiming( data, TEST_COUNT ) ;
-	long stopTime = System.nanoTime() ; ;
-    
+    long startTime = System.nanoTime() ;
+    testSimulatedTiming( data, TEST_COUNT ) ;
+    long stopTime = System.nanoTime() ; ;
+
         if (SIMULATED_TIMING) {
-            System.out.println( 
-                "\nTime per iteration for simulated generated copy method on " 
-                + msg + " " 
+            System.out.println(
+                "\nTime per iteration for simulated generated copy method on "
+                + msg + " "
                 + (((float)(stopTime - startTime))/TEST_COUNT)/1000 + " microseconds" ) ;
         }
     }
 
     public void testSimulatedTimingGraph() {
-	NonFinalComplexClass data = NonFinalComplexClass.makeNonFinalComplexClassGraph( ) ;
-	testSimulatedTiming( "graph", data ) ;
+    NonFinalComplexClass data = NonFinalComplexClass.makeNonFinalComplexClassGraph( ) ;
+    testSimulatedTiming( "graph", data ) ;
     }
 
     private static final int[] TREE_VALUES = { 4, 3, 2, 3 } ;
 
     public void testSimulatedTimingTree() {
-	NonFinalComplexClass data = 
-	    NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
-	testSimulatedTiming( "tree(4,3,2,3)", data ) ;
+    NonFinalComplexClass data =
+        NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
+    testSimulatedTiming( "tree(4,3,2,3)", data ) ;
     }
 
     public void testSimulatedTimingTree1() {
-	NonFinalComplexClass data = 
-	    NonFinalComplexClass.makeNonFinalComplexClass( 6 ) ;
-	testSimulatedTiming( "tree(6)", data ) ;
+    NonFinalComplexClass data =
+        NonFinalComplexClass.makeNonFinalComplexClass( 6 ) ;
+    testSimulatedTiming( "tree(6)", data ) ;
     }
 
     public void testSimulatedTimingTree2() {
-	NonFinalComplexClass data = 
-	    NonFinalComplexClass.makeNonFinalComplexClass( 6, 6 ) ;
-	testSimulatedTiming( "tree(6,6)", data ) ;
+    NonFinalComplexClass data =
+        NonFinalComplexClass.makeNonFinalComplexClass( 6, 6 ) ;
+    testSimulatedTiming( "tree(6,6)", data ) ;
     }
 
     public void testSimulatedTimingTree3() {
-	NonFinalComplexClass data = 
-	    NonFinalComplexClass.makeNonFinalComplexClass( 6, 6, 6 ) ;
-	testSimulatedTiming( "tree(6,6,6)", data ) ;
+    NonFinalComplexClass data =
+        NonFinalComplexClass.makeNonFinalComplexClass( 6, 6, 6 ) ;
+    testSimulatedTiming( "tree(6,6,6)", data ) ;
     }
 
     public void testSimulatedTimingTree4() {
-	NonFinalComplexClass data = 
-	    NonFinalComplexClass.makeNonFinalComplexClass( 6, 6, 6, 6 ) ;
-	testSimulatedTiming( "tree(6,6,6,6)", data ) ;
+    NonFinalComplexClass data =
+        NonFinalComplexClass.makeNonFinalComplexClass( 6, 6, 6, 6 ) ;
+    testSimulatedTiming( "tree(6,6,6,6)", data ) ;
     }
 
     public void testSimulatedTimingTree5() {
-	NonFinalComplexClass data = 
-	    NonFinalComplexClass.makeNonFinalComplexClass( 6, 6, 6, 6, 6 ) ;
-	testSimulatedTiming( "tree(6,6,6,6,6)", data ) ;
+    NonFinalComplexClass data =
+        NonFinalComplexClass.makeNonFinalComplexClass( 6, 6, 6, 6, 6 ) ;
+    testSimulatedTiming( "tree(6,6,6,6,6)", data ) ;
     }
 
     private NonFinalComplexClass navigate( NonFinalComplexClass data, int... args ) {
-	NonFinalComplexClass current = data ;
-	for (int x : args) {
-	    Object obj = current.references[x] ;
-	    current = (NonFinalComplexClass)obj ;
-	}
-	return current ;
+    NonFinalComplexClass current = data ;
+    for (int x : args) {
+        Object obj = current.references[x] ;
+        current = (NonFinalComplexClass)obj ;
+    }
+    return current ;
     }
 
     public void testSimulatedIsDirty() {
-	NonFinalComplexClass data = 
-	    NonFinalComplexClass.makeNonFinalComplexClass( 4, 3, 2, 3 ) ;
-	long epoch = 1 ;
-	assertTrue( data.isDirty( epoch++ ) ) ;
-	assertFalse( data.isDirty( epoch++ ) ) ;
-	navigate( data, 2, 2, 1 ).op1() ;
-	assertTrue( data.isDirty( epoch++ ) ) ;
-	assertFalse( data.isDirty( epoch++ ) ) ;
+    NonFinalComplexClass data =
+        NonFinalComplexClass.makeNonFinalComplexClass( 4, 3, 2, 3 ) ;
+    long epoch = 1 ;
+    assertTrue( data.isDirty( epoch++ ) ) ;
+    assertFalse( data.isDirty( epoch++ ) ) ;
+    navigate( data, 2, 2, 1 ).op1() ;
+    assertTrue( data.isDirty( epoch++ ) ) ;
+    assertFalse( data.isDirty( epoch++ ) ) ;
     }
 
     private void testSimulatedIsDirty( NonFinalComplexClass obj, int count ) {
-	boolean result = false ;
-	long epoch = 1 ;
-	for (int ctr=0; ctr<count; ctr++) {
-	    navigate( obj, 2, 2, 1 ).op1() ;
-	    result = result || obj.isDirty( epoch++ ) ;
-	}
+    boolean result = false ;
+    long epoch = 1 ;
+    for (int ctr=0; ctr<count; ctr++) {
+        navigate( obj, 2, 2, 1 ).op1() ;
+        result = result || obj.isDirty( epoch++ ) ;
+    }
     }
 
     private void testSimulatedIsDirty( String msg, NonFinalComplexClass data ) {
-	// Now, do the timing tests 
-	testSimulatedIsDirty( data, WARMUP_COUNT ) ;
+    // Now, do the timing tests
+    testSimulatedIsDirty( data, WARMUP_COUNT ) ;
 
-	long startTime = System.nanoTime() ;
-	testSimulatedIsDirty( data, TEST_COUNT ) ;
-	long stopTime = System.nanoTime() ; ;
-    
+    long startTime = System.nanoTime() ;
+    testSimulatedIsDirty( data, TEST_COUNT ) ;
+    long stopTime = System.nanoTime() ; ;
+
         if (SIMULATED_TIMING) {
-            System.out.println( 
-                "\nTimer per iteration for simulated generated isDirty method on " 
-                + msg + " " 
+            System.out.println(
+                "\nTimer per iteration for simulated generated isDirty method on "
+                + msg + " "
                 + (((float)(stopTime - startTime))/TEST_COUNT)/1000 + " microseconds" ) ;
         }
     }
 
     public void testSimulatedTimingIsDirty() {
-	NonFinalComplexClass data = 
-	    NonFinalComplexClass.makeNonFinalComplexClass( 4, 3, 2, 3 ) ;
-	testSimulatedIsDirty( "tree(4,3,2,3)", data ) ;
+    NonFinalComplexClass data =
+        NonFinalComplexClass.makeNonFinalComplexClass( 4, 3, 2, 3 ) ;
+    testSimulatedIsDirty( "tree(4,3,2,3)", data ) ;
     }
 
 
     interface Copyable {
-	void clear() ;
-	Copyable copy( long copyEpoch ) ;
+    void clear() ;
+    Copyable copy( long copyEpoch ) ;
     }
 
     private static class NonFinalComplexClass implements java.io.Serializable, Copyable {
-	public boolean b1 = false ;
-	protected char c1 = 'D' ;
-	private byte b2 = (byte)3 ;
-	short shrt = (short)-2345 ;
-	public int i1 = 273415 ;
-	protected long l1 = 38958284 ;
-	private float f1 = (float)3.1415926535 ;
-	double d1 = 2.718281828 ;
-	String str1 ;
-	String str2 ;
-	private NonFinalComplexClass obj1 = this ;
-	private NonFinalComplexClass obj2 = obj1 ;
-	public NonFinalComplexClass[] references ;
+    public boolean b1 = false ;
+    protected char c1 = 'D' ;
+    private byte b2 = (byte)3 ;
+    short shrt = (short)-2345 ;
+    public int i1 = 273415 ;
+    protected long l1 = 38958284 ;
+    private float f1 = (float)3.1415926535 ;
+    double d1 = 2.718281828 ;
+    String str1 ;
+    String str2 ;
+    private NonFinalComplexClass obj1 = this ;
+    private NonFinalComplexClass obj2 = obj1 ;
+    public NonFinalComplexClass[] references ;
 
-	// Simulate generated code for copy and dirty check
-	private long epoch = 0 ;
-	private NonFinalComplexClass copy = null ;
-	private boolean isDirty = true ;
+    // Simulate generated code for copy and dirty check
+    private long epoch = 0 ;
+    private NonFinalComplexClass copy = null ;
+    private boolean isDirty = true ;
 
-	// Simulate a mutator method that changes the state
-	public void op1() {
-	    isDirty = true ;
-	    l1++ ;
-	}
+    // Simulate a mutator method that changes the state
+    public void op1() {
+        isDirty = true ;
+        l1++ ;
+    }
 
-	private boolean checkObject( long epoch, Object obj ) {
-	    if (obj instanceof NonFinalComplexClass) {
-		NonFinalComplexClass cc = (NonFinalComplexClass)obj ;
-		return cc.isDirty( epoch ) ;
-	    } else {
-		return false ;
-	    }
-	}
+    private boolean checkObject( long epoch, Object obj ) {
+        if (obj instanceof NonFinalComplexClass) {
+        NonFinalComplexClass cc = (NonFinalComplexClass)obj ;
+        return cc.isDirty( epoch ) ;
+        } else {
+        return false ;
+        }
+    }
 
-	public boolean isDirty( long epochArg ) {
-	    boolean result = isDirty ;
-	    isDirty = false ;
+    public boolean isDirty( long epochArg ) {
+        boolean result = isDirty ;
+        isDirty = false ;
 
-	    if (epochArg == this.epoch) {
-		return result ;
-	    } else {
-		this.epoch = epochArg ;
-		result = checkObject( epochArg, obj1 ) || result ;
-		result = checkObject( epochArg, obj2 ) || result ;
-		if (references != null)
-		    for (int ctr=0; ctr<references.length; ctr++)
-			result = checkObject( epochArg, references[ctr] ) || result ;
-	    }
+        if (epochArg == this.epoch) {
+        return result ;
+        } else {
+        this.epoch = epochArg ;
+        result = checkObject( epochArg, obj1 ) || result ;
+        result = checkObject( epochArg, obj2 ) || result ;
+        if (references != null)
+            for (int ctr=0; ctr<references.length; ctr++)
+            result = checkObject( epochArg, references[ctr] ) || result ;
+        }
 
-	    return result ;
-	}
+        return result ;
+    }
 
-	// Don't use this: extra scan
-	public void clear() {
-	    if (copy != null) {
-		copy = null ;
-		epoch = 0 ;
+    // Don't use this: extra scan
+    public void clear() {
+        if (copy != null) {
+        copy = null ;
+        epoch = 0 ;
 
-		if (this.obj1 != null) 
-		    ((Copyable)this.obj1).clear() ;
+        if (this.obj1 != null)
+            ((Copyable)this.obj1).clear() ;
 
-		if (this.obj2 != null) 
-		    ((Copyable)this.obj2).clear() ;
+        if (this.obj2 != null)
+            ((Copyable)this.obj2).clear() ;
 
-		if (this.references != null) {
-		    for (int ctr=0; ctr<this.references.length; ctr++) {
-			NonFinalComplexClass next = 
-			    (NonFinalComplexClass)this.references[ctr] ;
+        if (this.references != null) {
+            for (int ctr=0; ctr<this.references.length; ctr++) {
+            NonFinalComplexClass next =
+                (NonFinalComplexClass)this.references[ctr] ;
 
-			if (next != null)
-			    next.clear() ;
-		    }
-		}
-	    }
-	}
+            if (next != null)
+                next.clear() ;
+            }
+        }
+        }
+    }
 
-	private Object copyObject( long epoch, Object arg ) {
-	    if (arg == null)
-		return null ;
+    private Object copyObject( long epoch, Object arg ) {
+        if (arg == null)
+        return null ;
 
-	    if (arg instanceof Copyable) {
-		return ((Copyable)arg).copy( epoch ) ;
-	    } else {
-		throw new IllegalArgumentException() ;
-	    }
-	}
+        if (arg instanceof Copyable) {
+        return ((Copyable)arg).copy( epoch ) ;
+        } else {
+        throw new IllegalArgumentException() ;
+        }
+    }
 
-	public Copyable copy( long copyEpoch ) {
-	    if ((copy == null) || (copyEpoch != epoch)) {
-		copy = new NonFinalComplexClass() ;
-		epoch = copyEpoch ;
+    public Copyable copy( long copyEpoch ) {
+        if ((copy == null) || (copyEpoch != epoch)) {
+        copy = new NonFinalComplexClass() ;
+        epoch = copyEpoch ;
 
-		copy.b1 = this.b1 ;
-		copy.c1 = this.c1 ;
-		copy.b2 = this.b2 ;
-		copy.shrt = this.shrt ;
-		copy.i1 = this.i1 ;
-		copy.l1 = this.l1 ;
-		copy.f1 = this.f1 ;
-		copy.d1 = this.d1 ;
-		copy.str1 = this.str1 ;
-		copy.str2 = this.str2 ;
-		copy.obj1 = (NonFinalComplexClass)copyObject( epoch, this.obj1 ) ;
-		copy.obj2 = (NonFinalComplexClass)copyObject( epoch, this.obj2 ) ;
+        copy.b1 = this.b1 ;
+        copy.c1 = this.c1 ;
+        copy.b2 = this.b2 ;
+        copy.shrt = this.shrt ;
+        copy.i1 = this.i1 ;
+        copy.l1 = this.l1 ;
+        copy.f1 = this.f1 ;
+        copy.d1 = this.d1 ;
+        copy.str1 = this.str1 ;
+        copy.str2 = this.str2 ;
+        copy.obj1 = (NonFinalComplexClass)copyObject( epoch, this.obj1 ) ;
+        copy.obj2 = (NonFinalComplexClass)copyObject( epoch, this.obj2 ) ;
 
-		if (this.references == null) {
-		    copy.references = null ;
-		} else {
-		    copy.references = new NonFinalComplexClass[this.references.length] ;
-		    for (int ctr=0; ctr<this.references.length; ctr++) {
-			copy.references[ctr] = (NonFinalComplexClass)copyObject( epoch, 
-			    this.references[ctr] ) ;
-		    }
-		}
-	    }
+        if (this.references == null) {
+            copy.references = null ;
+        } else {
+            copy.references = new NonFinalComplexClass[this.references.length] ;
+            for (int ctr=0; ctr<this.references.length; ctr++) {
+            copy.references[ctr] = (NonFinalComplexClass)copyObject( epoch,
+                this.references[ctr] ) ;
+            }
+        }
+        }
 
-	    return copy ;
-	}
-	// end of simulated generated code
-	
-	// Normally I would define hashCode, but we will not need it here.
-	// Do not use an instance of complexClass as a map key.
+        return copy ;
+    }
+    // end of simulated generated code
 
-	public String toString()
-	{
-	    return "NonFinalComplexClass[" + str2 + "]" ;
-	}
+    // Normally I would define hashCode, but we will not need it here.
+    // Do not use an instance of complexClass as a map key.
 
-	public NonFinalComplexClass( ) {
-	}
+    public String toString()
+    {
+        return "NonFinalComplexClass[" + str2 + "]" ;
+    }
 
-	public NonFinalComplexClass( String name )
-	{
-	    str1 = name ;
-	    str2 = str1 ;
-	}
+    public NonFinalComplexClass( ) {
+    }
 
-	public static NonFinalComplexClass generate( Holder<Integer> index, 
-	    NonFinalComplexClass[] leaves, List<Integer> args ) {
+    public NonFinalComplexClass( String name )
+    {
+        str1 = name ;
+        str2 = str1 ;
+    }
 
-	    NonFinalComplexClass result ;
+    public static NonFinalComplexClass generate( Holder<Integer> index,
+        NonFinalComplexClass[] leaves, List<Integer> args ) {
 
-	    if (args.size() == 0) {
-		int x = index.content() ;
-		result = new NonFinalComplexClass( "leaf" ) ;
-		leaves[x] = result ;
-		index.content( x+1 ) ; 
-	    } else {
-		int first = args.get(0) ;
-		List<Integer> tail = new LinkedList<Integer>( args ) ;
-		tail.remove(0) ;
+        NonFinalComplexClass result ;
 
-		result = new NonFinalComplexClass( 
-		    "Node(" + args + ")" ) ;
-		result.references = new NonFinalComplexClass[first] ;
-		for (int ctr=0; ctr<first; ctr++) {
-		    NonFinalComplexClass cc = generate( index, leaves, tail ) ;
-		    result.references[ctr] = cc ;
-		}
-	    }
+        if (args.size() == 0) {
+        int x = index.content() ;
+        result = new NonFinalComplexClass( "leaf" ) ;
+        leaves[x] = result ;
+        index.content( x+1 ) ;
+        } else {
+        int first = args.get(0) ;
+        List<Integer> tail = new LinkedList<Integer>( args ) ;
+        tail.remove(0) ;
 
-	    return result ;
-	}
+        result = new NonFinalComplexClass(
+            "Node(" + args + ")" ) ;
+        result.references = new NonFinalComplexClass[first] ;
+        for (int ctr=0; ctr<first; ctr++) {
+            NonFinalComplexClass cc = generate( index, leaves, tail ) ;
+            result.references[ctr] = cc ;
+        }
+        }
 
-	public static NonFinalComplexClass makeNonFinalComplexClass( int... args ) {
-	    int size = 1 ;
-	    List<Integer> sizes = new LinkedList<Integer>() ;
-	    for (int x : args) {
-		sizes.add( x ) ;
-		size *= x ;
-	    }
+        return result ;
+    }
 
-	    Holder<Integer> ccsIndex = new Holder<Integer>( 0 ) ;
-	    NonFinalComplexClass[] ccs = new NonFinalComplexClass[size] ;
+    public static NonFinalComplexClass makeNonFinalComplexClass( int... args ) {
+        int size = 1 ;
+        List<Integer> sizes = new LinkedList<Integer>() ;
+        for (int x : args) {
+        sizes.add( x ) ;
+        size *= x ;
+        }
 
-	    NonFinalComplexClass res = generate( ccsIndex, ccs, sizes ) ;
+        Holder<Integer> ccsIndex = new Holder<Integer>( 0 ) ;
+        NonFinalComplexClass[] ccs = new NonFinalComplexClass[size] ;
 
-	    for (int ctr=0; ctr<size; ctr++) {
-		ccs[ctr].obj1 = ccs[size-ctr-1] ;
-	    }
+        NonFinalComplexClass res = generate( ccsIndex, ccs, sizes ) ;
 
-	    return res ;
-	}
+        for (int ctr=0; ctr<size; ctr++) {
+        ccs[ctr].obj1 = ccs[size-ctr-1] ;
+        }
 
-	public static NonFinalComplexClass makeNonFinalComplexClass(String str )
-	{
-	    return new NonFinalComplexClass( str ) ;
-	}
+        return res ;
+    }
 
-	public static NonFinalComplexClass makeNonFinalComplexClassAliasedArray(String str )
-	{
-	    int num = 5 ;
-	    NonFinalComplexClass[] classes = new NonFinalComplexClass[ num ] ;
+    public static NonFinalComplexClass makeNonFinalComplexClass(String str )
+    {
+        return new NonFinalComplexClass( str ) ;
+    }
 
-	    for (int ctr = 0; ctr<num; ctr++ ) {
-		classes[ctr] = makeNonFinalComplexClass( str + ":member " + ctr ) ;
-		if (ctr==0) { // 0th classes references all others
-		    classes[ctr].references = new NonFinalComplexClass[num] ;
-		} else { // others reference only 0th, but allocate
-			 // different sizes reference arrays
-		    classes[ctr].references = new NonFinalComplexClass[ctr] ;
-		    classes[ctr].references[0] = classes[0] ;
-		}
+    public static NonFinalComplexClass makeNonFinalComplexClassAliasedArray(String str )
+    {
+        int num = 5 ;
+        NonFinalComplexClass[] classes = new NonFinalComplexClass[ num ] ;
 
-		// Make 0th class reference the others
-		classes[0].references[ctr] = classes[ctr] ;
-	    }
+        for (int ctr = 0; ctr<num; ctr++ ) {
+        classes[ctr] = makeNonFinalComplexClass( str + ":member " + ctr ) ;
+        if (ctr==0) { // 0th classes references all others
+            classes[ctr].references = new NonFinalComplexClass[num] ;
+        } else { // others reference only 0th, but allocate
+             // different sizes reference arrays
+            classes[ctr].references = new NonFinalComplexClass[ctr] ;
+            classes[ctr].references[0] = classes[0] ;
+        }
 
-	    return classes[0] ;
-	}
+        // Make 0th class reference the others
+        classes[0].references[ctr] = classes[ctr] ;
+        }
 
-	public static NonFinalComplexClass makeNonFinalComplexClassGraph()
-	{
-	    int num = 5 ;
-	    NonFinalComplexClass[] classes = new NonFinalComplexClass[ num ] ;
+        return classes[0] ;
+    }
 
-	    for (int ctr = 0; ctr<num; ctr++ ) {
-		classes[ctr] = makeNonFinalComplexClassAliasedArray(
-		    "group " + ctr ) ;
-		if (ctr==0) { // 0th classes references all others
-		    classes[ctr].references = new NonFinalComplexClass[num] ;
-		} else { // others reference only 0th, but allocate
-			 // different sizes reference arrays
-		    classes[ctr].references = new NonFinalComplexClass[ctr] ;
-		    classes[ctr].references[0] = classes[0] ;
-		}
+    public static NonFinalComplexClass makeNonFinalComplexClassGraph()
+    {
+        int num = 5 ;
+        NonFinalComplexClass[] classes = new NonFinalComplexClass[ num ] ;
 
-		// Make 0th class reference the others
-		classes[0].references[ctr] = classes[ctr] ;
-	    }
+        for (int ctr = 0; ctr<num; ctr++ ) {
+        classes[ctr] = makeNonFinalComplexClassAliasedArray(
+            "group " + ctr ) ;
+        if (ctr==0) { // 0th classes references all others
+            classes[ctr].references = new NonFinalComplexClass[num] ;
+        } else { // others reference only 0th, but allocate
+             // different sizes reference arrays
+            classes[ctr].references = new NonFinalComplexClass[ctr] ;
+            classes[ctr].references[0] = classes[0] ;
+        }
 
-	    return classes[0] ;
-	}
+        // Make 0th class reference the others
+        classes[0].references[ctr] = classes[ctr] ;
+        }
+
+        return classes[0] ;
+    }
     }
 
     public  Test makeNonFinalComplexClass()
     {
-	TestSuite ts = makeTestSuite( "testNonFinalComplexClass", new Object[] {
-	    // First test these for correctnesss
-	    makeTest( "testObject" ),
-	    makeTest( "testNonFinalComplexClassArray" ),
-	    makeTest( "testNonFinalComplexClassAliasedArray" ),
-	    makeTest( "testNonFinalComplexClassGraph" ),
-	    makeTest( "testNonFinalComplexClassTree" ),
+    TestSuite ts = makeTestSuite( "testNonFinalComplexClass", new Object[] {
+        // First test these for correctnesss
+        makeTest( "testObject" ),
+        makeTest( "testNonFinalComplexClassArray" ),
+        makeTest( "testNonFinalComplexClassAliasedArray" ),
+        makeTest( "testNonFinalComplexClassGraph" ),
+        makeTest( "testNonFinalComplexClassTree" ),
 
-	    // Then test for timing.
-	    new TimedTest( makeTest( "testTimedObject" ), 1 ), 
-	    new TimedTest( makeTest( "testTimedNonFinalComplexClassArray" ), 1 ), 
-	    new TimedTest( makeTest( "testTimedNonFinalComplexClassAliasedArray" ), 1 ),
-	    new TimedTest( makeTest( "testTimedNonFinalComplexClassGraph" ), 1 ),  
-	    new TimedTest( makeTest( "testTimedNonFinalComplexClassTree" ), 1 ) } 
-	) ;
+        // Then test for timing.
+        new TimedTest( makeTest( "testTimedObject" ), 1 ),
+        new TimedTest( makeTest( "testTimedNonFinalComplexClassArray" ), 1 ),
+        new TimedTest( makeTest( "testTimedNonFinalComplexClassAliasedArray" ), 1 ),
+        new TimedTest( makeTest( "testTimedNonFinalComplexClassGraph" ), 1 ),
+        new TimedTest( makeTest( "testTimedNonFinalComplexClassTree" ), 1 ) }
+    ) ;
 
-	if (usesCDR()) {
-	    TimedTest test = new TimedTest( 
-		makeTest( "testTimedNonFinalComplexClassTreeCDRTiming" ), 1 ) ;
-	    ts.addTest( test ) ;
-	    timedTests.add( test ) ;
-	}
+    if (usesCDR()) {
+        TimedTest test = new TimedTest(
+        makeTest( "testTimedNonFinalComplexClassTreeCDRTiming" ), 1 ) ;
+        ts.addTest( test ) ;
+        timedTests.add( test ) ;
+    }
 
-	return ts ;
+    return ts ;
     }
 
     public  void testNonFinalComplexClassArray()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClass( "FOO" ) ;
-	doStandardTest( data ) ;
+    Object data = NonFinalComplexClass.makeNonFinalComplexClass( "FOO" ) ;
+    doStandardTest( data ) ;
     }
 
     public  void testNonFinalComplexClassAliasedArray()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClassAliasedArray( "BAR" ) ;
-	doStandardTest( data ) ;
+    Object data = NonFinalComplexClass.makeNonFinalComplexClassAliasedArray( "BAR" ) ;
+    doStandardTest( data ) ;
     }
 
     public  void testNonFinalComplexClassGraph()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClassGraph( ) ;
-	doStandardTest( data ) ;
+    Object data = NonFinalComplexClass.makeNonFinalComplexClassGraph( ) ;
+    doStandardTest( data ) ;
     }
 
     public  void testNonFinalComplexClassTree()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES) ;
-	doStandardTest( data ) ;
+    Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES) ;
+    doStandardTest( data ) ;
     }
 
     // Run this first to make sure that HotSpot has a chance to optimize
     // the code.
     public void conditionTimingTests() {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClass( "FOO" ) ;
-	for (int ctr=0; ctr<2000; ctr++) {
+    Object data = NonFinalComplexClass.makeNonFinalComplexClass( "FOO" ) ;
+    for (int ctr=0; ctr<2000; ctr++) {
             copyObject(data);
         }
     }
 
     public void testTimedObject() {
-	Object obj = new Object() ;
-	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+    Object obj = new Object() ;
+    for (int ctr=0; ctr<REP_COUNT; ctr++) {
             copyObject(obj);
         }
     }
 
     public  void testTimedNonFinalComplexClassArray()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClass( "FOO" ) ;
-	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+    Object data = NonFinalComplexClass.makeNonFinalComplexClass( "FOO" ) ;
+    for (int ctr=0; ctr<REP_COUNT; ctr++) {
             copyObject(data);
         }
     }
 
     public  void testTimedNonFinalComplexClassAliasedArray()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClassAliasedArray( "BAR" ) ;
-	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+    Object data = NonFinalComplexClass.makeNonFinalComplexClassAliasedArray( "BAR" ) ;
+    for (int ctr=0; ctr<REP_COUNT; ctr++) {
             copyObject(data);
         }
     }
 
     public  void testTimedNonFinalComplexClassGraph()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClassGraph( ) ;
-	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+    Object data = NonFinalComplexClass.makeNonFinalComplexClassGraph( ) ;
+    for (int ctr=0; ctr<REP_COUNT; ctr++) {
             copyObject(data);
         }
     }
 
     public  void testTimedNonFinalComplexClassTree()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
+    Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
 
-	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+    for (int ctr=0; ctr<REP_COUNT; ctr++) {
             copyObject(data);
         }
     }
 
     public  void testTimedNonFinalComplexClassTreeCDRTiming()
     {
-	Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
+    Object data = NonFinalComplexClass.makeNonFinalComplexClass( TREE_VALUES ) ;
 
-	// Set up timing for CDR.
-	TimerFactory tf = TimerFactoryBuilder.make( "CopyTest",
+    // Set up timing for CDR.
+    TimerFactory tf = TimerFactoryBuilder.make( "CopyTest",
             "TimerFactory for CopyObject test");
-	TimerEventController controller = tf.makeController("copycontroller");
-	Timer top = tf.makeTimer( "top", "Total time spent for making "
-	    + REP_COUNT + " copies of Tree(4 3 2 3)" ) ;
+    TimerEventController controller = tf.makeController("copycontroller");
+    Timer top = tf.makeTimer( "top", "Total time spent for making "
+        + REP_COUNT + " copies of Tree(4 3 2 3)" ) ;
 
-	// Only create the handler after ALL timers are created.
-	StatsEventHandler handler = tf.makeStatsEventHandler( 
-	    "ComplexClassTreeTestStats" ) ;
-	controller.register( handler ) ;
+    // Only create the handler after ALL timers are created.
+    StatsEventHandler handler = tf.makeStatsEventHandler(
+        "ComplexClassTreeTestStats" ) ;
+    controller.register( handler ) ;
 
-	top.enable() ;
-	handler.clear() ;
+    top.enable() ;
+    handler.clear() ;
 
-	controller.enter( top ) ;
+    controller.enter( top ) ;
 
-	// Run the actual timed test
-	for (int ctr=0; ctr<REP_COUNT; ctr++) {
+    // Run the actual timed test
+    for (int ctr=0; ctr<REP_COUNT; ctr++) {
             copyObject(data);
         }
 
-	controller.exit( top ) ;
+    controller.exit( top ) ;
 
-	top.disable() ;
-	
-	// Dump out timing results.
-	// Map<Timer,Statistics> result = handler.stats() ;
-	// TimerUtils.writeHtmlTable( result, "CDRCopyTree4-3-2-3.html",
-	    // "Timing Data for making " + REP_COUNT
-	    // + " copies of Tree(4, 3, 2, 3) using ORBStream copier" ) ;
+    top.disable() ;
+
+    // Dump out timing results.
+    // Map<Timer,Statistics> result = handler.stats() ;
+    // TimerUtils.writeHtmlTable( result, "CDRCopyTree4-3-2-3.html",
+        // "Timing Data for making " + REP_COUNT
+        // + " copies of Tree(4, 3, 2, 3) using ORBStream copier" ) ;
     }
 
     public  void testExternalizableNonStaticContext()
@@ -1781,14 +1802,14 @@ public abstract class Client extends TestCase
     public  void testClassLoader() throws Exception {
 
         TestClassLoader cl = new TestClassLoader(
-	    Thread.currentThread().getContextClassLoader());
+        Thread.currentThread().getContextClassLoader());
         Bar bar = (Bar) cl.loadClass("foo.BarImpl").newInstance();
         doStandardTest(bar);
     }
 
     public  Test makeNonSerializableSuperClass()
     {
-	return makeTestSuite( "testNonSerializableSuperClass", new String[] {
+    return makeTestSuite( "testNonSerializableSuperClass", new String[] {
             "testNonSerializableSuperClass", "testNonSerializableObjectClass"
         } );
     }
@@ -1806,78 +1827,78 @@ public abstract class Client extends TestCase
     enum Color { RED, BLUE, GREEN } ;
 
     public void testEnum() {
-	doImmutableTest( Color.RED ) ;
+    doImmutableTest( Color.RED ) ;
     }
 
     private static class TransientHolder<T> implements Serializable {
-	private transient T contents ;
+    private transient T contents ;
 
-	public TransientHolder( T content ) {
-	    contents = content ;
-	}
+    public TransientHolder( T content ) {
+        contents = content ;
+    }
 
-	public T contents() {
-	    return contents ;
-	}
+    public T contents() {
+        return contents ;
+    }
     }
 
     private static class TestThread extends Thread {
-	private volatile boolean running = true ;
+    private volatile boolean running = true ;
 
-	public void run() {
-	    while (running) {
-		try { 
-		    sleep( 100 ) ;
-		} catch (Exception exx) {}
-	    }
-	}
-
-	public void quit() {
-	    running = false ;
-	}
+    public void run() {
+        while (running) {
+        try {
+            sleep( 100 ) ;
+        } catch (Exception exx) {}
+        }
     }
 
-    // All of these tests should either throw a 
+    public void quit() {
+        running = false ;
+    }
+    }
+
+    // All of these tests should either throw a
     // ReflectiveCopyException OR result in an empty
     // TransientHolder.
     public void testTransientThread() throws Throwable {
-	TransientHolder<Thread> value = 
-	    new TransientHolder<Thread>( new TestThread() ) ;
-	value.contents().start() ;
-	Thread.sleep( 100 ) ;
+    TransientHolder<Thread> value =
+        new TransientHolder<Thread>( new TestThread() ) ;
+    value.contents().start() ;
+    Thread.sleep( 100 ) ;
 
-	TransientHolder result = TransientHolder.class.cast(
-	    copyObject( value, false )) ;
-	assert( result.contents() == null ) ;
+    TransientHolder result = TransientHolder.class.cast(
+        copyObject( value, false )) ;
+    assert( result.contents() == null ) ;
     }
 
     public void testTransientThreadGroup() throws Throwable {
-	TransientHolder<ThreadGroup> value = 
-	    new TransientHolder<ThreadGroup>( new ThreadGroup( "test" )) ;
+    TransientHolder<ThreadGroup> value =
+        new TransientHolder<ThreadGroup>( new ThreadGroup( "test" )) ;
 
-	TransientHolder result = TransientHolder.class.cast(
-	    copyObject( value, false )) ;
-	assert( result.contents() == null ) ;
+    TransientHolder result = TransientHolder.class.cast(
+        copyObject( value, false )) ;
+    assert( result.contents() == null ) ;
     }
 
     /*
     public void testTransientProcess() throws Throwable {
-	TransientHolder<Process> value = 
-	    new TransientHolder<Process>( new Process()) ;
+    TransientHolder<Process> value =
+        new TransientHolder<Process>( new Process()) ;
 
-	TransientHolder result = TransientHolder.class.cast(
-	    copyObject( value, false )) ;
-	assert( result.contents() == null ) ;
+    TransientHolder result = TransientHolder.class.cast(
+        copyObject( value, false )) ;
+    assert( result.contents() == null ) ;
     }
     */
 
     public void testTransientProcessBuilder() throws Throwable {
-	TransientHolder<ProcessBuilder> value = 
-	    new TransientHolder<ProcessBuilder>( new ProcessBuilder("pwd")) ;
+    TransientHolder<ProcessBuilder> value =
+        new TransientHolder<ProcessBuilder>( new ProcessBuilder("pwd")) ;
 
-	TransientHolder result = TransientHolder.class.cast(
-	    copyObject( value, false )) ;
-	assert( result.contents() == null ) ;
+    TransientHolder result = TransientHolder.class.cast(
+        copyObject( value, false )) ;
+    assert( result.contents() == null ) ;
     }
 
     public  void testDynamicProxy() throws Throwable {
@@ -1898,19 +1919,19 @@ public abstract class Client extends TestCase
 
     public  Test makeCopyObjects()
     {
-	return makeTestSuite( "testCopyObjects", new String[] {
+    return makeTestSuite( "testCopyObjects", new String[] {
             "testCopyObjects", "testCopyObjectsAliased"
         } );
     }
 
     public void testCopyObjectsNull()
     {
-	try {
-	    doCopyObjectsTest( null ) ;
-	    fail( "copyObjects did not throw NullPointerException for a null argument" ) ;
-	} catch (NullPointerException npe) {
-	    // success
-	}
+    try {
+        doCopyObjectsTest( null ) ;
+        fail( "copyObjects did not throw NullPointerException for a null argument" ) ;
+    } catch (NullPointerException npe) {
+        // success
+    }
     }
 
 

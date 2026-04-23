@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
+import java.util.List;
 
 /** The interface that an Object must implement in order to support
  * Attributes.  The get and set methods are only for use by the

@@ -10,11 +10,11 @@
 
 package org.glassfish.pfl.basic.algorithm;
 
-import java.lang.annotation.Documented ;
-import java.lang.annotation.Target ;
-import java.lang.annotation.ElementType ;
-import java.lang.annotation.Retention ;
-import java.lang.annotation.RetentionPolicy ;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /** This annotation is applied to a field to indicate that it should
  * not be displayed by ObjectUtility.*ToString.

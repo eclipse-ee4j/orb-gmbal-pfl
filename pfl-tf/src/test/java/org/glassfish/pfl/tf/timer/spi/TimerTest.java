@@ -10,12 +10,12 @@
 
 package org.glassfish.pfl.tf.timer.spi;
 
+import java.util.Map;
+
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Map;
-
-// import corba.framework.TimerUtils ;
+// import corba.framework.TimerUtils;
 
 
 public class TimerTest {

@@ -10,9 +10,8 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.LibraryClassLoader ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.copyobject.spi.LibraryClassLoader;
 
 /** Class used to set and get the global class loader used
  * by the codegen library.  This is maintained in a ThreadLocal

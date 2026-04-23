@@ -16,9 +16,6 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.dynamic.codegen.impl.Statement ;
-import org.glassfish.pfl.dynamic.codegen.impl.Node ;
-
 /**
  *
  * @author ken

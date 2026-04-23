@@ -10,15 +10,15 @@
 
 package org.glassfish.pfl.dynamic.codegen;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.glassfish.pfl.dynamic.codegen.test.Constants_gen;
 import org.glassfish.pfl.dynamic.codegen.test.DefaultPackageTest_gen;
 import org.glassfish.pfl.dynamic.codegen.test.Flow_gen;
 import org.glassfish.pfl.dynamic.codegen.test.MyRemote__Adapter_Simplified_gen;
 import org.glassfish.pfl.dynamic.codegen.test.MyRemote__Adapter_gen;
 import org.glassfish.pfl.dynamic.codegen.test.MyRemote_gen;
-
-import java.util.HashMap;
-import java.util.Map;
 
 // Import all of the code generators that implement ClassGeneratorFactory here.
 // These are used in the tests.

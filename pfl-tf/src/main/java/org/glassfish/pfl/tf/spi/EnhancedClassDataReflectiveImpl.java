@@ -11,9 +11,6 @@
 
 package org.glassfish.pfl.tf.spi;
 
-import org.glassfish.pfl.tf.spi.annotation.MethodMonitorGroup;
-import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
-import org.glassfish.pfl.tf.spi.annotation.Description;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -22,6 +19,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.glassfish.pfl.tf.spi.annotation.Description;
+import org.glassfish.pfl.tf.spi.annotation.InfoMethod;
+import org.glassfish.pfl.tf.spi.annotation.MethodMonitorGroup;
 import org.objectweb.asm.Type;
 
 public class EnhancedClassDataReflectiveImpl extends EnhancedClassDataBase {

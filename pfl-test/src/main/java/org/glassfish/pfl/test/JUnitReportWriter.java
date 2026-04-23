@@ -21,8 +21,7 @@
 package org.glassfish.pfl.test;
 
 import java.io.OutputStream;
-
-import java.util.Properties ;
+import java.util.Properties;
 
 import org.glassfish.pfl.basic.contain.Pair;
 import org.glassfish.pfl.basic.contain.Triple;

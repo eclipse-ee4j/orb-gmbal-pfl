@@ -10,10 +10,10 @@
 
 package org.glassfish.pfl.dynamic.copyobject.impl;
 
-import java.util.Map ;
-import java.util.Iterator ;
+import java.util.Iterator;
+import java.util.Map;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException ;
+import org.glassfish.pfl.dynamic.copyobject.spi.ReflectiveCopyException;
 
 public abstract class DefaultClassCopiers
 {

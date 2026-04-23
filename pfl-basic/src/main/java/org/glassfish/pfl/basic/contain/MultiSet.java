@@ -10,8 +10,8 @@
 
 package org.glassfish.pfl.basic.contain ;
 
-import java.util.Map ;
-import java.util.HashMap ;
+import java.util.HashMap;
+import java.util.Map;
 
 /** A simple abstraction of a MultiSet, that is, a "set" that can contain
  * more than one copy of the same element.  I am implementing only the

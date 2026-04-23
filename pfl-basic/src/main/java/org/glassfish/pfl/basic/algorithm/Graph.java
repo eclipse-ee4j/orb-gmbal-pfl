@@ -10,12 +10,13 @@
 
 package org.glassfish.pfl.basic.algorithm ;
 
-import java.util.List ;
-import java.util.Collection ;
-import java.util.Collections ;
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.ArrayList ;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.glassfish.pfl.basic.func.UnaryFunction;
 
 public class Graph<E> {

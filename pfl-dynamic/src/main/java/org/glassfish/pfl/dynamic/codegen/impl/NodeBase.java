@@ -10,12 +10,10 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.dynamic.codegen.impl.Node ;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.DefaultCopier ;
-import org.glassfish.pfl.dynamic.copyobject.spi.Copy ;
-import org.glassfish.pfl.dynamic.copyobject.spi.CopyType ;
-import org.glassfish.pfl.dynamic.copyobject.spi.CopyInterceptor ;
+import org.glassfish.pfl.dynamic.copyobject.spi.Copy;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyInterceptor;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyType;
+import org.glassfish.pfl.dynamic.copyobject.spi.DefaultCopier;
 
 /** Base class for implementing various kinds of Nodes in the AST.
  * This mainly supports dynamic attributes.  It also supports

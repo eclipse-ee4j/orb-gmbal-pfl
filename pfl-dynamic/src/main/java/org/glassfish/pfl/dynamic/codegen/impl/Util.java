@@ -10,16 +10,14 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.io.PrintStream ;
+import java.io.PrintStream;
+import java.lang.reflect.Modifier;
+import java.util.IdentityHashMap;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.Set ;
-import java.util.Map ;
-import java.util.IdentityHashMap ;
-
-import java.lang.reflect.Modifier ;
-
-import org.glassfish.pfl.dynamic.codegen.spi.Type ;
-import org.glassfish.pfl.dynamic.codegen.spi.Variable ;
+import org.glassfish.pfl.dynamic.codegen.spi.Type;
+import org.glassfish.pfl.dynamic.codegen.spi.Variable;
 
 public final class Util {
     private Util() {}

@@ -10,11 +10,11 @@
 
 package org.glassfish.pfl.basic.fsm ;
 
-import java.util.Collections ;
-import java.util.Map ;
-import java.util.HashMap ;
-import java.util.Set ;
-import java.util.HashSet ;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /** Base class for all states in a StateEngine.  This must be used
 * as the base class for all states in transitions added to a StateEngine.

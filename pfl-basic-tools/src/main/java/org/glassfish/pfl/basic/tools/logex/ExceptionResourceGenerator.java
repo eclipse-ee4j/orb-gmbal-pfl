@@ -10,9 +10,6 @@
 
 package org.glassfish.pfl.basic.tools.logex;
 
-import org.glassfish.pfl.basic.tools.argparser.ArgParser;
-import org.glassfish.pfl.basic.tools.argparser.DefaultValue;
-import org.glassfish.pfl.basic.tools.argparser.Help;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -21,10 +18,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.glassfish.pfl.basic.tools.file.FileWrapper;
-import org.glassfish.pfl.basic.tools.file.Scanner;
+
 import org.glassfish.pfl.basic.logex.ExceptionWrapper;
 import org.glassfish.pfl.basic.logex.WrapperGenerator;
+import org.glassfish.pfl.basic.tools.argparser.ArgParser;
+import org.glassfish.pfl.basic.tools.argparser.DefaultValue;
+import org.glassfish.pfl.basic.tools.argparser.Help;
+import org.glassfish.pfl.basic.tools.file.FileWrapper;
+import org.glassfish.pfl.basic.tools.file.Scanner;
 
 /** Scans a directory looking for class files.  For each class file,
  * if the class file is annotated with ExceptionWrapper, extract the

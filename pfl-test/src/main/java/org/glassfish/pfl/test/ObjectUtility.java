@@ -10,35 +10,34 @@
 
 package org.glassfish.pfl.test ;
 
-import org.glassfish.pfl.basic.reflection.FieldValueHelper;
-
-import java.security.PrivilegedAction;
-import java.security.AccessController;
-import java.security.Permission;
-import java.security.ProtectionDomain;
-import java.security.CodeSource;
-import java.security.Principal;
-import java.security.PermissionCollection;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
-import java.util.Map.Entry;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Enumeration;
-import java.util.Properties;
-import java.util.IdentityHashMap;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.math.BigInteger ;
-import java.math.BigDecimal ;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.security.AccessController;
+import java.security.CodeSource;
+import java.security.Permission;
+import java.security.PermissionCollection;
+import java.security.Principal;
+import java.security.PrivilegedAction;
+import java.security.ProtectionDomain;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
+import java.util.Set;
+
+import org.glassfish.pfl.basic.reflection.FieldValueHelper;
 
 /** General object related utilities.  This class must not depend on
  * generated log wrappers.

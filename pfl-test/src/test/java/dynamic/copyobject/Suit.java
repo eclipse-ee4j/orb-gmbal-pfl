@@ -10,8 +10,8 @@
 
 package dynamic.copyobject ;
 
-import java.io.Serializable;
 import java.io.ObjectStreamException;
+import java.io.Serializable;
 
 public class Suit implements Comparable, Serializable {
 

@@ -10,13 +10,12 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import java.util.List ;
-import java.util.ArrayList ;
-import java.lang.Math ;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.glassfish.pfl.dynamic.copyobject.spi.Copy ;
-import org.glassfish.pfl.dynamic.copyobject.spi.CopyInterceptor ;
-import org.glassfish.pfl.dynamic.copyobject.spi.CopyType ;
+import org.glassfish.pfl.dynamic.copyobject.spi.Copy;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyInterceptor;
+import org.glassfish.pfl.dynamic.copyobject.spi.CopyType;
 
 /** An implementation of the AttributedObject interface.  This implementation
  * supports lazy copying of AttributedObject instances.

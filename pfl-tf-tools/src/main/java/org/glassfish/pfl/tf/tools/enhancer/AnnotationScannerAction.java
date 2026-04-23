@@ -11,9 +11,6 @@
 
 package org.glassfish.pfl.tf.tools.enhancer;
 
-import org.glassfish.pfl.basic.tools.file.FileWrapper;
-import org.glassfish.pfl.basic.tools.file.Scanner;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,11 +18,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.glassfish.pfl.tf.timer.spi.TimingInfoProcessor;
+import org.glassfish.pfl.basic.tools.file.FileWrapper;
+import org.glassfish.pfl.basic.tools.file.Scanner;
 import org.glassfish.pfl.tf.spi.Util;
 import org.glassfish.pfl.tf.spi.annotation.MethodMonitorGroup;
+import org.glassfish.pfl.tf.timer.spi.TimingInfoProcessor;
 import org.objectweb.asm.AnnotationVisitor;
-
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassVisitor;
 import org.objectweb.asm.FieldVisitor;

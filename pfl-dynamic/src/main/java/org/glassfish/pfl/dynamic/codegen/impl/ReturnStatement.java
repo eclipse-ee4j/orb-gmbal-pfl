@@ -10,10 +10,6 @@
 
 package org.glassfish.pfl.dynamic.codegen.impl;
 
-import org.glassfish.pfl.dynamic.codegen.impl.ExpressionInternal ;
-
-import org.glassfish.pfl.dynamic.codegen.impl.StatementBase ;
-
 public final class ReturnStatement extends StatementBase {
     private ExpressionInternal expr ;
 

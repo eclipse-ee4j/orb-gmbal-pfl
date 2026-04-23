@@ -10,19 +10,17 @@
 
 package org.glassfish.pfl.dynamic.codegen.spi;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import org.glassfish.pfl.dynamic.codegen.impl.ExpressionInternal;
-import java.lang.reflect.Modifier ;
-
-import java.io.StringWriter ;
-import java.io.PrintWriter ;
-
-import java.util.List ;
-import java.util.Set ;
-import java.util.HashSet ;
-import java.util.ArrayList ;
-import java.util.Iterator ;
-
-import org.glassfish.pfl.dynamic.copyobject.spi.Immutable ;
+import org.glassfish.pfl.dynamic.copyobject.spi.Immutable;
 
 /** Represents the signature of a method, which is sometimes needed
  * for selecting the correct method. 

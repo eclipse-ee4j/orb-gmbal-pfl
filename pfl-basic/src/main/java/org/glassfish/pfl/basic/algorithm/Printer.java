@@ -10,7 +10,7 @@
 
 package org.glassfish.pfl.basic.algorithm ;
 
-import java.io.PrintStream ;
+import java.io.PrintStream;
 
 /** Manages printing of indented source code.
  * Line numbers start at 1 and increase by 1

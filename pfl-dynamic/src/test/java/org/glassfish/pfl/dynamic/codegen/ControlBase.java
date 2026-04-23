@@ -10,13 +10,13 @@
 
 package org.glassfish.pfl.dynamic.codegen;
 
-import org.glassfish.pfl.basic.contain.Pair;
-import org.glassfish.pfl.basic.func.NullaryFunction;
-import org.glassfish.pfl.basic.reflection.Bridge;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import org.glassfish.pfl.basic.contain.Pair;
+import org.glassfish.pfl.basic.func.NullaryFunction;
+import org.glassfish.pfl.basic.reflection.Bridge;
 
 
 /**
