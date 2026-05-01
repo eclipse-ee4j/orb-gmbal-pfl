@@ -29,7 +29,7 @@
 
     <groupId>org.glassfish.pfl</groupId>
     <artifactId>pfl</artifactId>
-    <version>5.1.1</version>
+    <version>5.1.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Eclipse ORB Primitive Function Library</name>
@@ -64,7 +64,7 @@
         <connection>scm:git:ssh://git@github.com/eclipse-ee4j/orb-gmbal-pfl.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/eclipse-ee4j/orb-gmbal-pfl.git</developerConnection>
         <url>https://github.com/eclipse-ee4j/orb-gmbal-pfl</url>
-        <tag>5.1.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <issueManagement>
